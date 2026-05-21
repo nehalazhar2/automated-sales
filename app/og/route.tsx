@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { SITE_NAME } from '@/lib/site';
 
 export const runtime = 'edge';
-export const contentType = 'image/png';
+
 export const size = { width: 1200, height: 630 };
 
 export async function GET(request: Request) {
