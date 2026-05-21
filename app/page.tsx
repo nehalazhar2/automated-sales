@@ -1,0 +1,211 @@
+import Link from 'next/link';
+import { buildMetadata } from '@/lib/seo';
+import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
+
+export const metadata = buildMetadata({
+  title: 'Pipedrive Consultants & Automation Experts | Automated Sales',
+  description:
+    'Leading Pipedrive Consultants. We help structure Pipedrive and automate your sales processes — CRM, AI, Zapier and ActiveCampaign experts.',
+  path: '/',
+});
+
+const SERVICES = [
+  {
+    icon: '◆',
+    title: 'Marketing and Sales Funnel Development',
+    body:
+      "Although we specialise in Active Campaign and Pipedrive CRM, we're more than implementation experts. We bring our wealth of experience, including Marketing and Sales Directors and Sales Founders to each project. This enables us to develop processes which work from a marketing and sales perspective, whilst also considering implementation possibilities. If you're looking for a Pipedrive Consultant our team of experts are ready to help.",
+  },
+  {
+    icon: '⟲',
+    title: 'Sales Process',
+    body:
+      'We work with organisations to structure end to end sales processes, designed to enable teams to hit ambitious objectives. We do this by understanding your current business, where you are today, and where you want to be. We map logical workflows which enable your team to hit and exceed their targets. Our team is comprised of award winning sales professionals at every organisational size — start-up, corporate or agency.',
+  },
+  {
+    icon: '✦',
+    title: 'Automation Experts',
+    body:
+      "As our name suggests, we're huge advocates for automation. We've integrated and automated countless systems and processes, using Active Campaign Automations, Pipedrive Workflows or third party platforms such as Zapier. Integrating multiple third-party applications greatly enhances functionality. By developing automations to handle repetitive tasks we save your team hours every week.",
+  },
+  {
+    icon: '◑',
+    title: 'Pipedrive, Zapier and Active Campaign Consultancy',
+    body:
+      "Every week, we work with multiple organisations, with many instances of Pipedrive and Active Campaign. This gives our team huge insight into best practice across different sectors. It's likely we've developed, or worked with, businesses in your sector. We can bring this expertise to your organisation.",
+  },
+];
+
+const PROJECTS = [
+  { href: '/automating-lettings-agencys-process/', title: 'Automated Estate Agent', body: 'A Pipedrive and automation rebuild for a UK lettings business.' },
+  { href: '/taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive/', title: 'Pipedrive Pipeline', body: 'Taking an offline lead management process online for a US non-profit.' },
+  { href: '/automating-sales-outreach/', title: 'Pipedrive Expert Workflow', body: 'Multi-channel outreach machine built in Pipedrive, Zapier and ActiveCampaign.' },
+];
+
+const TESTIMONIALS = [
+  {
+    quote:
+      'Pipedrive Consultants did a super job for us! We knew we needed an automated solution for handling incoming leads and we had picked Pipedrive as our platform, but that\'s about all we knew. They helped us think through our current manual lead management system and then took over from there. The milestones were all hit on time and on budget. We will definitely go back to them with any similar project.',
+    who: 'Carlo Franzblau, Electronic Learning Products Inc',
+  },
+  {
+    quote:
+      'Pipedrive Consultants were extremely knowledgable and set-up the CRM without any problems. They were quick to respond to any queries and went out of their way to make sure the project was completed successfully.',
+    who: 'Adam Fox, Insperanto',
+  },
+  {
+    quote:
+      'Automated Sales are absolute lifesavers! They\'ve made the experience with Pipedrive so much better. They\'re professional and get the job done in time. They go above and beyond and are great to also brainstorm ideas with the business.',
+    who: 'Christian, Portfolio Insider',
+  },
+];
+
+export default function HomePage() {
+  return (
+    <>
+      <section className="as-hero">
+        <div className="as-container as-hero-grid">
+          <div>
+            <span className="as-eyebrow">Marketing, Sales and Automation Consultancy</span>
+            <h1>Automated Sales</h1>
+            <p className="as-lead">
+              Our Pipedrive Consultants develop marketing automation, sales systems, business processes and
+              integrations which improve efficiency and drive profit.
+            </p>
+            <div className="as-actions">
+              <Link className="as-btn as-btn-primary" href="/contact-2/">
+                Find out more →
+              </Link>
+              <Link className="as-btn as-btn-secondary" href="/projects/">
+                View recent projects
+              </Link>
+            </div>
+            <div className="as-proof-list">
+              <div className="as-proof-item">Pipedrive Advisory Council member</div>
+              <div className="as-proof-item">Top 30 Global Pipedrive Partner</div>
+              <div className="as-proof-item">200+ Pipedrive projects delivered</div>
+              <div className="as-proof-item">CRM, automation, AI and reporting expertise</div>
+            </div>
+          </div>
+          <div className="as-visual">
+            <div className="as-visual-dark">
+              <div className="as-visual-head">
+                <div>
+                  <p style={{ margin: 0, color: '#cbd5e1', fontSize: 14 }}>Sales system snapshot</p>
+                  <div className="as-visual-title">What gets fixed</div>
+                </div>
+                <div className="as-icon" style={{ background: 'rgba(255,255,255,.1)', margin: 0 }}>↗</div>
+              </div>
+              <div className="as-visual-card"><strong>Pipeline clarity</strong><span>Stages, rules and required data</span></div>
+              <div className="as-visual-card"><strong>Lead response</strong><span>Routing, assignment and SLA follow-up</span></div>
+              <div className="as-visual-card"><strong>Reporting</strong><span>Dashboards leadership can trust</span></div>
+              <div className="as-visual-card"><strong>Automation</strong><span>Less admin and fewer missed steps</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ClientLogos heading="Some of our amazing clients" />
+
+      <section className="as-section">
+        <div className="as-container as-split">
+          <div>
+            <span className="as-eyebrow">Get to know us</span>
+            <h2>The leading marketing and sales automation consultancy.</h2>
+          </div>
+          <div>
+            <p>
+              As the leading marketing and sales automation consultancy we develop marketing funnels, sales
+              workflows and business automations that save time whilst maximising profit. We understand the
+              pressures facing sales professionals today and make it our priority to deliver processes and
+              systems which achieve and exceed your targets. We work with businesses of all sizes, from all
+              over the globe.
+            </p>
+            <p style={{ marginTop: 16 }}>
+              <Link className="as-btn as-btn-secondary" href="/about-2/">Learn more →</Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="as-section as-section-muted">
+        <div className="as-container">
+          <span className="as-eyebrow">Our Services</span>
+          <h2>Everything you need to run a modern sales system.</h2>
+          <div className="as-grid-2" style={{ marginTop: 40 }}>
+            {SERVICES.map((s) => (
+              <article key={s.title} className="as-card">
+                <div className="as-icon">{s.icon}</div>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </article>
+            ))}
+          </div>
+          <div className="as-actions" style={{ justifyContent: 'center', marginTop: 40 }}>
+            <Link className="as-btn as-btn-primary" href="/contact-2/">Talk to us today →</Link>
+          </div>
+        </div>
+      </section>
+
+      <ClientLogos heading="Technologies we integrate" logos={TECH_LOGOS} speed={30} />
+
+      <section className="as-section as-section-muted">
+        <div className="as-container">
+          <span className="as-eyebrow">Recent projects</span>
+          <h2>A sample of recent work.</h2>
+          <div className="as-grid-3" style={{ marginTop: 40 }}>
+            {PROJECTS.map((p) => (
+              <article key={p.href} className="as-card">
+                <span className="as-tag">Case study</span>
+                <h3><Link href={p.href}>{p.title}</Link></h3>
+                <p>{p.body}</p>
+                <p style={{ marginTop: 16 }}>
+                  <Link className="as-btn as-btn-secondary" href={p.href}>Read more →</Link>
+                </p>
+              </article>
+            ))}
+          </div>
+          <div className="as-actions" style={{ justifyContent: 'center', marginTop: 32 }}>
+            <Link className="as-btn as-btn-secondary" href="/projects/">View more →</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="as-section">
+        <div className="as-container">
+          <span className="as-eyebrow">Testimonials</span>
+          <h2>What clients say.</h2>
+          <div className="as-testimonials">
+            {TESTIMONIALS.map((t) => (
+              <article key={t.who} className="as-card">
+                <div className="as-stars">★★★★★</div>
+                <p style={{ marginTop: 12 }}>{t.quote}</p>
+                <p style={{ marginTop: 16, fontWeight: 800, color: 'var(--slate-700)' }}>{t.who}</p>
+              </article>
+            ))}
+          </div>
+          <div className="as-actions" style={{ justifyContent: 'center', marginTop: 32 }}>
+            <Link className="as-btn as-btn-secondary" href="/testimonials/">More testimonials →</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="as-cta">
+        <div className="as-container">
+          <div className="as-cta-box">
+            <span className="as-eyebrow dark">Ready when you are</span>
+            <h2>Get a sales system that works as hard as your team does.</h2>
+            <p>
+              Book a 30-minute CRM audit. We will look at your Pipedrive (or current CRM), your sales process
+              and your tooling, and tell you what to fix first.
+            </p>
+            <div className="as-actions" style={{ justifyContent: 'center', marginTop: 32 }}>
+              <Link className="as-btn as-btn-primary" href="/contact-2/">Book a CRM audit →</Link>
+              <Link className="as-btn as-btn-secondary" href="/projects/">See recent projects</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

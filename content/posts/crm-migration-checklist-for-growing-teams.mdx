@@ -1,0 +1,53 @@
+---
+title: "CRM migration checklist for growing teams"
+description: "A pragmatic checklist for migrating CRMs — what to bring, what to leave behind, and how to keep reporting and automations alive through the cutover."
+date: "2024-12-08"
+category: "CRM"
+author: "Automated Sales"
+---
+
+Most CRM migrations fail in the same way: someone exports everything, imports everything, and discovers six months later that 40% of the data is junk and the automations were never rebuilt. Here is the checklist we run on every migration.
+
+## Before the migration
+
+**Decide what to bring.** Not every contact, deal or activity is worth migrating. Set a cutoff (e.g. "won/lost in the last 24 months") and audit the rest.
+
+**Define the data model.** What is a contact, a company, a deal in the new system? Do not assume the old model maps cleanly.
+
+**Map the fields.** Build a spreadsheet: old field → new field → transformation. This is the single most important artifact in the project.
+
+**Identify the automations.** List every Zap, workflow and integration. For each one: keep, rebuild, or kill.
+
+## During the migration
+
+**Run a dry-run.** Migrate 5% of records into a sandbox. Spot-check every record type. Fix the mapping. Repeat.
+
+**Cut over on a low-traffic day.** Friday afternoon UK time has worked well for us. Most reps can absorb a weekend of frozen reporting; nobody can absorb a Tuesday outage.
+
+**Freeze writes.** During the migration window, the old CRM is read-only. Communicate this loudly.
+
+**Have a rollback plan.** Even if you never use it.
+
+## After the migration
+
+**Reconcile.** Counts of contacts, companies, deals, activities — old vs new. Differences are usually fine, but they should be explainable.
+
+**Run the automations.** All of them. Watch them for a week.
+
+**Rebuild reporting.** Old dashboards rarely port cleanly. Plan a week of dashboard work post-cutover.
+
+**Train the team.** New CRM means new habits. Plan one structured training session and at least two "office hours" follow-ups.
+
+## What we leave behind
+
+A few things we deliberately do not migrate:
+
+- Contacts with no activity in 24+ months
+- Deals stuck in "qualifying" for more than 6 months (these are dead)
+- Free-text fields that nobody ever queries
+- Custom fields used by fewer than 5% of records
+- Tags that have not been touched in a year
+
+Pipedrive (or any CRM) gets faster, leaner and more useful when it stops carrying historical baggage.
+
+Migrating soon? [Tell us where you are coming from and where you are going](/contact-2/) — we will sense-check the plan.
