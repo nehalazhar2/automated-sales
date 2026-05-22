@@ -12,6 +12,7 @@ export type PostFrontmatter = {
   category?: string;
   author?: string;
   draft?: boolean;
+  noIndex?: boolean;
 };
 
 export type PostRecord = {

@@ -30,14 +30,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${SITE_URL}/${p.slug}/`,
     lastModified: new Date(p.frontmatter.updated || p.frontmatter.date),
     changeFrequency: 'monthly',
-    priority: 0.7,
+    priority: p.frontmatter.noIndex ? 0.3 : 0.7,
   }));
 
   const caseStudyEntries: MetadataRoute.Sitemap = getAllCaseStudies().map((p) => ({
     url: `${SITE_URL}/${p.slug}/`,
     lastModified: new Date(p.frontmatter.updated || p.frontmatter.date),
     changeFrequency: 'monthly',
-    priority: 0.7,
+    priority: p.frontmatter.noIndex ? 0.3 : 0.7,
   }));
 
   return [...staticEntries, ...postEntries, ...caseStudyEntries];

@@ -1,6 +1,7 @@
 import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
+import RecentProjects from '@/components/RecentProjects';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
@@ -124,6 +125,29 @@ export default function Page() {
       </section>
 
       <ClientLogos heading="Technologies we integrate" logos={TECH_LOGOS} speed={30} />
+
+      <RecentProjects
+        projects={[
+          {
+            slug: 'increasing-sales-for-a-high-tech-high-growth-startup',
+            title: 'Pipedrive launch in 2 weeks',
+            body: 'Full Pipedrive implementation for a Los Angeles fintech — data cleansing, dedupe, timezone formulas and a sales dashboard built against an aggressive deadline.',
+            image: '/images/projects/data-import.jpeg',
+          },
+          {
+            slug: 'taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive',
+            title: 'Offline to Pipedrive',
+            body: 'A US non-profit moved off spreadsheets onto Pipedrive — every awareness, qualification and tablet-shipment step automated against the right deal.',
+            image: '/images/projects/pipeline.jpeg',
+          },
+          {
+            slug: 'automating-lettings-agencys-process',
+            title: 'Automated lettings pipeline',
+            body: 'End-to-end Pipedrive automation for a fast-growing Canadian lettings agency — saving them an entire FTE.',
+            image: '/images/projects/lettings-agent.png',
+          },
+        ]}
+      />
 
       <section className="as-section">
         <div className="as-container">

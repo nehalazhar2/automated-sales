@@ -1,0 +1,72 @@
+---
+title: "Automating a Letting Agency's entire viewing process using multiple platforms"
+description: "How we automated Hanlyn Property Maintenance's tenant scheduling process end-to-end across Facebook, Google Forms, Calendly, Zapier and Pipedrive — saving them an FTE."
+date: "2022-04-15"
+category: "Case study"
+author: "Automated Sales"
+ogImage: "/images/projects/lettings-agent.png"
+---
+
+## Overview
+
+Hanlyn Property Maintenance are a fast growing lettings and property maintenance company based in Hamilton, Canada.
+
+They initially approached us as they'd recently implemented Pipedrive and were looking for assistance in structuring the CRM to meet their needs. They also considered there may be some aspects of Pipedrive that could be automated to help reduce their time spent on admin tasks.
+
+Learn how we automated their entire tenant scheduling process, helping them scale exponentially.
+
+## The Challenge
+
+Hanlyn PM were new to CRM, having traditionally managed processes using a combination of Excel or even paper. Having not used a CRM system previously the team were unaware of how they should best use the system and what was possible.
+
+As a fast growing company the volume of leads was increasing rapidly, at this stage it was becoming impossible to effectively respond to all enquiries without bringing on additional team members to manage client communication. They needed a way to effectively manage their lead flow process whilst ensuring their team could dedicate their time to the most valuable tasks, namely conducting property viewings and maintenance.
+
+## The Approach
+
+As with all partners, we started with an initial Zoom meeting where the Hanlyn team talked us through their current process. This included where they advertise properties (Facebook Marketplace and a lettings syndicate program called RentSync), the challenges with reviewing and approving prospects (many prospective tenants don't pass their qualification criteria — salary, pets, move in dates etc), how they then scheduled viewings with approved potential tenants (they'd recently started using Calendly and this was working well) and how the team would view important management information (they couldn't).
+
+After this discussion we went away and mapped the process at high level to ensure our understanding of their current process was correct. We then used this map to identify areas of improvement and areas we could automate. Although Hanlyn had originally reached out to us for help specifically with Pipedrive we were confident we could automate a huge amount of their process by automating aspects of Pipedrive in combination with other tools.
+
+We proposed building a bespoke solution to automate their entire process from prospective tenant enquiry through to qualifying tenants in or out, automating scheduling and moving deals through Pipedrive based on tenant activity and giving management the insights they needed. The approach would contain multiple moving parts but would save the team a vast amount of manual time and save a huge amount of $ which would be lost on time spent managing the process.
+
+The solution we proposed included setup, integration and automation of the following platforms:
+
+- Facebook
+- Autoresponder.AI
+- Outlook Email
+- Google Forms
+- Google Sheets
+- [Zapier](/zapier-consultants/)
+- Calendly
+- [Pipedrive Workflows](/pipedrive-consultant/)
+
+### Implementation Details
+
+Once in project we encountered a challenge with the initial auto-responder from Facebook. Whilst Facebook allows autoresponders from Business Pages, Hanlyn uses a personal Facebook page to manage their lettings. With such a vast number of rentals listed on their current page it would have been time prohibitive to migrate these properties to a business page, even if this had been possible, Hanlyn preferred to keep the listings on their personal page. Keeping the listings on the personal page could have derailed the initial phase of the automated workflow — through our initial research it was not possible to incorporate any type of autoresponder within personal pages.
+
+This initial auto-response was key to driving enquiries via Facebook Messenger (one of Hanlyn's key drivers of enquiries), so we needed to find a solution. That solution came in the form of Autoresponder.ai — this is an Android only app which can be configured to auto-respond to Android Push Notifications. As it doesn't technically respond to the direct Messenger messages (just the push notifications) we were able to configure this to work around the limitations of Facebook. Although the team at Hanlyn use Apple devices they acquired an inexpensive Android phone, we collaboratively configured the device and app to send automated messages to Messenger enquires related to property viewings.
+
+Now when a prospective tenant enquires via FB Messenger they are sent an auto-response including the Google Form we created, and from that point enter the automated process. The Android phone is left in the office running automatically with no maintenance required.
+
+In addition to enquiries received via FB Messenger, Hanlyn also receive enquiries via RentSync, a platform that posts listing to multiple rental websites. We were able to configure RentSync to send auto-response emails for rental enquiries, these emails also contained links to the same Google Form.
+
+When prospective tenants receive the Google Form they complete the form and click submit. From here we designed logic using Zapier Paths, if the tenant provides answers that would not qualify them for a viewing they are sent an email thanking them for their submission and informing them they were unsuccessful on this application whilst providing steps to take when their circumstances change. If however the tenant provides answers Hanlyn consider to qualify them for viewings an automation then creates the Person and Deal in Pipedrive. The Deal is entered into a first stage Pipeline called 'Qualified', the automation also updates custom fields in Pipedrive to show their answers to questions — this allows the team to filter tenants based on various criteria in the future.
+
+Once the contact and deal is created in Pipedrive, an automated email is sent to the tenant, this email informs them they have passed qualification and are able to book a viewing at any available property. The email contains a link to Hanlyn's Calendly account which lists all available properties and the available viewing times.
+
+The tenant then schedules a viewing at a time convenient for themselves. Once scheduled, Calendly sends them a calendar invite and emails and SMS's prior to the viewing to ensure a reduction in no-shows.
+
+An automation then appends the Calendly booking to the deal in Pipedrive and moves the Deal to the stage 'Viewing Scheduled', this also creates an Activity for the relevant lettings agent and adds it to their calendar.
+
+Reports created in Insights now show the management team how many qualified tenants they're receiving each month, how many of those go on to actually book viewings and identify areas for improvement.
+
+## Results
+
+- We've been able to automate a process which previously required a full time member of staff to manage, effectively saving Hanlyn 1× FTE salary.
+- The process ensures Hanlyn can continue to scale to levels previously unmanageable.
+- The team are now free to spend time doing the tasks that generate revenue — more time running viewings than admin.
+- Prospective tenants can now book their own viewing times saving any back/forth between them and the lettings agent.
+- Prospective tenants now receive instant feedback on if they've been successful and next steps if not.
+- Huge reduction in 'no shows' as tenants are sent reminders 24hrs and 2hrs before viewings.
+- The automated process makes it impossible for enquiries to 'slip through the cracks'.
+- Hanlyn are now fielding hundreds of enquiries daily.

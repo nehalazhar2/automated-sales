@@ -2,6 +2,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getAllCaseStudies } from '@/lib/mdx';
 
 export const metadata = buildMetadata({
@@ -42,6 +43,17 @@ export default function Page() {
             <div className="as-grid-2" style={{ marginTop: 40 }}>
               {studies.map((s) => (
                 <article key={s.slug} className="as-card">
+                  {s.frontmatter.ogImage && (
+                    <Link href={`/${s.slug}/`} className="as-card-image">
+                      <Image
+                        src={s.frontmatter.ogImage}
+                        alt={s.frontmatter.title}
+                        width={1000}
+                        height={750}
+                        sizes="(max-width:700px) 100vw, 500px"
+                      />
+                    </Link>
+                  )}
                   <span className="as-tag">{s.frontmatter.category || 'Case study'}</span>
                   <h3><Link href={`/${s.slug}/`}>{s.frontmatter.title}</Link></h3>
                   <p>{s.frontmatter.description}</p>

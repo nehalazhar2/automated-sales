@@ -1,6 +1,7 @@
 import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
+import RecentProjects from '@/components/RecentProjects';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
@@ -120,6 +121,29 @@ export default function Page() {
       </section>
 
       <ClientLogos heading="Technologies we integrate" logos={TECH_LOGOS} speed={30} />
+
+      <RecentProjects
+        projects={[
+          {
+            slug: 'building-email-journeys-using-active-campaign',
+            title: 'Lifecycle email journeys',
+            body: 'Onboarding, activation, nurture and renewal journeys in ActiveCampaign — synced to Pipedrive so sales and marketing report on the same numbers.',
+            image: '/images/projects/data-import.jpeg',
+          },
+          {
+            slug: 'automating-sales-outreach',
+            title: 'Multi-channel outreach',
+            body: 'ActiveCampaign sequences powering a multi-channel outreach machine, with guardrails so contacts never get two competing messages.',
+            image: '/images/projects/outreach.png',
+          },
+          {
+            slug: 'automating-lettings-agencys-process',
+            title: 'Automated lettings communications',
+            body: 'Email automations for qualification, viewing reminders and follow-up — integrated with Pipedrive and the rest of the lettings stack.',
+            image: '/images/projects/lettings-agent.png',
+          },
+        ]}
+      />
 
       <section className="as-section">
         <div className="as-container">

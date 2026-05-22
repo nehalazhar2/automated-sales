@@ -1,6 +1,7 @@
 import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
+import RecentProjects from '@/components/RecentProjects';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
@@ -97,6 +98,29 @@ export default function Page() {
       </section>
 
       <ClientLogos heading="Technologies we integrate" logos={TECH_LOGOS} speed={30} />
+
+      <RecentProjects
+        projects={[
+          {
+            slug: 'automating-lettings-agencys-process',
+            title: 'Automated lettings pipeline',
+            body: 'Zapier orchestrating Facebook Messenger, Autoresponder.AI, Google Forms, Calendly and Pipedrive — end-to-end tenant enquiry automation.',
+            image: '/images/projects/lettings-agent.png',
+          },
+          {
+            slug: 'taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive',
+            title: 'Offline to automated',
+            body: 'Zapier moved a US non-profit off spreadsheets and into a fully automated lead-to-tablet-shipment workflow.',
+            image: '/images/projects/pipeline.jpeg',
+          },
+          {
+            slug: 'automating-sales-outreach',
+            title: 'Multi-channel outreach',
+            body: 'A Zapier-driven outreach machine across Pipedrive, ActiveCampaign and the rest of the sales stack — 3.4× volume at flat headcount.',
+            image: '/images/projects/outreach.png',
+          },
+        ]}
+      />
 
       <section className="as-section">
         <div className="as-container">

@@ -7,7 +7,7 @@ Next.js 15 rebuild of automated-sales.com. App Router, TypeScript, MDX, Vercel.
 - **Next.js 15** App Router, static export per page (SSG) for instant TTFB.
 - **TypeScript** strict mode.
 - **MDX** for blog posts and case studies (`content/posts/`, `content/case-studies/`).
-- **Nodemailer** for the contact form (Server Action → cPanel SMTP).
+- **Resend** for the contact form (Server Action → Resend API).
 - **Inter** via `next/font/google` (matches the original design).
 - **No CSS framework** — the original `style.css` is ported verbatim into `app/globals.css`. Every `.as-*` class still works.
 
@@ -54,7 +54,7 @@ lib/
   site.ts                    SITE_URL, SITE_NAME, NAV, FOOTER_LINKS
   seo.ts                     buildMetadata() helper used by every page
   mdx.ts                     MDX loader with frontmatter
-  mailer.ts                  Nodemailer transport (Node runtime only)
+  mailer.ts                  Resend SDK wrapper (Node runtime only)
 public/
   images/                    Place WP images here (logo, hero, client logos)
   og/default.png             Static fallback OG image (replace with branded asset)
@@ -112,17 +112,29 @@ The fastest way: visit the live URL, copy the article body, paste into a new `.m
 
 ## Contact form
 
-The form on `/contact-2/` posts to a Server Action (`app/contact-2/actions.ts`) which calls `lib/mailer.ts` (Nodemailer). Required env vars:
+The form on `/contact-2/` posts to a Server Action (`app/contact-2/actions.ts`) which calls `lib/mailer.ts` (Resend SDK). Required env vars:
 
 ```
-SMTP_HOST=mail.automated-sales.com    # or whatever cPanel gives you
-SMTP_PORT=465
-SMTP_SECURE=true                       # false for STARTTLS on 587
-SMTP_USER=contact@automated-sales.com
-SMTP_PASS=…
-SMTP_FROM="Automated Sales Website <contact@automated-sales.com>"
-CONTACT_TO=hello@automated-sales.com   # where enquiries are delivered
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
+CONTACT_TO=hello@automated-sales.com
+CONTACT_FROM="Automated Sales <onboarding@resend.dev>"
 ```
+
+Setup (one-time, ~2 minutes):
+
+1. Sign up at [resend.com](https://resend.com) (free tier: 100 emails/day, no credit card).
+2. Go to **API Keys** → create a new key with full access.
+3. Paste it into `.env.local` (dev) and Vercel project env vars (prod).
+4. Set `CONTACT_TO` to whatever inbox should receive enquiries.
+
+The default `CONTACT_FROM` uses Resend's own verified domain (`onboarding@resend.dev`) so this works immediately with no domain setup. Replies from your team's inbox go directly to the prospect because the Server Action sets `Reply-To` to the prospect's email — so it behaves exactly like a normal contact form.
+
+When you're ready to send from your own domain (`hello@automated-sales.com`):
+
+1. In Resend, go to **Domains** → add `automated-sales.com`.
+2. Add the DNS records Resend provides (SPF, DKIM, optional DMARC) to your domain.
+3. Wait for verification (usually < 15 minutes).
+4. Update `CONTACT_FROM` to `"Automated Sales <hello@automated-sales.com>"` in Vercel.
 
 Honeypot field + in-memory rate limit (5 submissions / minute / IP). For higher traffic switch the rate limiter to `@vercel/kv`.
 

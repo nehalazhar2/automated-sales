@@ -1,5 +1,6 @@
 import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
+import RecentProjects from '@/components/RecentProjects';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
@@ -43,6 +44,27 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <RecentProjects
+        projects={[
+          {
+            slug: 'rw-invest-ai',
+            title: 'AI inside a property investment sales team',
+            body: 'Call transcription, intent scoring and AI-assisted drafting embedded into the CRM — without breaking the brand voice or compliance posture.',
+          },
+          {
+            slug: 'safer-group-ai',
+            title: 'AI in a regulated environment',
+            body: 'Narrow AI agents and transcription introduced into a regulated sales process, with audit trails and a human in the loop where decisions touch a customer.',
+          },
+          {
+            slug: 'automating-sales-outreach',
+            title: 'AI-assisted outreach at scale',
+            body: 'Subject-line and first-line drafting plus AI call summaries feeding Pipedrive — 3.4× outreach volume at flat headcount, brand voice intact.',
+            image: '/images/projects/outreach.png',
+          },
+        ]}
+      />
 
       <CtaBox
         heading="Where could AI actually help your sales team?"

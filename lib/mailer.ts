@@ -1,26 +1,15 @@
 import 'server-only';
-import nodemailer, { type Transporter } from 'nodemailer';
+import { Resend } from 'resend';
 
-let cached: Transporter | null = null;
+let cached: Resend | null = null;
 
-function getTransport(): Transporter {
+function getClient(): Resend {
   if (cached) return cached;
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const secure = (process.env.SMTP_SECURE || 'true').toLowerCase() === 'true';
-
-  if (!host || !user || !pass) {
-    throw new Error('SMTP env vars missing (SMTP_HOST, SMTP_USER, SMTP_PASS)');
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    throw new Error('RESEND_API_KEY is missing');
   }
-
-  cached = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: { user, pass },
-  });
+  cached = new Resend(key);
   return cached;
 }
 
@@ -33,9 +22,14 @@ export type ContactPayload = {
 };
 
 export async function sendContactEmail(payload: ContactPayload) {
-  const transport = getTransport();
-  const to = process.env.CONTACT_TO || process.env.SMTP_USER!;
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER!;
+  const resend = getClient();
+  const to = process.env.CONTACT_TO;
+  if (!to) throw new Error('CONTACT_TO is missing');
+
+  // Default sender uses Resend's own verified domain so this works without
+  // owning a verified domain. Once you verify automated-sales.com in Resend,
+  // set CONTACT_FROM in env to e.g. "Automated Sales <hello@automated-sales.com>".
+  const from = process.env.CONTACT_FROM || 'Automated Sales <onboarding@resend.dev>';
 
   const lines = [
     `Name:    ${payload.name}`,
@@ -44,13 +38,17 @@ export async function sendContactEmail(payload: ContactPayload) {
     payload.service ? `Service: ${payload.service}` : null,
     '',
     payload.message,
-  ].filter(Boolean);
+  ].filter(Boolean) as string[];
 
-  await transport.sendMail({
-    to,
+  const { error } = await resend.emails.send({
     from,
+    to: [to],
     replyTo: `${payload.name} <${payload.email}>`,
     subject: `Automated Sales website enquiry — ${payload.name}`,
     text: lines.join('\n'),
   });
+
+  if (error) {
+    throw new Error(`Resend send failed: ${error.message}`);
+  }
 }

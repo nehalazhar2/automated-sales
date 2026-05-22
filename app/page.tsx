@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { buildMetadata } from '@/lib/seo';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
 
@@ -37,26 +38,47 @@ const SERVICES = [
 ];
 
 const PROJECTS = [
-  { href: '/automating-lettings-agencys-process/', title: 'Automated Estate Agent', body: 'A Pipedrive and automation rebuild for a UK lettings business.' },
-  { href: '/taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive/', title: 'Pipedrive Pipeline', body: 'Taking an offline lead management process online for a US non-profit.' },
-  { href: '/automating-sales-outreach/', title: 'Pipedrive Expert Workflow', body: 'Multi-channel outreach machine built in Pipedrive, Zapier and ActiveCampaign.' },
+  {
+    href: '/automating-lettings-agencys-process/',
+    title: 'Automated Estate Agent',
+    body: 'A Pipedrive and automation rebuild for a UK lettings business.',
+    image: '/images/projects/lettings-agent.png',
+  },
+  {
+    href: '/taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive/',
+    title: 'Pipedrive Pipeline',
+    body: 'Taking an offline lead management process online for a US non-profit.',
+    image: '/images/projects/pipeline.jpeg',
+  },
+  {
+    href: '/automating-sales-outreach/',
+    title: 'Pipedrive Expert Workflow',
+    body: 'Multi-channel outreach machine built in Pipedrive, Zapier and ActiveCampaign.',
+    image: '/images/projects/outreach.png',
+  },
 ];
 
 const TESTIMONIALS = [
   {
     quote:
       'Pipedrive Consultants did a super job for us! We knew we needed an automated solution for handling incoming leads and we had picked Pipedrive as our platform, but that\'s about all we knew. They helped us think through our current manual lead management system and then took over from there. The milestones were all hit on time and on budget. We will definitely go back to them with any similar project.',
-    who: 'Carlo Franzblau, Electronic Learning Products Inc',
+    name: 'Carlo Franzblau',
+    role: 'Electronic Learning Products Inc',
+    avatar: '/images/avatars/carlo.png',
   },
   {
     quote:
       'Pipedrive Consultants were extremely knowledgable and set-up the CRM without any problems. They were quick to respond to any queries and went out of their way to make sure the project was completed successfully.',
-    who: 'Adam Fox, Insperanto',
+    name: 'Adam Fox',
+    role: 'Insperanto',
+    avatar: '/images/avatars/adam.png',
   },
   {
     quote:
       'Automated Sales are absolute lifesavers! They\'ve made the experience with Pipedrive so much better. They\'re professional and get the job done in time. They go above and beyond and are great to also brainstorm ideas with the business.',
-    who: 'Christian, Portfolio Insider',
+    name: 'Christian',
+    role: 'Portfolio Insider',
+    avatar: '/images/avatars/christian.jpeg',
   },
 ];
 
@@ -156,6 +178,9 @@ export default function HomePage() {
           <div className="as-grid-3" style={{ marginTop: 40 }}>
             {PROJECTS.map((p) => (
               <article key={p.href} className="as-card">
+                <Link href={p.href} className="as-card-image">
+                  <Image src={p.image} alt={p.title} width={1000} height={750} sizes="(max-width:700px) 100vw, 400px" />
+                </Link>
                 <span className="as-tag">Case study</span>
                 <h3><Link href={p.href}>{p.title}</Link></h3>
                 <p>{p.body}</p>
@@ -177,10 +202,18 @@ export default function HomePage() {
           <h2>What clients say.</h2>
           <div className="as-testimonials">
             {TESTIMONIALS.map((t) => (
-              <article key={t.who} className="as-card">
+              <article key={t.name} className="as-card">
                 <div className="as-stars">★★★★★</div>
                 <p style={{ marginTop: 12 }}>{t.quote}</p>
-                <p style={{ marginTop: 16, fontWeight: 800, color: 'var(--slate-700)' }}>{t.who}</p>
+                <div className="as-attribution">
+                  <div className="as-avatar">
+                    <Image src={t.avatar} alt={t.name} width={88} height={88} />
+                  </div>
+                  <div>
+                    <div className="as-attribution-name">{t.name}</div>
+                    <div className="as-attribution-role">{t.role}</div>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
