@@ -105,6 +105,31 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
           />
         </div>
+
+        {isCaseStudy && (
+          <aside
+            style={{
+              marginTop: 56,
+              padding: 28,
+              background: 'var(--slate-50)',
+              border: '1px solid var(--slate-200)',
+              borderRadius: 24,
+            }}
+          >
+            <span className="as-eyebrow" style={{ marginBottom: 12 }}>Get help with this</span>
+            <p style={{ marginTop: 8, color: 'var(--slate-700)' }}>
+              Want to apply a similar setup to your team?
+            </p>
+            <div className="as-actions" style={{ marginTop: 18 }}>
+              <Link className="as-btn as-btn-primary" href="/contact-2/">
+                Book a discovery call →
+              </Link>
+              <Link className="as-btn as-btn-secondary" href="/pipedrive-zapier-active-campaign-services/">
+                See all services
+              </Link>
+            </div>
+          </aside>
+        )}
       </article>
     </>
   );

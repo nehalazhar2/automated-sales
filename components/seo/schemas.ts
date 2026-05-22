@@ -10,9 +10,40 @@ export function professionalServiceSchema() {
     description: SITE_DESCRIPTION,
     logo: `${SITE_URL}/images/logo.png`,
     image: `${SITE_URL}/images/logo.png`,
+    areaServed: 'Worldwide',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Cardiff',
+      addressCountry: 'GB',
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'sales',
+      email: 'info@automated-sales.com',
+      url: `${SITE_URL}/contact-2/`,
+      availableLanguage: ['English'],
+    },
     sameAs: [
       'https://www.linkedin.com/company/automated-sales/',
+      'https://twitter.com/automated_sales',
+      'https://www.facebook.com/automatedsales',
+      'https://www.instagram.com/automatedsales1/',
     ],
+  };
+}
+
+export function faqSchema(items: Array<{ q: string; a: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
   };
 }
 

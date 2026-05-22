@@ -1,10 +1,11 @@
 import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
+import RelatedServices from '@/components/RelatedServices';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'AI Consultants for Sales Teams | Automated Sales',
+  title: 'AI Consultants for Sales Teams',
   description:
     'AI consultants that help sales teams adopt AI where it pays back: transcription, lead scoring, AI agents and content tooling embedded in the CRM.',
   path: '/ai-consultants/',
@@ -65,6 +66,8 @@ export default function Page() {
           },
         ]}
       />
+
+      <RelatedServices currentPath="/ai-consultants/" />
 
       <CtaBox
         heading="Where could AI actually help your sales team?"

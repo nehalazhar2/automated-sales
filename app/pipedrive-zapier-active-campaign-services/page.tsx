@@ -4,7 +4,7 @@ import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
 export const metadata = buildMetadata({
-  title: 'Services — Pipedrive, Zapier & Active Campaign | Automated Sales',
+  title: 'Services — Pipedrive, Zapier & Active Campaign',
   description:
     'Marketing, sales, automation and CRM services across Pipedrive, Active Campaign and Zapier. Sales strategists, CRM architects and integration partners.',
   path: '/pipedrive-zapier-active-campaign-services/',

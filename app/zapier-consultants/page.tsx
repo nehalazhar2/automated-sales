@@ -2,11 +2,12 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
 import RecentProjects from '@/components/RecentProjects';
+import RelatedServices from '@/components/RelatedServices';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
 export const metadata = buildMetadata({
-  title: 'Zapier Consultant - Certified Zapier Expert | Automated Sales',
+  title: 'Zapier Consultant — Certified Zapier Expert',
   description:
     'Zapier Consultants. The leading automation consultancy. We automate time consuming tasks saving your team hours every week.',
   path: '/zapier-consultants/',
@@ -137,6 +138,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <RelatedServices currentPath="/zapier-consultants/" />
 
       <CtaBox
         heading="Got Zaps you do not trust anymore?"

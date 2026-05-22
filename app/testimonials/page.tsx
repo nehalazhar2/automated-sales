@@ -4,7 +4,7 @@ import CtaBox from '@/components/CtaBox';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Automated Sales | Pipedrive Consultant — Testimonials',
+  title: 'Testimonials — Pipedrive Consultant',
   description:
     'What clients say about working with Automated Sales on Pipedrive, Zapier and Active Campaign projects.',
   path: '/testimonials/',

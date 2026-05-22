@@ -3,7 +3,7 @@ import CtaBox from '@/components/CtaBox';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'About Us | Automated Sales',
+  title: 'About Us',
   description:
     'About Automated Sales — the leading marketing, sales, automation and CRM consultancy specialising in Pipedrive, Active Campaign and Zapier.',
   path: '/about-2/',

@@ -2,6 +2,9 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
 import RecentProjects from '@/components/RecentProjects';
+import RelatedServices from '@/components/RelatedServices';
+import StructuredData from '@/components/seo/StructuredData';
+import { faqSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
@@ -67,12 +70,18 @@ const TESTIMONIALS = [
 export default function Page() {
   return (
     <>
+      <StructuredData data={faqSchema(FAQS)} />
+
       <PageHero
         eyebrow="Pipedrive Consultant"
         heading="We're the leading Pipedrive CRM consultancy."
         lead="We develop Pipedrive sales systems and processes which improve efficiency and drive profit."
         primaryCta={{ href: '/contact-2/', label: 'Find out more →' }}
-        secondaryCta={{ href: 'https://app.pipedrive.com/affiliate/pdp-automated-sales?utm_content=copy_text&utm_medium=partners_program&utm_source=Automated%20Sales&utm_term=pdp-automated-sales', label: 'Get an extended free Pipedrive trial' }}
+        secondaryCta={{
+          href: 'https://app.pipedrive.com/affiliate/pdp-automated-sales?utm_content=copy_text&utm_medium=partners_program&utm_source=Automated%20Sales&utm_term=pdp-automated-sales',
+          label: 'Get an extended free Pipedrive trial',
+          sponsored: true,
+        }}
       />
 
       <ClientLogos heading="Some of our amazing clients" />
@@ -179,6 +188,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <RelatedServices currentPath="/pipedrive-consultant/" />
 
       <CtaBox
         heading="Ready to scale your sales operation?"

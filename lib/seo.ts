@@ -10,6 +10,12 @@ type BuildMetadataInput = {
   publishedTime?: string;
   modifiedTime?: string;
   noIndex?: boolean;
+  /**
+   * When true, the title bypasses the layout's `%s | Automated Sales` template
+   * and is used verbatim. Use for the home page and for any title that already
+   * contains the brand suffix.
+   */
+  titleAbsolute?: boolean;
 };
 
 export function buildMetadata(input: BuildMetadataInput): Metadata {
@@ -19,7 +25,7 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
   const ogImage = input.ogImage || `${SITE_URL}/og?title=${encodeURIComponent(input.title)}`;
 
   return {
-    title: input.title,
+    title: input.titleAbsolute ? { absolute: input.title } : input.title,
     description,
     alternates: { canonical },
     openGraph: {

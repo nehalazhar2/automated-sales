@@ -8,6 +8,7 @@ export const metadata = buildMetadata({
   description:
     'Leading Pipedrive Consultants. We help structure Pipedrive and automate your sales processes — CRM, AI, Zapier and ActiveCampaign experts.',
   path: '/',
+  titleAbsolute: true,
 });
 
 const SERVICES = [

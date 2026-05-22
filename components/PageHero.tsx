@@ -1,13 +1,40 @@
 import Link from 'next/link';
 
+type Cta = {
+  href: string;
+  label: string;
+  /** If true, renders rel="nofollow sponsored noopener noreferrer" target="_blank". */
+  sponsored?: boolean;
+  /** If true, renders rel="noopener noreferrer" target="_blank" (without sponsored). */
+  external?: boolean;
+};
+
 type Props = {
   eyebrow: string;
   heading: string;
   lead: string;
-  primaryCta?: { href: string; label: string };
-  secondaryCta?: { href: string; label: string };
+  primaryCta?: Cta;
+  secondaryCta?: Cta;
   dark?: boolean;
 };
+
+function CtaButton({ cta, className }: { cta: Cta; className: string }) {
+  if (cta.sponsored || cta.external) {
+    const rel = cta.sponsored
+      ? 'nofollow sponsored noopener noreferrer'
+      : 'noopener noreferrer';
+    return (
+      <a className={className} href={cta.href} target="_blank" rel={rel}>
+        {cta.label}
+      </a>
+    );
+  }
+  return (
+    <Link className={className} href={cta.href}>
+      {cta.label}
+    </Link>
+  );
+}
 
 export default function PageHero({ eyebrow, heading, lead, primaryCta, secondaryCta, dark }: Props) {
   return (
@@ -18,16 +45,8 @@ export default function PageHero({ eyebrow, heading, lead, primaryCta, secondary
         <p className="as-lead">{lead}</p>
         {(primaryCta || secondaryCta) && (
           <div className="as-actions">
-            {primaryCta && (
-              <Link className="as-btn as-btn-primary" href={primaryCta.href}>
-                {primaryCta.label}
-              </Link>
-            )}
-            {secondaryCta && (
-              <Link className="as-btn as-btn-secondary" href={secondaryCta.href}>
-                {secondaryCta.label}
-              </Link>
-            )}
+            {primaryCta && <CtaButton cta={primaryCta} className="as-btn as-btn-primary" />}
+            {secondaryCta && <CtaButton cta={secondaryCta} className="as-btn as-btn-secondary" />}
           </div>
         )}
       </div>

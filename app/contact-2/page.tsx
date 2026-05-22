@@ -3,7 +3,7 @@ import ContactForm from '@/components/ContactForm';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Contact Us | Automated Sales | Pipedrive Consultants',
+  title: 'Contact Us — Pipedrive Consultants',
   description:
     'Get in touch about Pipedrive, Active Campaign, Zapier, automation or AI workflows. We typically reply within one working day.',
   path: '/contact-2/',

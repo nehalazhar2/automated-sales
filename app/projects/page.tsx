@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { getAllCaseStudies } from '@/lib/mdx';
 
 export const metadata = buildMetadata({
-  title: 'Recent Pipedrive Projects | Automated Sales',
+  title: 'Recent Pipedrive Projects',
   description:
     'A selection of recent Pipedrive, Zapier and Active Campaign projects — sales process, automation and integration work for businesses of all sizes.',
   path: '/projects/',

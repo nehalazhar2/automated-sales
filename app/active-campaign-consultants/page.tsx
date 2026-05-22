@@ -2,6 +2,9 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
 import RecentProjects from '@/components/RecentProjects';
+import RelatedServices from '@/components/RelatedServices';
+import StructuredData from '@/components/seo/StructuredData';
+import { faqSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
@@ -67,12 +70,18 @@ const TESTIMONIALS = [
 export default function Page() {
   return (
     <>
+      <StructuredData data={faqSchema(FAQS)} />
+
       <PageHero
         eyebrow="Active Campaign Consultants"
         heading="Active Campaign Consultancy."
         lead="Marketing automation that engages prospects and drives sales."
         primaryCta={{ href: '/contact-2/', label: 'Find out more →' }}
-        secondaryCta={{ href: 'https://www.activecampaign.com/?_r=Q9413H3D', label: 'Get a free Active Campaign trial' }}
+        secondaryCta={{
+          href: 'https://www.activecampaign.com/?_r=Q9413H3D',
+          label: 'Get a free Active Campaign trial',
+          sponsored: true,
+        }}
       />
 
       <ClientLogos heading="Some of our amazing clients" />
@@ -175,6 +184,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <RelatedServices currentPath="/active-campaign-consultants/" />
 
       <CtaBox
         heading="Ready to scale your marketing operation?"
