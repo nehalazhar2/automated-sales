@@ -14,6 +14,7 @@ const STATIC_ROUTES: Array<{ path: string; priority: number; changeFrequency: Me
   { path: '/contact-2/',                                    priority: 0.7, changeFrequency: 'yearly' },
   { path: '/blog/',                                         priority: 0.7, changeFrequency: 'weekly' },
   { path: '/testimonials/',                                 priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/free-pipedrive-trial-extended/',                priority: 0.7, changeFrequency: 'monthly' },
   { path: '/privacy/',                                      priority: 0.3, changeFrequency: 'yearly' },
 ];
 
