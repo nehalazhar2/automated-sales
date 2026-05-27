@@ -32,6 +32,16 @@ export const FOOTER_LINKS = {
     { href: '/active-campaign-consultants/', label: 'ActiveCampaign' },
     { href: '/blog/', label: 'Blog' },
   ],
+  'Pipedrive services': [
+    { href: '/pipedrive-expert/', label: 'Pipedrive Expert' },
+    { href: '/pipedrive-implementation/', label: 'Pipedrive Implementation' },
+    { href: '/pipedrive-setup/', label: 'Pipedrive Setup' },
+    { href: '/pipedrive-help/', label: 'Pipedrive Help' },
+    { href: '/pipedrive-training/', label: 'Pipedrive Training' },
+    { href: '/pipedrive-integration/', label: 'Pipedrive Integration' },
+    { href: '/pipedrive-automation/', label: 'Pipedrive Automation' },
+    { href: '/pipedrive-partner/', label: 'Pipedrive Partner' },
+  ],
   Company: [
     { href: '/about-2/', label: 'About' },
     { href: '/testimonials/', label: 'Testimonials' },

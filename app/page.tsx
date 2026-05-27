@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { buildMetadata } from '@/lib/seo';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
+import TestimonialsMarquee from '@/components/TestimonialsMarquee';
 
 export const metadata = buildMetadata({
   title: 'Pipedrive Consultants & Automation Experts | Automated Sales',
@@ -62,24 +63,63 @@ const PROJECTS = [
 const TESTIMONIALS = [
   {
     quote:
-      'Pipedrive Consultants did a super job for us! We knew we needed an automated solution for handling incoming leads and we had picked Pipedrive as our platform, but that\'s about all we knew. They helped us think through our current manual lead management system and then took over from there. The milestones were all hit on time and on budget. We will definitely go back to them with any similar project.',
+      "Pipedrive Consultants did a super job for us! They helped us think through our manual lead management system and then took over from there. The milestones were all hit on time and on budget.",
     name: 'Carlo Franzblau',
-    role: 'Electronic Learning Products Inc',
+    role: 'Founder, Electronic Learning Products',
     avatar: '/images/avatars/carlo.png',
   },
   {
     quote:
-      'Pipedrive Consultants were extremely knowledgable and set-up the CRM without any problems. They were quick to respond to any queries and went out of their way to make sure the project was completed successfully.',
+      'Pipedrive Consultants were extremely knowledgable and set-up the CRM without any problems. They went out of their way to make sure the project was completed successfully.',
     name: 'Adam Fox',
-    role: 'Insperanto',
+    role: 'Founder, Insperanto Investments',
     avatar: '/images/avatars/adam.png',
   },
   {
     quote:
-      'Automated Sales are absolute lifesavers! They\'ve made the experience with Pipedrive so much better. They\'re professional and get the job done in time. They go above and beyond and are great to also brainstorm ideas with the business.',
-    name: 'Christian',
-    role: 'Portfolio Insider',
+      "Absolute lifesavers — they made the experience with Pipedrive so much better. Professional, quick, and great to brainstorm with. They brought my stress level down!",
+    name: 'Christian Hogan',
+    role: 'Head of IT and Data, Portfolio Insider',
     avatar: '/images/avatars/christian.jpeg',
+  },
+  {
+    quote:
+      'Dan is the ultimate Pipedrive consultant. He implemented an amazing Pipedrive process for our sales team! Look forward to working with him on additional integrations.',
+    name: 'Geeshan Subasingha',
+    role: 'Partner, Net Fusion Designs',
+    avatar: '/images/avatars/geeshan.jpg',
+  },
+  {
+    quote:
+      'Dan went above and beyond cleaning up our Pipedrive account and creating a ton of automations. Highly recommended!!!',
+    name: 'Bryan Driscoll',
+    role: 'Co-Founder, Motivated Leads',
+    avatar: '/images/avatars/bryan.jpg',
+  },
+  {
+    quote:
+      'Another great project from Dan and the team. Pipedrive Consultants come highly recommended and we will be continuing to work with them on an hourly contract.',
+    name: 'Kirsty Griffiths',
+    role: 'Head of Sales',
+    avatar: '/images/avatars/kirsty.png',
+  },
+  {
+    quote:
+      'Very complex job — after multiple attempts with other consultants and no joy, Daniel managed to get it done in 1–2 days. Definitely recommend.',
+    name: 'Mike Katasi',
+    role: 'Buyer, Official Watches',
+    avatar: '/images/avatars/mike.png',
+  },
+  {
+    quote:
+      'Daniel has extensive knowledge and experience with Pipedrive and proposed very accurate and valuable solutions. His contribution was instrumental in getting us started.',
+    name: 'Peter Trataris',
+    role: 'Founder, Bluefields Trading',
+  },
+  {
+    quote: 'Excellent support and knowledge from Dan. Thank you for all your great input!',
+    name: "Michael O'Callaghan",
+    role: 'CEO, CourseCo',
   },
 ];
 
@@ -119,10 +159,10 @@ export default function HomePage() {
                 </div>
                 <div className="as-icon" style={{ background: 'rgba(255,255,255,.1)', margin: 0 }}>↗</div>
               </div>
-              <div className="as-visual-card"><strong>Pipeline clarity</strong><span>Stages, rules and required data</span></div>
-              <div className="as-visual-card"><strong>Lead response</strong><span>Routing, assignment and SLA follow-up</span></div>
-              <div className="as-visual-card"><strong>Reporting</strong><span>Dashboards leadership can trust</span></div>
-              <div className="as-visual-card"><strong>Automation</strong><span>Less admin and fewer missed steps</span></div>
+              <Link href="/pipedrive-consultant/" className="as-visual-card"><strong>Pipeline clarity</strong><span>Stages, rules and required data</span></Link>
+              <Link href="/zapier-consultants/" className="as-visual-card"><strong>Lead response</strong><span>Routing, assignment and SLA follow-up</span></Link>
+              <Link href="/pipedrive-expert/" className="as-visual-card"><strong>Reporting</strong><span>Dashboards leadership can trust</span></Link>
+              <Link href="/pipedrive-automation/" className="as-visual-card"><strong>Automation</strong><span>Less admin and fewer missed steps</span></Link>
             </div>
           </div>
         </div>
@@ -201,23 +241,9 @@ export default function HomePage() {
         <div className="as-container">
           <span className="as-eyebrow">Testimonials</span>
           <h2>What clients say.</h2>
-          <div className="as-testimonials">
-            {TESTIMONIALS.map((t) => (
-              <article key={t.name} className="as-card">
-                <div className="as-stars">★★★★★</div>
-                <p style={{ marginTop: 12 }}>{t.quote}</p>
-                <div className="as-attribution">
-                  <div className="as-avatar">
-                    <Image src={t.avatar} alt={t.name} width={88} height={88} />
-                  </div>
-                  <div>
-                    <div className="as-attribution-name">{t.name}</div>
-                    <div className="as-attribution-role">{t.role}</div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+        </div>
+        <TestimonialsMarquee testimonials={TESTIMONIALS} />
+        <div className="as-container">
           <div className="as-actions" style={{ justifyContent: 'center', marginTop: 32 }}>
             <Link className="as-btn as-btn-secondary" href="/testimonials/">More testimonials →</Link>
           </div>

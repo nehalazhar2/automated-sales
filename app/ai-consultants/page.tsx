@@ -12,12 +12,14 @@ export const metadata = buildMetadata({
 });
 
 const USE_CASES = [
-  { title: 'Call transcription → CRM', body: 'Every meeting transcribed, summarised and pushed back into Pipedrive against the right deal.' },
+    { title: 'AI agents', body: 'Inbox triage, follow-up drafting, admin work — narrow agents that do one job well.' },
+
   { title: 'Lead scoring', body: 'Score against real outcomes, not gut feel — Pipedrive fields driven by an AI model your team can trust.' },
-  { title: 'AI agents', body: 'Inbox triage, follow-up drafting, admin work — narrow agents that do one job well.' },
   { title: 'RAG over your CRM', body: 'Ask questions of your CRM and knowledge base in natural language with answers grounded in your data.' },
   { title: 'Voice of customer', body: 'Surface themes from calls, surveys and support tickets to feed product, sales and marketing.' },
   { title: 'Content generation', body: 'Outreach, proposals and case studies generated against your tone of voice and a vetted source-of-truth.' },
+  { title: 'Call transcription → CRM', body: 'Every meeting transcribed, summarised and pushed back into Pipedrive against the right deal.' }
+
 ];
 
 export default function Page() {

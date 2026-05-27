@@ -3,6 +3,7 @@ import CtaBox from '@/components/CtaBox';
 import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedServices from '@/components/RelatedServices';
+import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -188,6 +189,11 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <RelatedPipedriveServices
+        currentPath="/pipedrive-consultant/"
+        heading="Specialised Pipedrive services."
+      />
 
       <RelatedServices currentPath="/pipedrive-consultant/" />
 

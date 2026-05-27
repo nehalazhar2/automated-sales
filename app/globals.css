@@ -164,7 +164,11 @@ h3{font-size:clamp(20px,2.2vw,24px);font-weight:900}
 .as-visual-card{
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);
   border-radius:18px;padding:16px;margin-top:12px;
+  display:block;text-decoration:none;color:inherit;
+  transition:background .15s ease, border-color .15s ease, transform .15s ease;
 }
+a.as-visual-card:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.25);transform:translateY(-1px)}
+a.as-visual-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .as-visual-card strong{display:block;color:#fff}
 .as-visual-card span{display:block;color:var(--slate-300);font-size:14px;margin-top:3px}
 
@@ -257,7 +261,7 @@ h3{font-size:clamp(20px,2.2vw,24px);font-weight:900}
 
 /* ---------- FOOTER (fallback) ---------- */
 .site-footer{background:var(--slate-950);color:#fff;padding:56px 0}
-.as-footer-grid{display:grid;grid-template-columns:1.3fr .7fr .7fr .7fr;gap:40px}
+.as-footer-grid{display:grid;grid-template-columns:1.3fr repeat(4, .7fr);gap:40px}
 .site-footer p{color:var(--slate-300)}
 .as-footer-title{font-size:13px;font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:var(--slate-500);margin-bottom:16px}
 .as-footer-links{display:grid;gap:10px}
@@ -378,6 +382,37 @@ h3{font-size:clamp(20px,2.2vw,24px);font-weight:900}
 
 @media(prefers-reduced-motion:reduce){
   .as-clients-track{animation:none;flex-wrap:wrap;justify-content:center;width:100%}
+}
+
+/* ---------- TESTIMONIALS MARQUEE ---------- */
+.as-testimonials-marquee{
+  --as-marquee-speed:80s;
+  overflow:hidden;
+  position:relative;
+  margin-top:46px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);
+}
+.as-testimonials-track{
+  display:flex;
+  width:max-content;
+  gap:24px;
+  animation:as-marquee var(--as-marquee-speed) linear infinite;
+  align-items:stretch;
+}
+.as-testimonials-marquee:hover .as-testimonials-track{animation-play-state:paused}
+.as-testimonials-item{
+  flex:0 0 360px;
+  width:360px;
+  display:flex;
+  flex-direction:column;
+}
+@media(max-width:480px){
+  .as-testimonials-item{flex-basis:300px;width:300px}
+}
+@media(prefers-reduced-motion:reduce){
+  .as-testimonials-track{animation:none;flex-wrap:wrap;justify-content:center;width:100%}
+  .as-testimonials-marquee{-webkit-mask-image:none;mask-image:none}
 }
 
 /* ---------- CARD IMAGE + AVATAR ---------- */

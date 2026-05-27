@@ -21,7 +21,7 @@ export default function Page() {
         <div className="as-container as-split">
           <div>
             <span className="as-eyebrow">What happens next</span>
-            <h2>One reply. One short call. No sales push.</h2>
+            <h2>Get in touch for a no obligation free call about your project</h2>
             <p>
               We will reply with a couple of clarifying questions, then book a 30-minute call to dig into the
               shape of your sales process and your current stack. If we are the right team you will get a
@@ -35,7 +35,7 @@ export default function Page() {
               </div>
               <div>
                 <div className="as-footer-title" style={{ color: 'var(--slate-500)' }}>Based in</div>
-                <p style={{ margin: 0, fontWeight: 700 }}>Cardiff, UK — working with clients worldwide</p>
+                <p style={{ margin: 0, fontWeight: 700 }}>Dubai, UAE — working with clients worldwide</p>
               </div>
               <div>
                 <div className="as-footer-title" style={{ color: 'var(--slate-500)' }}>Social</div>
