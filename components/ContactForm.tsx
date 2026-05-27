@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { submitContact, type ContactState } from '@/app/contact-2/actions';
 
 const initial: ContactState = { status: 'idle' };
@@ -20,6 +20,18 @@ const SERVICES = [
 export default function ContactForm() {
   const [state, formAction, pending] = useActionState(submitContact, initial);
   const errors = state.status === 'error' ? state.fieldErrors || {} : {};
+  const attributionRef = useRef<HTMLInputElement>(null);
+  const currentPathRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('as_attribution');
+      if (stored && attributionRef.current) attributionRef.current.value = stored;
+      if (currentPathRef.current) currentPathRef.current.value = window.location.pathname;
+    } catch {
+      // ignore
+    }
+  }, []);
 
   if (state.status === 'success') {
     return (
@@ -72,6 +84,9 @@ export default function ContactForm() {
         />
         {errors.message && <small style={{ color: '#b91c1c' }}>{errors.message}</small>}
       </label>
+
+      <input ref={attributionRef} type="hidden" name="attribution" defaultValue="" />
+      <input ref={currentPathRef} type="hidden" name="currentPath" defaultValue="" />
 
       {/* Honeypot — must remain empty */}
       <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">

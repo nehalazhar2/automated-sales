@@ -19,6 +19,19 @@ export type ContactPayload = {
   company?: string;
   service?: string;
   message: string;
+  attribution?: {
+    landingPath?: string;
+    referrer?: string;
+    firstSeenAt?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_term?: string;
+    utm_content?: string;
+    gclid?: string;
+    fbclid?: string;
+  };
+  submittedFrom?: string;
 };
 
 export async function sendContactEmail(payload: ContactPayload) {
@@ -31,6 +44,21 @@ export async function sendContactEmail(payload: ContactPayload) {
   // set CONTACT_FROM in env to e.g. "Automated Sales <hello@automated-sales.com>".
   const from = process.env.CONTACT_FROM || 'Automated Sales <onboarding@resend.dev>';
 
+  const a = payload.attribution || {};
+  const attributionLines = [
+    payload.submittedFrom ? `Submitted from: ${payload.submittedFrom}` : null,
+    a.landingPath ? `Landing page:   ${a.landingPath}` : null,
+    a.referrer ? `Referrer:       ${a.referrer}` : null,
+    a.utm_source ? `UTM source:     ${a.utm_source}` : null,
+    a.utm_medium ? `UTM medium:     ${a.utm_medium}` : null,
+    a.utm_campaign ? `UTM campaign:   ${a.utm_campaign}` : null,
+    a.utm_term ? `UTM term:       ${a.utm_term}` : null,
+    a.utm_content ? `UTM content:    ${a.utm_content}` : null,
+    a.gclid ? `gclid:          ${a.gclid}` : null,
+    a.fbclid ? `fbclid:         ${a.fbclid}` : null,
+    a.firstSeenAt ? `First seen:     ${a.firstSeenAt}` : null,
+  ].filter(Boolean) as string[];
+
   const lines = [
     `Name:    ${payload.name}`,
     `Email:   ${payload.email}`,
@@ -38,6 +66,7 @@ export async function sendContactEmail(payload: ContactPayload) {
     payload.service ? `Service: ${payload.service}` : null,
     '',
     payload.message,
+    ...(attributionLines.length ? ['', '— Attribution —', ...attributionLines] : []),
   ].filter(Boolean) as string[];
 
   const { error } = await resend.emails.send({

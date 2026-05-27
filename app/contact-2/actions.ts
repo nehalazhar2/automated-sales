@@ -10,7 +10,33 @@ const Schema = z.object({
   service: z.string().max(120).optional().or(z.literal('')),
   message: z.string().min(10, 'Tell us a little more — at least 10 characters').max(5000),
   website: z.string().max(0).optional().or(z.literal('')),
+  attribution: z.string().max(2000).optional().or(z.literal('')),
+  currentPath: z.string().max(500).optional().or(z.literal('')),
 });
+
+type Attribution = {
+  landingPath?: string;
+  referrer?: string;
+  firstSeenAt?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
+  gclid?: string;
+  fbclid?: string;
+};
+
+function parseAttribution(raw: string): Attribution | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') return parsed as Attribution;
+  } catch {
+    // bad JSON — ignore
+  }
+  return null;
+}
 
 const ipRateState = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 5;
@@ -48,6 +74,8 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
     service: String(formData.get('service') || ''),
     message: String(formData.get('message') || ''),
     website: String(formData.get('website') || ''),
+    attribution: String(formData.get('attribution') || ''),
+    currentPath: String(formData.get('currentPath') || ''),
   };
 
   const parsed = Schema.safeParse(raw);
@@ -72,6 +100,8 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
       company: parsed.data.company || undefined,
       service: parsed.data.service || undefined,
       message: parsed.data.message,
+      attribution: parseAttribution(parsed.data.attribution || '') || undefined,
+      submittedFrom: parsed.data.currentPath || undefined,
     });
   } catch (err) {
     console.error('contact form send failed', err);
