@@ -35,7 +35,7 @@ export default function Page() {
               </div>
               <div>
                 <div className="as-footer-title" style={{ color: 'var(--slate-500)' }}>Based in</div>
-                <p style={{ margin: 0, fontWeight: 700 }}>Dubai, UAE — working with clients worldwide</p>
+                <p style={{ margin: 0, fontWeight: 700 }}>Cardiff, UK | Dubai, UAE — working with clients worldwide</p>
               </div>
               <div>
                 <div className="as-footer-title" style={{ color: 'var(--slate-500)' }}>Social</div>
