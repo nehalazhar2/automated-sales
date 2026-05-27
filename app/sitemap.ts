@@ -23,6 +23,7 @@ const STATIC_ROUTES: Array<{ path: string; priority: number; changeFrequency: Me
   { path: '/pipedrive-integration/',                        priority: 0.7, changeFrequency: 'monthly' },
   { path: '/pipedrive-automation/',                         priority: 0.7, changeFrequency: 'monthly' },
   { path: '/pipedrive-partner/',                            priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/website-design/',                               priority: 0.8, changeFrequency: 'monthly' },
   { path: '/privacy/',                                      priority: 0.3, changeFrequency: 'yearly' },
 ];
 

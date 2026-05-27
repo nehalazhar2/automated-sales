@@ -45,7 +45,7 @@ export const PIPEDRIVE_VARIANTS: Variant[] = [
   {
     href: '/pipedrive-partner/',
     label: 'Pipedrive Partner',
-    blurb: 'A Top 30 Global Pipedrive Partner and Advisory Council member based in the UK.',
+    blurb: 'A Global Pipedrive Partner and Advisory Council member based in the UK.',
   },
 ];
 

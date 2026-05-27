@@ -28,9 +28,14 @@ const ALL_SERVICES: Service[] = [
     blurb: 'Lifecycle journeys, segmentation and sales-marketing handoff in ActiveCampaign.',
   },
   {
+    href: '/website-design/',
+    label: 'Website design',
+    blurb: 'Fast, SEO-optimised company websites built in 48 hours — the same SEO discipline we apply to sales systems.',
+  },
+  {
     href: '/pipedrive-zapier-active-campaign-services/',
     label: 'All services',
-    blurb: 'The full service catalogue — CRM, automation, AI and marketing automation.',
+    blurb: 'The full service catalogue — CRM, automation, AI, websites and marketing automation.',
   },
 ];
 

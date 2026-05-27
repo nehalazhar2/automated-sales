@@ -67,7 +67,7 @@ export default function Page() {
             <p>
               Anyone can call themselves a Pipedrive consultant. Pipedrive Partner status is awarded by
               Pipedrive itself, based on certified projects shipped, customer satisfaction scores, and
-              ongoing engagement with the product roadmap. Top 30 globally means we are in the smallest
+              ongoing engagement with the product roadmap.  globally means we are in the smallest
               tier of partners worldwide — a useful filter when you are deciding whom to trust with
               your CRM.
             </p>

@@ -30,6 +30,7 @@ export const FOOTER_LINKS = {
     { href: '/ai-consultants/', label: 'AI' },
     { href: '/zapier-consultants/', label: 'Zapier' },
     { href: '/active-campaign-consultants/', label: 'ActiveCampaign' },
+    { href: '/website-design/', label: 'Website design' },
     { href: '/blog/', label: 'Blog' },
   ],
   'Pipedrive services': [

@@ -145,7 +145,7 @@ export default function HomePage() {
             </div>
             <div className="as-proof-list">
               <div className="as-proof-item">Pipedrive Advisory Council member</div>
-              <div className="as-proof-item">Top 30 Global Pipedrive Partner</div>
+              <div className="as-proof-item">Global Pipedrive Partner</div>
               <div className="as-proof-item">200+ Pipedrive projects delivered</div>
               <div className="as-proof-item">CRM, automation, AI and reporting expertise</div>
             </div>

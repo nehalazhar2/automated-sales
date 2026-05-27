@@ -8,7 +8,7 @@ const PIPEDRIVE_AFFILIATE_URL =
 export const metadata = buildMetadata({
   title: 'Extended Free Pipedrive Trial — Free Pipedrive Consultation',
   description:
-    'Try Pipedrive free for 30 days — twice as long as the standard trial. Plus a free 30-minute consultation from a Top 30 Pipedrive Partner.',
+    'Try Pipedrive free for 30 days — twice as long as the standard trial. Plus a free 30-minute consultation from a Pipedrive Partner.',
   path: '/free-pipedrive-trial-extended/',
 });
 
@@ -18,7 +18,7 @@ export default function Page() {
       <PageHero
         eyebrow="Free Pipedrive trial"
         heading="Try Pipedrive free for 30 days."
-        lead="Pipedrive's standard trial is 14 days. As a Top 30 Global Pipedrive Partner, we can give you an extended 30-day trial — twice as long. Plus a free 30-minute consultation to help configure Pipedrive around your sales process."
+        lead="Pipedrive's standard trial is 14 days. As a Global Pipedrive Partner, we can give you an extended 30-day trial — twice as long. Plus a free 30-minute consultation to help configure Pipedrive around your sales process."
         primaryCta={{
           href: PIPEDRIVE_AFFILIATE_URL,
           label: 'Start your free 30-day trial →',
@@ -47,12 +47,12 @@ export default function Page() {
         <div className="as-container as-split">
           <div>
             <span className="as-eyebrow">About Automated Sales</span>
-            <h2>A Top 30 Global Pipedrive Partner.</h2>
+            <h2>A Global Pipedrive Partner.</h2>
           </div>
           <div>
             <p>
               Automated Sales is a consultancy specialising in Pipedrive implementation, sales process design
-              and workflow automation. We are a Top 30 Global Pipedrive Partner and a member of the Pipedrive
+              and workflow automation. We are a Global Pipedrive Partner and a member of the Pipedrive
               Advisory Council. We have shipped 200+ CRM, automation and AI projects across SaaS, professional
               services, property, finance and B2B services.
             </p>

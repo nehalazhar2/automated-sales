@@ -10,7 +10,7 @@ import { buildMetadata } from '@/lib/seo';
 export const metadata = buildMetadata({
   title: 'Pipedrive Expert — Senior Pipedrive Consultants',
   description:
-    'Pipedrive expert services from a Top 30 Global Pipedrive Partner. Senior consultants for complex sales operations, multi-pipeline builds and CRM rebuilds.',
+    'Pipedrive expert services from a  Global Pipedrive Partner. Senior consultants for complex sales operations, multi-pipeline builds and CRM rebuilds.',
   path: '/pipedrive-expert/',
 });
 
