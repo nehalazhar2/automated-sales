@@ -17,19 +17,19 @@ export const metadata = buildMetadata({
 const FAQS = [
   {
     q: 'When should I hire a Pipedrive expert rather than a generalist consultant?',
-    a: 'Hire a Pipedrive expert when your build is non-trivial — multiple pipelines, custom fields driving automation, two-way integrations, complex reporting, or a previous setup that has drifted. A specialist who has shipped 200+ Pipedrive builds will avoid the dead-ends a generalist learns by burning your time.',
+    a: 'Hire a Pipedrive expert when your build is non-trivial: multiple pipelines, custom fields driving automation, two-way integrations, complex reporting, or a previous setup that has drifted. A specialist who has shipped 200+ Pipedrive builds will avoid the dead-ends a generalist learns by burning your time.',
   },
   {
     q: 'What does "senior" mean on your team?',
-    a: 'Our senior consultants have 5+ years working in Pipedrive specifically, have led at least 30 end-to-end implementations, and have backgrounds in sales leadership rather than just admin configuration. They are the people who own client outcomes — not handed off to juniors after kickoff.',
+    a: 'Our senior consultants have 5+ years working in Pipedrive specifically, have led at least 30 end-to-end implementations, and have backgrounds in sales leadership rather than just admin configuration. They are the people who own client outcomes, not handed off to juniors after kickoff.',
   },
   {
     q: 'Can a Pipedrive expert rescue a broken setup?',
-    a: 'Yes — rescue work is one of our most common engagements. We audit the existing account, map what should stay versus what should be rebuilt, and migrate cleanly without losing historical deal data or reporting continuity.',
+    a: 'Yes, rescue work is one of our most common engagements. We audit the existing account, map what should stay versus what should be rebuilt, and migrate cleanly without losing historical deal data or reporting continuity.',
   },
   {
-    q: 'How do you charge for expert-level work?',
-    a: 'Project-based for scoped builds (recommended for rebuilds and implementations) and retainer for ongoing optimisation. We are upfront about scope and never bill for surprises — change requests are quoted before any work starts.',
+    q: 'How do you charge for expert level work?',
+    a: 'Project based for scoped builds (recommended for rebuilds and implementations) and retainer for ongoing optimisation. We are upfront about scope and never bill for surprises, change requests are quoted before any work starts.',
   },
 ];
 
@@ -48,7 +48,7 @@ export default function Page() {
       <PageHero
         eyebrow="Pipedrive Expert"
         heading="Senior Pipedrive experts for complex sales operations."
-        lead="When your Pipedrive build matters — multi-pipeline, multi-team, integrated and automated — work with experts who have shipped 200+ Pipedrive projects."
+        lead="When your Pipedrive build matters: multi-pipeline, multi-team, integrated and automated — work with experts who have shipped 200+ Pipedrive projects."
         primaryCta={{ href: '/contact-2/', label: 'Talk to a Pipedrive expert →' }}
         secondaryCta={{ href: '/projects/', label: 'See recent work' }}
       />
@@ -62,7 +62,7 @@ export default function Page() {
           <div>
             <p>
               The first time you build a Pipedrive account, you make eight expensive mistakes. By the
-              fiftieth, you make none — you recognise the shape of the problem in the first 20 minutes and
+              fiftieth, you make none, you recognise the shape of the problem in the first 20 minutes and
               you know which of three or four patterns it maps to. That pattern recognition is what you
               are buying from a senior Pipedrive expert. Not configuration speed. Not button-clicking.
               Judgement.
@@ -73,9 +73,8 @@ export default function Page() {
               underlying problems repeat. We have already solved yours.
             </p>
             <p style={{ marginTop: 16 }}>
-              We are independent and product-led on Pipedrive — we do not push you to other CRMs to hit a
-              partner quota. If Pipedrive is wrong for you, we will tell you. Most of the time, it is the
-              right answer and the question is how to configure it for how your team actually sells.
+              We are independent and product-led on Pipedrive, we do not push you to other CRMs to hit a
+              partner quota. If Pipedrive is wrong for you, we will tell you. Typically, the biggested question is how to configure it for how your team actually sells.
             </p>
           </div>
         </div>
@@ -90,7 +89,7 @@ export default function Page() {
               <h3>Multi-pipeline architecture</h3>
               <p>
                 When you sell more than one product, to more than one buyer type, in more than one
-                process — pipeline design becomes a system architecture problem, not a configuration
+                process, pipeline design becomes a system architecture problem, not a configuration
                 exercise. Choosing what is a stage, a pipeline, a deal type or a custom field is the
                 most consequential decision in your build. Get it wrong and you rebuild within 18 months.
               </p>
@@ -100,15 +99,15 @@ export default function Page() {
               <p>
                 Pipedrive lets you create unlimited custom fields. Most teams over-create them, then
                 use them inconsistently, then lose them in reporting. A senior expert designs the field
-                taxonomy around the questions your sales leadership will ask in 12 months — not just the
+                taxonomy around the questions your sales leadership will ask in 12 months, not just the
                 data you happen to capture today.
               </p>
             </article>
             <article className="as-card">
               <h3>Two-way integration design</h3>
               <p>
-                Zapier and Make solve the easy 70%. The other 30% — bidirectional sync conflicts, idempotent
-                webhook handling, deduplication strategy, error recovery — is where teams either invest in
+                Zapier and Make solve the easy 70%. The other 30% handled by bidirectional sync conflicts, idempotent
+                webhook handling, deduplication strategy, error recovery. This is where teams either invest in
                 experienced design upfront or pay for it in silent data corruption later.
               </p>
             </article>
@@ -132,12 +131,12 @@ export default function Page() {
           </div>
           <div>
             <p>
-              You speak to the senior consultant who will own the build before you sign anything. They
-              run discovery themselves. They make the architectural decisions themselves. They do not
+              You speak to the senior consultant who will own the build before you commit to anything. They
+              run discovery themselves. They make the architectural decisions. They do not
               hand you off to a junior after the kickoff call.
             </p>
             <p style={{ marginTop: 16 }}>
-              Behind that senior lead you get our wider team — automation specialists for Zapier and
+              Behind that senior lead you get our wider team, automation specialists for Zapier and
               Make work, integration engineers for API-level builds, and a Pipedrive Advisory Council
               member who shapes the product roadmap. The team you need, with the seniority you can feel.
             </p>
