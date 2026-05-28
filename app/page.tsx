@@ -254,10 +254,10 @@ export default function HomePage() {
         <div className="as-container">
           <div className="as-cta-box">
             <span className="as-eyebrow dark">Ready when you are</span>
-            <h2>Get a sales system that works as hard as your team does.</h2>
+            <h2>Get a sales system that works as hard as you doe.</h2>
             <p>
-              Book a 30-minute CRM audit. We will look at your Pipedrive (or current CRM), your sales process
-              and your tooling, and tell you what to fix first.
+              Book a 30-minute CRM audit. We will look at your your sales process, Pipedrive (or current CRM)
+              and your tooling, and tell you how we can help.
             </p>
             <div className="as-actions" style={{ justifyContent: 'center', marginTop: 32 }}>
               <Link className="as-btn as-btn-primary" href="/contact-2/">Book a CRM audit →</Link>
