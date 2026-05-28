@@ -5,7 +5,7 @@ import { buildMetadata } from '@/lib/seo';
 export const metadata = buildMetadata({
   title: 'Contact Us — Pipedrive Consultants',
   description:
-    'Get in touch about Pipedrive, Active Campaign, Zapier, automation or AI workflows. We typically reply within one working day.',
+    'Get in touch about Sales Process, Pipedrive, Active Campaign, Zapier, automation or AI workflows.',
   path: '/contact-2/',
 });
 
@@ -15,7 +15,7 @@ export default function Page() {
       <PageHero
         eyebrow="Get in touch"
         heading="Lets chat."
-        lead="Get in touch to find out how we can help. Tell us a few lines about your setup and what you are trying to fix — we typically reply within one working day."
+        lead="Get in touch to find out how we can help. Tell us a few lines about your setup and what you are trying to fix."
       />
       <section className="as-section">
         <div className="as-container as-split">
