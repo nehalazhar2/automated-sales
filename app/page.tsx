@@ -106,6 +106,36 @@ const TESTIMONIALS = [
     quote:
       "Dan is very knowledgeable and great to work with. He brings not only a robust understanding of Pipedrive as a tool, but also experience with how to integrate it into a successful sales process. He is responsive and prepared. Highly recommend!",
   },
+  {
+    quote: "The best work I have seen in a while. I will go to him for other projects as well!",
+  },
+  {
+    quote: "Excellent support and knowledge from Dan. Thank you for all your great input. Best of luck.",
+  },
+  {
+    quote:
+      "Daniel has extensive knowledge and experience with Pipedrive and proposed very accurate and valuable solutions to our issues. His contribution was instrumental with the implementation and in getting started with the software.",
+  },
+  {
+    quote:
+      "Really pleased with the outcome — the job was very complex and after multiple attempts with other freelancers and no joy, Daniel managed to get the job done within 1–2 days. I can definitely recommend using Daniel and will definitely be keeping in touch when more work is needed.",
+  },
+  {
+    quote:
+      "Dan went above and beyond cleaning up our Pipedrive account and creating a ton of automations. Highly recommended!!!",
+  },
+  {
+    quote:
+      "Dan did a super job for us! We knew we needed an automated solution for handling incoming leads and we had picked Pipedrive as our platform, but that's about all we knew. Dan helped us think through our current manual lead management system and then took over from there. The milestones were all hit on time and on budget. And when unanticipated surprises came up we were able to work through them with good communication. We will definitely go back to him with any similar project. I whole-heartedly recommend Dan for this type of work!",
+  },
+  {
+    quote:
+      "Dan was extremely knowledgable and set up the CRM without any problems. He was quick to respond to any queries and went out of his way to make sure the project was completed successfully. Thank you, Dan, for your hard work on this project. We will definitely be hiring Dan again for future projects.",
+  },
+  {
+    quote:
+      "Daniel is AMAZING!!! Not only did he simplify all the issues I was facing with my CRM, but he set it up in a way where I now save 3–4 hours a day dealing with clients. Look no further, hire Dan to set up your CRM. HIGHLY recommended.",
+  },
 ];
 
 export default function HomePage() {
