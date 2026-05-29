@@ -27,8 +27,8 @@ export default function Page() {
     <>
       <PageHero
         eyebrow="AI consultancy"
-        heading="AI that fits the sales process — not a science project."
-        lead="We help sales-led teams adopt AI in ways that compound: tied to the CRM, measurable, and owned by the team — not the consultant."
+        heading="AI and Automation that helps your sales team sell more, faster"
+        lead="We help sales-led teams adopt AI in ways that compound: tied to the CRM, measurable, and owned by the team, not the consultant."
         primaryCta={{ href: '/contact-2/', label: 'Book an AI workshop →' }}
         secondaryCta={{ href: '/projects/', label: 'See AI projects' }}
       />
