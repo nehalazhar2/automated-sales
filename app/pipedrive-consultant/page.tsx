@@ -57,7 +57,7 @@ const FAQS = [
   },
   {
     q: 'What size businesses do you work with?',
-    a: 'We work with all sizes of business, from solopreneurs to multi-nationals. No matter the size of your organisation we can improve your processes and increase sales.',
+    a: 'We work with all sizes of business, from SMBs to Multi-Nationals. No matter the size of your organisation we can improve your processes and increase sales.',
   },
   {
     q: 'How can you help me?',
