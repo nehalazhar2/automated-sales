@@ -47,7 +47,7 @@ export default function Page() {
     <>
       <PageHero
         eyebrow="Zapier Consultants"
-        heading="The leading automation consultancy, specialising in Zapier."
+        heading="Leading automation consultancy, specialising in Zapier."
         lead="Zapier Automations connecting your favourite services and apps. We automate time consuming tasks saving your team hours every week."
         primaryCta={{ href: '/contact-2/', label: 'Find out more →' }}
         secondaryCta={{ href: '/pipedrive-zapier-active-campaign-services/', label: 'Explore services' }}
