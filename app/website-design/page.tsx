@@ -6,17 +6,17 @@ import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Website Design — Company Websites Built In 48 Hours',
+  title: 'Website Design — Company Websites Built In 7 days!',
   description:
-    'Fast, affordable, SEO-optimised company websites built in 48 hours. Company profile sites that load fast and rank well — from a Pipedrive Partner.',
+    'Fast, affordable, SEO-optimised company websites built in 7 days. Company profile sites that load fast rank well and drive sales.',
   path: '/website-design/',
 });
 
 const PILLARS = [
   {
-    title: '48-hour turnaround',
+    title: '7 day turnaround',
     body:
-      'A working company website live in two business days from brief approval and content received. No three-month build cycles, no agency runaround.',
+      'A working company website live in severn business days from brief approval and content received. No three-month build cycles, no agency runaround.',
   },
   {
     title: 'SEO-optimised by default',
@@ -80,7 +80,7 @@ const PROCESS = [
     step: '3',
     title: 'Build',
     body:
-      'We build the site against a preview URL you can review live. Two rounds of revisions are included. The 48 hours clock starts when content lands and the brief is approved.',
+      'We build the site against a preview URL you can review live. Two rounds of revisions included.',
   },
   {
     step: '4',
@@ -92,8 +92,8 @@ const PROCESS = [
 
 const FAQS = [
   {
-    q: 'Is 48 hours really realistic for a company website?',
-    a: 'Yes, with one condition: the 48 hours starts when the brief is approved and your content (logos, photos, copy or copy notes) is in our hands. From that point, two business days to a live, SEO-ready company site is normal for us. If you are still deciding what to say or who you are talking to, that is the part that takes time — not the build.',
+    q: 'Is 7 days really realistic for a company website?',
+    a: 'Yes, the 7 days start when the brief is approved and your content (logos, photos, copy or copy notes) is in our hands. From that point, severn business days to a live, SEO-ready company site is achievable. If you are still deciding what to say or who you are talking to, that is the part that takes time — not the build.',
   },
   {
     q: 'What is not included at the base price?',
@@ -127,8 +127,8 @@ export default function Page() {
 
       <PageHero
         eyebrow="Website design"
-        heading="Company websites built in 48 hours."
-        lead="Fast, affordable, SEO-optimised company websites — built by the same team that runs sales systems for a Pipedrive Partner."
+        heading="Company websites built in 7 days."
+        lead="Fast, affordable, SEO-optimised company websites, built by the same team building automated sales systems for organisations globally."
         primaryCta={{ href: '/contact-2/', label: 'Get a quote →' }}
         secondaryCta={{ href: '/projects/', label: 'See recent work' }}
       />
