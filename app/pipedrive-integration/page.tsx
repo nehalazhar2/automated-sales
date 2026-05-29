@@ -20,7 +20,7 @@ export const metadata = buildMetadata({
 const FAQS = [
   {
     q: 'Should we integrate Pipedrive with Zapier, Make, or directly via the API?',
-    a: 'Zapier and Make are the right answer for most teams — fast to ship, easy to maintain, low risk. We move to a direct API integration when volume makes Zapier expensive, when the logic is too complex for a low-code tool, or when you need transactional integrity that Zapier cannot guarantee. We will recommend the cheapest option that meets your reliability requirements.',
+    a: 'Zapier and Make are the right answer for most teams — fast to ship, easy to maintain, low risk. We move to a direct API integration when volume makes Zapier expensive, when the logic is too complex for a low-code tool or when you need transactional integrity that no-code cannot guarantee. We will recommend the most suitable approach for your specefic requirements.',
   },
   {
     q: 'What integrations have you built before?',
