@@ -72,7 +72,7 @@ export default function Page() {
 
       <PageHero
         eyebrow="Pipedrive Consultant"
-        heading="We're the leading Pipedrive CRM consultancy."
+        heading="The leading Pipedrive CRM consultancy."
         lead="We develop Pipedrive sales systems and processes which improve efficiency and drive profit."
         primaryCta={{ href: '/contact-2/', label: 'Find out more →' }}
         secondaryCta={{
