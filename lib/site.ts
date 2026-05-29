@@ -13,6 +13,7 @@ export const NAV: Array<{ href: string; label: string }> = [
   { href: '/ai-consultants/', label: 'AI' },
   { href: '/zapier-consultants/', label: 'Zapier' },
   { href: '/active-campaign-consultants/', label: 'ActiveCampaign' },
+  { href: '/website-design/', label: 'Website Design' },
   { href: '/pipedrive-zapier-active-campaign-services/', label: 'Services' },
   { href: '/projects/', label: 'Projects' },
   { href: '/blog/', label: 'Blog' },
