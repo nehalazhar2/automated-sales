@@ -3,7 +3,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
-import ProofList from '@/components/ProofList';
+import { DEFAULT_ITEMS as PROOF_ITEMS } from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -52,9 +52,8 @@ export default function Page() {
         lead="Email, calendar, accounting, lead sources, AI, data warehouse — integrated cleanly via Zapier, Make or direct API by people who have shipped hundreds of integrations."
         primaryCta={{ href: '/contact-2/', label: 'Talk integrations →' }}
         secondaryCta={{ href: '/zapier-consultants/', label: 'Zapier-specific work' }}
+        proofItems={PROOF_ITEMS}
       />
-
-      <ProofList />
 
       <section className="as-section">
         <div className="as-container as-split">

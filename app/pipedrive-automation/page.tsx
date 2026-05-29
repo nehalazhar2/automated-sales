@@ -3,7 +3,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
-import ProofList from '@/components/ProofList';
+import { DEFAULT_ITEMS as PROOF_ITEMS } from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -52,9 +52,8 @@ export default function Page() {
         lead="Lead routing, follow-up sequences, stage-change actions and CRM hygiene — automated cleanly inside Pipedrive (with Zapier and Make where it makes sense)."
         primaryCta={{ href: '/contact-2/', label: 'Automate Pipedrive →' }}
         secondaryCta={{ href: '/pipedrive-integration/', label: 'See integrations' }}
+        proofItems={PROOF_ITEMS}
       />
-
-      <ProofList />
 
       <section className="as-section">
         <div className="as-container as-split">

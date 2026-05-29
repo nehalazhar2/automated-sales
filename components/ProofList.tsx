@@ -1,4 +1,4 @@
-const DEFAULT_ITEMS = [
+export const DEFAULT_ITEMS = [
   'Pipedrive Advisory Council member',
   'Global Pipedrive Partner',
   '200+ Pipedrive projects delivered',

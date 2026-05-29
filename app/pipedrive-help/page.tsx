@@ -3,7 +3,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
-import ProofList from '@/components/ProofList';
+import { DEFAULT_ITEMS as PROOF_ITEMS } from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -52,9 +52,8 @@ export default function Page() {
         lead="Ad-hoc Pipedrive support from senior consultants. No retainer, no minimum spend — fix the specific thing that is broken and get on with selling."
         primaryCta={{ href: '/contact-2/', label: 'Describe your problem →' }}
         secondaryCta={{ href: '/pipedrive-training/', label: 'Need training instead?' }}
+        proofItems={PROOF_ITEMS}
       />
-
-      <ProofList />
 
       <section className="as-section">
         <div className="as-container as-split">
