@@ -16,7 +16,7 @@ const PILLARS = [
   {
     title: '7 day turnaround',
     body:
-      'A working company website live in severn business days from brief approval and content received. No three-month build cycles, no agency runaround.',
+      'A working company website live in seven business days from brief approval and content received. No three-month build cycles, no agency runaround.',
   },
   {
     title: 'SEO-optimised by default',
@@ -93,7 +93,7 @@ const PROCESS = [
 const FAQS = [
   {
     q: 'Is 7 days really realistic for a company website?',
-    a: 'Yes, the 7 days start when the brief is approved and your content (logos, photos, copy or copy notes) is in our hands. From that point, severn business days to a live, SEO-ready company site is achievable. If you are still deciding what to say or who you are talking to, that is the part that takes time — not the build.',
+    a: 'Yes, the 7 days start when the brief is approved and your content (logos, photos, copy or copy notes) is in our hands. From that point, seven business days to a live, SEO-ready company site is achievable. If you are still deciding what to say or who you are talking to, that is the part that takes time — not the build.',
   },
   {
     q: 'What is not included at the base price?',
@@ -166,7 +166,7 @@ export default function Page() {
       <section className="as-section">
         <div className="as-container">
           <span className="as-eyebrow">How it works</span>
-          <h2>Four steps. Two business days from green light to live.</h2>
+          <h2>Four steps. Seven business days from green light to live.</h2>
           <div className="as-grid-2" style={{ marginTop: 40 }}>
             {PROCESS.map((p) => (
               <article key={p.step} className="as-card">
