@@ -16,7 +16,7 @@ export default function Page() {
     <>
       <PageHero
         eyebrow="Blog"
-        heading="Pipedrive, automation and AI — written for operators."
+        heading="The latest in Pipedrive, marketing, automation and AI"
         lead="Field notes from CRM, automation, AI and marketing automation projects."
       />
       <section className="as-section">
