@@ -1,4 +1,4 @@
-```tsx
+
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
