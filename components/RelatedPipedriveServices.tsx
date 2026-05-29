@@ -63,6 +63,7 @@ const NEIGHBOURS: Record<string, string[]> = {
   '/pipedrive-integration/': ['/pipedrive-automation/', '/pipedrive-implementation/', '/pipedrive-expert/', '/pipedrive-help/'],
   '/pipedrive-automation/': ['/pipedrive-integration/', '/pipedrive-expert/', '/pipedrive-implementation/', '/pipedrive-help/'],
   '/pipedrive-partner/': ['/pipedrive-expert/', '/pipedrive-implementation/', '/pipedrive-automation/', '/pipedrive-integration/'],
+  '/pipedrive-free-trial/': ['/pipedrive-expert/', '/pipedrive-implementation/', '/pipedrive-automation/', '/pipedrive-integration/'],
 };
 
 type Props = {
