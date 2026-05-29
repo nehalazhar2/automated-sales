@@ -4,9 +4,9 @@ import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
 export const metadata = buildMetadata({
-  title: 'Services — Pipedrive, Zapier & Active Campaign',
+  title: 'Services — Pipedrive, AI, Zapier & Active Campaign',
   description:
-    'Marketing, sales, automation and CRM services across Pipedrive, Active Campaign and Zapier. Sales strategists, CRM architects and integration partners.',
+    'Marketing, sales, automation, CRM and AI services across Pipedrive, Active Campaign and Zapier. Sales strategists, CRM architects and integration partners.',
   path: '/pipedrive-zapier-active-campaign-services/',
 });
 
@@ -24,22 +24,22 @@ const ABILITIES = [
   {
     title: 'Integration partners',
     body:
-      "Pipedrive and Active Campaign are incredibly powerful tools. When combined with third party platforms they can supercharge your sales and marketing initiatives. We setup direct integrations using marketplace tools, and harness the power of Zapier and Make (Integromat) to connect tools that don't have native integrations.",
+      "Pipedrive and Active Campaign are incredibly powerful tools. When combined with third party platforms they can supercharge your sales and marketing initiatives. We setup direct integrations using marketplace tools, harness the power of Zapier and Make (Integromat) and build direct API's to connect tools that don't have native integrations.",
   },
   {
     title: 'AI consultants',
     body:
-      "AI sits alongside the CRM, not instead of it. We build narrow AI agents, call transcription, lead scoring and AI-powered next-best-action recommendations — all written back to Pipedrive against the deal, so reps see the answer in the CRM rather than chasing it across half a dozen tools.",
+      "AI sits alongside the CRM, not instead of it. We build bespoke AI agents, call transcription, lead scoring and AI-powered next-best-action recommendations — all written back to Pipedrive against the deal, so reps see the answer in the CRM rather than chasing it across half a dozen tools.",
   },
   {
     title: 'Custom integration engineers',
     body:
-      "Zapier and Make handle most integration work cleanly. For the cases where they cannot — high volume, transactional integrity, conditional logic too complex for low-code — we build direct API integrations with proper error handling, retry logic and reconciliation. We pick the cheapest tool that meets your reliability requirements.",
+      "Zapier and Make handle most integration work cleanly. For the cases where they cannot — high volume, transactional integrity, conditional logic too complex for low-code — we build direct API integrations with proper error handling, retry logic and reconciliation. We recommend the most suitable approach for your requirements.",
   },
   {
     title: 'Website design',
     body:
-      "Fast, SEO-optimised company websites built in 48 hours from brief approval — the same SEO discipline we apply to our own site, packaged for businesses that need a credible web presence without a three-month agency build.",
+      "Fast, SEO-optimised company websites built in 7 days from brief approval — the same SEO discipline we apply to our own site, packaged for businesses that need a credible web presence without a three-month agency build.",
   },
 ];
 
