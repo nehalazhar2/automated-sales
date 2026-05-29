@@ -32,7 +32,7 @@ export default function Page() {
       <p>
         For the purposes of this Privacy Policy, “Automated Sales”, “we”, “us” and “our” refers to
         the Automated Sales business, including Automated Sales FZE LLC and, where applicable, the UK
-        limited company entity through which Automated Sales services are provided.
+        limited company entity - Automates Sales LTD, through which Automated Sales services are provided.
       </p>
 
       <p>
