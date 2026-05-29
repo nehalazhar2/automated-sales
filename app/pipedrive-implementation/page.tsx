@@ -3,6 +3,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
+import ProofList from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -10,7 +11,7 @@ import { buildMetadata } from '@/lib/seo';
 export const metadata = buildMetadata({
   title: 'Pipedrive Implementation — Done Right, First Time',
   description:
-    'Pipedrive implementation services from a Top 30 Global Pipedrive Partner. Phased rollouts with process design, data migration, training and go-live support.',
+    'Pipedrive implementation services from a certified Global Pipedrive Partner. Phased rollouts with process design, data migration, training and go-live support.',
   path: '/pipedrive-implementation/',
 });
 
@@ -52,6 +53,8 @@ export default function Page() {
         primaryCta={{ href: '/contact-2/', label: 'Scope your implementation →' }}
         secondaryCta={{ href: '/projects/', label: 'See past rollouts' }}
       />
+
+      <ProofList />
 
       <section className="as-section">
         <div className="as-container as-split">

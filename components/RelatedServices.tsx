@@ -10,7 +10,7 @@ const ALL_SERVICES: Service[] = [
   {
     href: '/pipedrive-consultant/',
     label: 'Pipedrive consultants',
-    blurb: 'Pipeline, process and reporting from a Top 30 Global Pipedrive Partner.',
+    blurb: 'Pipeline, process and reporting from a certified Global Pipedrive Partner.',
   },
   {
     href: '/ai-consultants/',

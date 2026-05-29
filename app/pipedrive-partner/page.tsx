@@ -3,14 +3,15 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
+import ProofList from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Pipedrive Partner — Top 30 Global Pipedrive Partner (UK)',
+  title: 'Pipedrive Partner — Certified Global Pipedrive Partner (UK)',
   description:
-    'A certified Pipedrive Partner and Pipedrive Advisory Council member in the UK. Top 30 globally — extended free trials, partner discounts and senior expertise.',
+    'A certified Pipedrive Partner and Pipedrive Advisory Council member in the UK — extended free trials, partner discounts and senior expertise.',
   path: '/pipedrive-partner/',
 });
 
@@ -47,7 +48,7 @@ export default function Page() {
 
       <PageHero
         eyebrow="Pipedrive Partner"
-        heading="A Top 30 Global Pipedrive Partner — built in the UK."
+        heading="A certified Global Pipedrive Partner — built in the UK."
         lead="Certified Pipedrive Partner and Pipedrive Advisory Council member. We help vendor-validated companies pick, configure, integrate and scale Pipedrive."
         primaryCta={{ href: '/contact-2/', label: 'Talk to the partner team →' }}
         secondaryCta={{
@@ -56,6 +57,8 @@ export default function Page() {
           sponsored: true,
         }}
       />
+
+      <ProofList />
 
       <section className="as-section">
         <div className="as-container as-split">
@@ -67,9 +70,8 @@ export default function Page() {
             <p>
               Anyone can call themselves a Pipedrive consultant. Pipedrive Partner status is awarded by
               Pipedrive itself, based on certified projects shipped, customer satisfaction scores, and
-              ongoing engagement with the product roadmap.  globally means we are in the smallest
-              tier of partners worldwide — a useful filter when you are deciding whom to trust with
-              your CRM.
+              ongoing engagement with the product roadmap — a useful filter when you are deciding
+              whom to trust with your CRM.
             </p>
             <p style={{ marginTop: 16 }}>
               That validation is not just a logo. It means we have access to senior Pipedrive product
@@ -182,7 +184,7 @@ export default function Page() {
       <RelatedPipedriveServices currentPath="/pipedrive-partner/" />
 
       <CtaBox
-        heading="Buy or build Pipedrive with a Top 30 partner."
+        heading="Buy or build Pipedrive with a certified partner."
         body="Whether you are evaluating Pipedrive for the first time or scaling an existing setup, partner-grade expertise lowers the risk."
         primary={{ href: '/contact-2/', label: 'Speak to the team →' }}
         secondary={{ href: '/pipedrive-consultant/', label: 'See the full Pipedrive Consultant service' }}

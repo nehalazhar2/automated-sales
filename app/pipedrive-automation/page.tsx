@@ -3,6 +3,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
+import ProofList from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -52,6 +53,8 @@ export default function Page() {
         primaryCta={{ href: '/contact-2/', label: 'Automate Pipedrive →' }}
         secondaryCta={{ href: '/pipedrive-integration/', label: 'See integrations' }}
       />
+
+      <ProofList />
 
       <section className="as-section">
         <div className="as-container as-split">

@@ -4,6 +4,7 @@ import ClientLogos, { TECH_LOGOS } from '@/components/ClientLogos';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedServices from '@/components/RelatedServices';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
+import ProofList from '@/components/ProofList';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -84,6 +85,8 @@ export default function Page() {
           sponsored: true,
         }}
       />
+
+      <ProofList />
 
       <ClientLogos heading="Some of our amazing clients" />
 

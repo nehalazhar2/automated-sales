@@ -156,7 +156,7 @@ export default function Page() {
             {INCLUDED.map((item) => (
               <article key={item.title} className="as-card">
                 <h3>{item.title}</h3>
-                <p dangerouslySetInnerHTML={{ __html: item.body }} />
+                <p>{item.body}</p>
               </article>
             ))}
           </div>
