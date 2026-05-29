@@ -4,6 +4,8 @@ import CtaBox from '@/components/CtaBox';
 import RecentProjects from '@/components/RecentProjects';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
 import { DEFAULT_ITEMS as PROOF_ITEMS } from '@/components/ProofList';
+import TestimonialsMarquee from '@/components/TestimonialsMarquee';
+import { TESTIMONIALS } from '@/lib/testimonials';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -192,6 +194,14 @@ export default function Page() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="as-section">
+        <div className="as-container">
+          <span className="as-eyebrow">Testimonials</span>
+          <h2>What clients say.</h2>
+        </div>
+        <TestimonialsMarquee testimonials={TESTIMONIALS} />
       </section>
 
       <RelatedPipedriveServices currentPath="/pipedrive-implementation/" />

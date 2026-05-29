@@ -5,6 +5,8 @@ import RecentProjects from '@/components/RecentProjects';
 import RelatedServices from '@/components/RelatedServices';
 import RelatedPipedriveServices from '@/components/RelatedPipedriveServices';
 import { DEFAULT_ITEMS as PROOF_ITEMS } from '@/components/ProofList';
+import TestimonialsMarquee from '@/components/TestimonialsMarquee';
+import { TESTIMONIALS } from '@/lib/testimonials';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
@@ -61,12 +63,6 @@ const FAQS = [
     q: 'How can you help me?',
     a: "We don't 'just' implement Pipedrive according to best practice. We work with our partners to understand their business and sales process, offering advice and recommendations before configuring the CRM. This results in teams saving hours of administrative work each week whilst increasing sales performance across the business.",
   },
-];
-
-const TESTIMONIALS = [
-  { quote: 'Pipedrive Consultants did a super job for us! They helped us think through our current manual lead management system and then took over from there. The milestones were all hit on time and on budget.', who: 'Carlo Franzblau, Electronic Learning Products Inc' },
-  { quote: 'Automated Sales went above and beyond cleaning up our Pipedrive account and creating a ton of automations. Highly recommended!!!', who: 'Bryan Driscoll, Motivated Leads' },
-  { quote: 'Automated Sales are the ultimate Pipedrive consultants. They implemented an amazing Pipedrive process for our sales team!', who: 'Geeshan, Netfusion Designs' },
 ];
 
 export default function Page() {
@@ -165,16 +161,8 @@ export default function Page() {
         <div className="as-container">
           <span className="as-eyebrow">Testimonials</span>
           <h2>What clients say.</h2>
-          <div className="as-grid-3" style={{ marginTop: 40 }}>
-            {TESTIMONIALS.map((t) => (
-              <article key={t.who} className="as-card">
-                <div className="as-stars">★★★★★</div>
-                <p style={{ marginTop: 12 }}>{t.quote}</p>
-                <p style={{ marginTop: 16, fontWeight: 800, color: 'var(--slate-700)' }}>{t.who}</p>
-              </article>
-            ))}
-          </div>
         </div>
+        <TestimonialsMarquee testimonials={TESTIMONIALS} />
       </section>
 
       <section className="as-section as-section-muted">
