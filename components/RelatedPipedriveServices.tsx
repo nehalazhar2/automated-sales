@@ -47,6 +47,11 @@ export const PIPEDRIVE_VARIANTS: Variant[] = [
     label: 'Pipedrive Partner',
     blurb: 'A Global Pipedrive Partner and Advisory Council member based in the UK.',
   },
+  {
+    href: 'free-pipedrive-trial-extended/',
+    label: 'Pipedrive Extended Free Trial',
+    blurb: 'Try Pipedrive free for 30 days.',
+  },
 ];
 
 const NEIGHBOURS: Record<string, string[]> = {
