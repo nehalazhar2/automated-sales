@@ -43,6 +43,7 @@ export const FOOTER_LINKS = {
     { href: '/pipedrive-integration/', label: 'Pipedrive Integration' },
     { href: '/pipedrive-automation/', label: 'Pipedrive Automation' },
     { href: '/pipedrive-partner/', label: 'Pipedrive Partner' },
+    { href: '/free-pipedrive-trial-extended/', label: 'Extended Free Pipedrive Trial' },
   ],
   Company: [
     { href: '/about-2/', label: 'About' },
