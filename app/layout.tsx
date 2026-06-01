@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AttributionTracker from '@/components/AttributionTracker';
+import ChatWidget from '@/components/ChatWidget';
 import StructuredData from '@/components/seo/StructuredData';
 import { professionalServiceSchema } from '@/components/seo/schemas';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/site';
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <Footer />
+        <ChatWidget />
         <Script id="leadfeeder" strategy="afterInteractive">
           {`(function(ss,ex){window.ldfdr=window.ldfdr||function(){(ldfdr._q=ldfdr._q||[]).push([].slice.call(arguments));};(function(d,s){var fs=d.getElementsByTagName(s)[0];function ce(src){var cs=d.createElement(s);cs.src=src;cs.async=1;fs.parentNode.insertBefore(cs,fs);}ce('https://sc.lfeeder.com/lftracker_v1_'+ss+(ex?'_'+ex:'')+'.js');})(document,'script');})('JMvZ8gbBo0pa2pOd');`}
         </Script>
