@@ -30,7 +30,7 @@ const ALL_SERVICES: Service[] = [
   {
     href: '/website-design/',
     label: 'Website design',
-    blurb: 'Fast, SEO-optimised company websites built in 48 hours — the same SEO discipline we apply to sales systems.',
+    blurb: 'Fast, SEO-optimised company websites built in 7 days — the same SEO discipline we apply to sales systems.',
   },
   {
     href: '/pipedrive-zapier-active-campaign-services/',

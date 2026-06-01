@@ -30,7 +30,7 @@ export function greetingFor(pathname: string): string {
     return "Want to talk through what a Pipedrive consultant engagement looks like?";
   }
   if (pathname.startsWith('/website-design')) {
-    return "Need a company website in 48 hours? I can give you the quick version.";
+    return "Need a company website in 7 days? I can give you the quick version.";
   }
   if (pathname.startsWith('/ai-consultants')) {
     return "Thinking about AI in your sales process? Ask me what's realistic.";
