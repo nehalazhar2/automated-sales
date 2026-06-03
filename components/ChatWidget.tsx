@@ -1,13 +1,23 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { greetingFor } from '@/lib/chat/greetings';
 
 type Msg = { role: 'user' | 'assistant'; content: string; images?: string[] };
 
 const MAX_IMAGE_BYTES = 4_000_000; // 4 MB per image
 const MAX_IMAGES_PER_MESSAGE = 4;
+
+// Strip the [[nav:/path]] marker from streamed text, including a
+// partial marker at the end (e.g. "[[na" while a token is mid-stream)
+// so the marker never flashes in the chat bubble.
+function stripNavMarker(s: string): string {
+  let out = s.replace(/\[\[nav:\/[a-z0-9\-\/]*\]\]/gi, '');
+  const tailMatch = out.match(/\[\[(?:n(?:a(?:v(?::(?:\/[a-z0-9\-\/]*)?)?)?)?)?$/i);
+  if (tailMatch) out = out.slice(0, tailMatch.index);
+  return out.trimEnd();
+}
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -28,6 +38,31 @@ const PD_PERSON_KEY = 'as_chat_pipedrive_person_id';
 const PD_NOTE_KEY = 'as_chat_pipedrive_note_id';
 const PD_LEAD_KEY = 'as_chat_pipedrive_lead_id';
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
+const NAV_RE = /\[\[nav:(\/[a-z0-9\-\/]*)\]\]/i;
+const NAV_DELAY_MS = 1200;
+const ALLOWED_NAV_PATHS = new Set<string>([
+  '/',
+  '/pipedrive-implementation',
+  '/pipedrive-setup',
+  '/pipedrive-training',
+  '/pipedrive-consultant',
+  '/pipedrive-expert',
+  '/pipedrive-partner',
+  '/pipedrive-help',
+  '/pipedrive-automation',
+  '/pipedrive-integration',
+  '/pipedrive-zapier-active-campaign-services',
+  '/zapier-consultants',
+  '/active-campaign-consultants',
+  '/ai-consultants',
+  '/website-design',
+  '/free-pipedrive-trial-extended',
+  '/testimonials',
+  '/projects',
+  '/blog',
+  '/about-2',
+  '/contact-2',
+]);
 
 function getOrCreateConversationId(): string {
   try {
@@ -78,6 +113,7 @@ async function syncToPipedrive(payload: {
 
 export default function ChatWidget() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
@@ -247,9 +283,10 @@ export default function ChatWidget() {
         const { done, value } = await reader.read();
         if (done) break;
         acc += decoder.decode(value, { stream: true });
+        const visible = stripNavMarker(acc);
         setMessages((m) => {
           const copy = [...m];
-          copy[copy.length - 1] = { role: 'assistant', content: acc };
+          copy[copy.length - 1] = { role: 'assistant', content: visible };
           return copy;
         });
       }
@@ -265,6 +302,25 @@ export default function ChatWidget() {
       });
     } finally {
       setIsStreaming(false);
+    }
+
+    if (!streamErrored && acc) {
+      const navMatch = acc.match(NAV_RE);
+      if (navMatch) {
+        const target = navMatch[1];
+        if (
+          ALLOWED_NAV_PATHS.has(target) &&
+          target !== (pathname || '/')
+        ) {
+          window.setTimeout(() => {
+            try {
+              router.push(target);
+            } catch {
+              // ignore
+            }
+          }, NAV_DELAY_MS);
+        }
+      }
     }
 
     // Sync to Pipedrive after a successful response, if we have an email
@@ -283,7 +339,7 @@ export default function ChatWidget() {
                 }
               : m
           ),
-          { role: 'assistant', content: acc },
+          { role: 'assistant', content: stripNavMarker(acc) || acc },
         ];
         void syncToPipedrive({
           email,
