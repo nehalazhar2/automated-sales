@@ -85,9 +85,8 @@ export async function POST(req: Request) {
       }
     }
     if (!personId) {
-      const localPart = body.email.split('@')[0];
       personId = await createPerson({
-        name: `Chat visitor (${localPart})`,
+        name: body.email,
         email: body.email,
       });
     }
@@ -101,12 +100,13 @@ export async function POST(req: Request) {
     let leadId = body.leadId;
     let leadUrl: string | undefined;
     if (isFirstSync && !leadId) {
+      const trimmedName = existingPersonName?.trim() ?? '';
       const hasRealName =
-        existingPersonName &&
-        existingPersonName.trim().length > 0 &&
-        !/^chat visitor\b/i.test(existingPersonName.trim());
+        trimmedName.length > 0 &&
+        trimmedName.toLowerCase() !== body.email.toLowerCase() &&
+        !/^chat visitor\b/i.test(trimmedName);
       const leadTitle = hasRealName
-        ? existingPersonName!.trim()
+        ? trimmedName
         : `${body.email} - chat enquiry`;
       try {
         const lead = await createLead({
