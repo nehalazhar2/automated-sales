@@ -6,6 +6,7 @@ import {
   createNote,
   updateNote,
   createLead,
+  getPersonName,
 } from '@/lib/pipedrive/client';
 import { sendNewEnquiryEmail } from '@/lib/chat/notify';
 
@@ -72,8 +73,16 @@ export async function POST(req: Request) {
 
   try {
     let personId = body.personId;
+    let existingPersonName: string | null = null;
     if (!personId) {
       personId = (await findPersonByEmail(body.email)) ?? undefined;
+      if (personId) {
+        try {
+          existingPersonName = await getPersonName(personId);
+        } catch {
+          existingPersonName = null;
+        }
+      }
     }
     if (!personId) {
       const localPart = body.email.split('@')[0];
@@ -89,19 +98,19 @@ export async function POST(req: Request) {
       startedAt: body.startedAt,
     });
 
-    let noteId = body.noteId;
-    if (!noteId) {
-      noteId = await createNote({ personId, content: html });
-    } else {
-      await updateNote(noteId, html);
-    }
-
     let leadId = body.leadId;
     let leadUrl: string | undefined;
     if (isFirstSync && !leadId) {
+      const hasRealName =
+        existingPersonName &&
+        existingPersonName.trim().length > 0 &&
+        !/^chat visitor\b/i.test(existingPersonName.trim());
+      const leadTitle = hasRealName
+        ? existingPersonName!.trim()
+        : `${body.email} - chat enquiry`;
       try {
         const lead = await createLead({
-          title: `Website chat enquiry — ${body.email}`,
+          title: leadTitle,
           personId,
         });
         leadId = lead.id;
@@ -109,7 +118,16 @@ export async function POST(req: Request) {
       } catch (e) {
         console.error('Pipedrive createLead failed', e);
       }
+    }
 
+    let noteId = body.noteId;
+    if (!noteId) {
+      noteId = await createNote({ personId, content: html, leadId });
+    } else {
+      await updateNote(noteId, html, { leadId });
+    }
+
+    if (isFirstSync) {
       try {
         await sendNewEnquiryEmail({
           email: body.email,
