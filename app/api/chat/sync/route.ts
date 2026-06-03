@@ -5,7 +5,9 @@ import {
   createPerson,
   createNote,
   updateNote,
+  createLead,
 } from '@/lib/pipedrive/client';
+import { sendNewEnquiryEmail } from '@/lib/chat/notify';
 
 export const runtime = 'edge';
 
@@ -24,6 +26,7 @@ const Body = z.object({
   conversationId: z.string().min(8).max(64),
   personId: z.number().int().positive().optional(),
   noteId: z.number().int().positive().optional(),
+  leadId: z.string().min(1).max(64).optional(),
   startedAt: z.string().max(40).optional(),
 });
 
@@ -65,6 +68,8 @@ export async function POST(req: Request) {
     return ok({ ok: false, error: 'invalid_body' }, 400);
   }
 
+  const isFirstSync = !body.personId && !body.noteId && !body.leadId;
+
   try {
     let personId = body.personId;
     if (!personId) {
@@ -91,7 +96,36 @@ export async function POST(req: Request) {
       await updateNote(noteId, html);
     }
 
-    return ok({ ok: true, personId, noteId });
+    let leadId = body.leadId;
+    let leadUrl: string | undefined;
+    if (isFirstSync && !leadId) {
+      try {
+        const lead = await createLead({
+          title: `Website chat enquiry — ${body.email}`,
+          personId,
+        });
+        leadId = lead.id;
+        leadUrl = lead.url;
+      } catch (e) {
+        console.error('Pipedrive createLead failed', e);
+      }
+
+      try {
+        await sendNewEnquiryEmail({
+          email: body.email,
+          pathname: body.pathname,
+          conversationId: body.conversationId,
+          personId,
+          leadId,
+          leadUrl,
+          firstMessages: body.transcript,
+        });
+      } catch (e) {
+        console.error('Resend notify failed', e);
+      }
+    }
+
+    return ok({ ok: true, personId, noteId, leadId });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'sync_failed';
     return ok({
@@ -100,6 +134,7 @@ export async function POST(req: Request) {
       message,
       personId: body.personId,
       noteId: body.noteId,
+      leadId: body.leadId,
     });
   }
 }

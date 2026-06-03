@@ -61,3 +61,20 @@ export async function updateNote(noteId: number, content: string): Promise<void>
     body: JSON.stringify({ content }),
   });
 }
+
+export async function createLead(input: {
+  title: string;
+  personId: number;
+}): Promise<{ id: string; url: string }> {
+  const data = (await call('/api/v1/leads', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: input.title,
+      person_id: input.personId,
+    }),
+  })) as { data?: { id?: string } };
+  const id = data.data?.id;
+  if (!id) throw new Error('Pipedrive createLead: no id returned');
+  const domain = process.env.PIPEDRIVE_DOMAIN;
+  return { id, url: `https://${domain}.pipedrive.com/leads/inbox/${id}` };
+}

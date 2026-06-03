@@ -26,6 +26,7 @@ const STARTED_AT_KEY = 'as_chat_started_at';
 const EMAIL_KEY = 'as_chat_email';
 const PD_PERSON_KEY = 'as_chat_pipedrive_person_id';
 const PD_NOTE_KEY = 'as_chat_pipedrive_note_id';
+const PD_LEAD_KEY = 'as_chat_pipedrive_lead_id';
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
 
 function getOrCreateConversationId(): string {
@@ -54,6 +55,7 @@ async function syncToPipedrive(payload: {
   try {
     const personIdRaw = sessionStorage.getItem(PD_PERSON_KEY);
     const noteIdRaw = sessionStorage.getItem(PD_NOTE_KEY);
+    const leadIdRaw = sessionStorage.getItem(PD_LEAD_KEY);
     const res = await fetch('/api/chat/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,12 +63,14 @@ async function syncToPipedrive(payload: {
         ...payload,
         personId: personIdRaw ? Number(personIdRaw) : undefined,
         noteId: noteIdRaw ? Number(noteIdRaw) : undefined,
+        leadId: leadIdRaw || undefined,
       }),
     });
     if (!res.ok) return;
-    const data = (await res.json()) as { personId?: number; noteId?: number };
+    const data = (await res.json()) as { personId?: number; noteId?: number; leadId?: string };
     if (data.personId) sessionStorage.setItem(PD_PERSON_KEY, String(data.personId));
     if (data.noteId) sessionStorage.setItem(PD_NOTE_KEY, String(data.noteId));
+    if (data.leadId) sessionStorage.setItem(PD_LEAD_KEY, data.leadId);
   } catch {
     // swallow — chat continues
   }
