@@ -4,11 +4,73 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { greetingFor } from '@/lib/chat/greetings';
 
-type Msg = { role: 'user' | 'assistant'; content: string };
+type Msg = { role: 'user' | 'assistant'; content: string; images?: string[] };
+
+const MAX_IMAGE_BYTES = 4_000_000; // 4 MB per image
+const MAX_IMAGES_PER_MESSAGE = 4;
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
 
 const DISMISSED_PREFIX = 'as_chat_proactive_dismissed:';
 const AUTO_OPEN_KEY = 'as_chat_auto_opened';
 const AUTO_OPEN_MS = 30_000;
+const CONV_ID_KEY = 'as_chat_conversation_id';
+const STARTED_AT_KEY = 'as_chat_started_at';
+const EMAIL_KEY = 'as_chat_email';
+const PD_PERSON_KEY = 'as_chat_pipedrive_person_id';
+const PD_NOTE_KEY = 'as_chat_pipedrive_note_id';
+const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
+
+function getOrCreateConversationId(): string {
+  try {
+    const existing = sessionStorage.getItem(CONV_ID_KEY);
+    if (existing) return existing;
+    const id =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now().toString(36);
+    sessionStorage.setItem(CONV_ID_KEY, id);
+    sessionStorage.setItem(STARTED_AT_KEY, new Date().toISOString());
+    return id;
+  } catch {
+    return 'unknown-' + Date.now();
+  }
+}
+
+async function syncToPipedrive(payload: {
+  email: string;
+  transcript: { role: 'user' | 'assistant'; content: string }[];
+  pathname: string;
+  conversationId: string;
+  startedAt: string;
+}): Promise<void> {
+  try {
+    const personIdRaw = sessionStorage.getItem(PD_PERSON_KEY);
+    const noteIdRaw = sessionStorage.getItem(PD_NOTE_KEY);
+    const res = await fetch('/api/chat/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...payload,
+        personId: personIdRaw ? Number(personIdRaw) : undefined,
+        noteId: noteIdRaw ? Number(noteIdRaw) : undefined,
+      }),
+    });
+    if (!res.ok) return;
+    const data = (await res.json()) as { personId?: number; noteId?: number };
+    if (data.personId) sessionStorage.setItem(PD_PERSON_KEY, String(data.personId));
+    if (data.noteId) sessionStorage.setItem(PD_NOTE_KEY, String(data.noteId));
+  } catch {
+    // swallow — chat continues
+  }
+}
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -17,7 +79,38 @@ export default function ChatWidget() {
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [proactive, setProactive] = useState<string | null>(null);
+  const [pendingImages, setPendingImages] = useState<string[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const onPickFiles = useCallback(async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImageError(null);
+    const newOnes: string[] = [];
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) {
+        setImageError('Only image files are supported.');
+        continue;
+      }
+      if (file.size > MAX_IMAGE_BYTES) {
+        setImageError('Each image must be under 4 MB.');
+        continue;
+      }
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        newOnes.push(dataUrl);
+      } catch {
+        setImageError('Could not read that file.');
+      }
+    }
+    setPendingImages((prev) => [...prev, ...newOnes].slice(0, MAX_IMAGES_PER_MESSAGE));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
+
+  const removePendingImage = useCallback((idx: number) => {
+    setPendingImages((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
 
   // Auto-scroll to bottom on new content
   useEffect(() => {
@@ -94,15 +187,34 @@ export default function ChatWidget() {
 
   const send = useCallback(async () => {
     const text = input.trim();
-    if (!text || isStreaming) return;
+    const imagesToSend = pendingImages;
+    if ((!text && imagesToSend.length === 0) || isStreaming) return;
     setInput('');
-    const next: Msg[] = [...messages, { role: 'user', content: text }];
+    setPendingImages([]);
+    setImageError(null);
+
+    const conversationId = getOrCreateConversationId();
+    const startedAt =
+      sessionStorage.getItem(STARTED_AT_KEY) ?? new Date().toISOString();
+
+    // Detect email in the user's message; cache first match
+    if (!sessionStorage.getItem(EMAIL_KEY)) {
+      const m = text.match(EMAIL_RE);
+      if (m) sessionStorage.setItem(EMAIL_KEY, m[1].toLowerCase());
+    }
+
+    const userMsg: Msg = {
+      role: 'user',
+      content: text || (imagesToSend.length ? '(image attached)' : ''),
+      ...(imagesToSend.length ? { images: imagesToSend } : {}),
+    };
+    const next: Msg[] = [...messages, userMsg];
     setMessages(next);
     setIsStreaming(true);
-
-    // Add empty assistant placeholder
     setMessages((m) => [...m, { role: 'assistant', content: '' }]);
 
+    let acc = '';
+    let streamErrored = false;
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -114,16 +226,19 @@ export default function ChatWidget() {
       });
       if (!res.ok || !res.body) {
         const errText = await res.text().catch(() => 'Something went wrong.');
+        streamErrored = true;
         setMessages((m) => {
           const copy = [...m];
-          copy[copy.length - 1] = { role: 'assistant', content: errText || 'Sorry, I hit an error.' };
+          copy[copy.length - 1] = {
+            role: 'assistant',
+            content: errText || 'Sorry, I hit an error.',
+          };
           return copy;
         });
         return;
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let acc = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -135,6 +250,7 @@ export default function ChatWidget() {
         });
       }
     } catch {
+      streamErrored = true;
       setMessages((m) => {
         const copy = [...m];
         copy[copy.length - 1] = {
@@ -146,7 +262,35 @@ export default function ChatWidget() {
     } finally {
       setIsStreaming(false);
     }
-  }, [input, isStreaming, messages, pathname]);
+
+    // Sync to Pipedrive after a successful response, if we have an email
+    if (!streamErrored && acc) {
+      const email = sessionStorage.getItem(EMAIL_KEY);
+      if (email) {
+        // Don't ship base64 images to Pipedrive — replace with a placeholder
+        const transcript: Msg[] = [
+          ...next.map((m) =>
+            m.images && m.images.length > 0
+              ? {
+                  role: m.role,
+                  content:
+                    (m.content && m.content !== '(image attached)' ? m.content + ' ' : '') +
+                    `[${m.images.length} image${m.images.length > 1 ? 's' : ''} attached]`,
+                }
+              : m
+          ),
+          { role: 'assistant', content: acc },
+        ];
+        void syncToPipedrive({
+          email,
+          transcript,
+          pathname: pathname || '/',
+          conversationId,
+          startedAt,
+        });
+      }
+    }
+  }, [input, isStreaming, messages, pathname, pendingImages]);
 
   return (
     <>
@@ -243,12 +387,41 @@ export default function ChatWidget() {
                 key={i}
                 className={m.role === 'user' ? 'as-chat-msg-user' : 'as-chat-msg-bot'}
               >
-                {m.content || (isStreaming && i === messages.length - 1 ? (
+                {m.images && m.images.length > 0 && (
+                  <div className="as-chat-msg-images">
+                    {m.images.map((src, j) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={j} src={src} alt="Attached image" />
+                    ))}
+                  </div>
+                )}
+                {m.content && m.content !== '(image attached)' ? (
+                  <div>{m.content}</div>
+                ) : null}
+                {!m.content && isStreaming && i === messages.length - 1 ? (
                   <span className="as-chat-typing"><span></span><span></span><span></span></span>
-                ) : null)}
+                ) : null}
               </div>
             ))}
           </div>
+          {(pendingImages.length > 0 || imageError) && (
+            <div className="as-chat-attachments">
+              {pendingImages.map((src, i) => (
+                <div key={i} className="as-chat-thumb">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="Pending attachment" />
+                  <button
+                    type="button"
+                    aria-label="Remove image"
+                    onClick={() => removePendingImage(i)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              {imageError && <div className="as-chat-attach-error">{imageError}</div>}
+            </div>
+          )}
           <form
             className="as-chat-input"
             onSubmit={(e) => {
@@ -257,14 +430,44 @@ export default function ChatWidget() {
             }}
           >
             <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              onChange={(e) => onPickFiles(e.target.files)}
+            />
+            <button
+              type="button"
+              className="as-chat-attach-btn"
+              aria-label="Attach image"
+              title="Attach image"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isStreaming || pendingImages.length >= MAX_IMAGES_PER_MESSAGE}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M21 12.5L12.5 21a5 5 0 0 1-7-7L14 5.5a3.5 3.5 0 0 1 5 5L10.5 19a2 2 0 0 1-3-3L16 7.5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Type a message…"
+              placeholder={pendingImages.length > 0 ? 'Add a message (optional)…' : 'Type a message…'}
               aria-label="Message"
               disabled={isStreaming}
             />
-            <button type="submit" disabled={isStreaming || !input.trim()} aria-label="Send">
+            <button
+              type="submit"
+              disabled={isStreaming || (!input.trim() && pendingImages.length === 0)}
+              aria-label="Send"
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
                   d="M5 12l14-7-7 14-2-5-5-2z"

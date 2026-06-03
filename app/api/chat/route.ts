@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import OpenAI from 'openai';
-import { systemPrompt } from '@/lib/chat/systemPrompt';
 
 export const runtime = 'edge';
 
@@ -9,7 +8,11 @@ const Body = z.object({
     .array(
       z.object({
         role: z.enum(['user', 'assistant']),
-        content: z.string().min(1).max(2000),
+        content: z.string().max(2000),
+        images: z
+          .array(z.string().startsWith('data:image/').max(8_000_000))
+          .max(4)
+          .optional(),
       })
     )
     .min(1)
@@ -45,17 +48,15 @@ export async function POST(req: Request) {
 
   let body: z.infer<typeof Body>;
   try {
-    const raw = await req.json();
-    body = Body.parse(raw);
+    body = Body.parse(await req.json());
   } catch {
     return new Response('Invalid request body.', { status: 400 });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
-  if (!apiKey) {
-    return new Response('Chat is not configured.', { status: 500 });
-  }
+  const promptId = process.env.OPENAI_PROMPT_ID;
+  if (!apiKey) return new Response('Chat is not configured.', { status: 500 });
+  if (!promptId) return new Response('Prompt id not configured.', { status: 500 });
 
   const openai = new OpenAI({ apiKey });
 
@@ -65,21 +66,38 @@ export async function POST(req: Request) {
       const abort = new AbortController();
       const timeout = setTimeout(() => abort.abort(), 30_000);
       try {
-        const completion = await openai.chat.completions.create(
+        const events = await openai.responses.create(
           {
-            model,
+            prompt: {
+              id: promptId,
+              variables: { pathname: body.pathname },
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            input: body.messages.map((m): any => {
+              if (m.role === 'assistant') {
+                return { role: 'assistant', content: m.content || '' };
+              }
+              const parts: Array<
+                { type: 'input_text'; text: string } | { type: 'input_image'; image_url: string; detail: 'auto' }
+              > = [];
+              if (m.content) parts.push({ type: 'input_text', text: m.content });
+              if (m.images) {
+                for (const img of m.images) {
+                  parts.push({ type: 'input_image', image_url: img, detail: 'auto' });
+                }
+              }
+              if (parts.length === 0) parts.push({ type: 'input_text', text: '' });
+              return { role: 'user', content: parts };
+            }),
             stream: true,
-            messages: [
-              { role: 'system', content: systemPrompt(body.pathname) },
-              ...body.messages,
-            ],
           },
           { signal: abort.signal }
         );
 
-        for await (const chunk of completion) {
-          const delta = chunk.choices?.[0]?.delta?.content;
-          if (delta) controller.enqueue(encoder.encode(delta));
+        for await (const event of events as AsyncIterable<{ type: string; delta?: string }>) {
+          if (event.type === 'response.output_text.delta' && event.delta) {
+            controller.enqueue(encoder.encode(event.delta));
+          }
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Chat error.';
