@@ -44,7 +44,7 @@ export const FOOTER_LINKS = {
     { href: '/pipedrive-automation/', label: 'Pipedrive Automation' },
     { href: '/pipedrive-partner/', label: 'Pipedrive Partner' },
     { href: '/free-pipedrive-trial-extended/', label: 'Pipedrive Free Trial' },
-    { href: 'https://leadrouter.automated-sales.com', label: 'Pipedrive Lead Router' },
+    { href: 'https://leadrouter.automated-sales.com/', label: 'Pipedrive Lead Router' },
   ],
   Company: [
     { href: '/about-2/', label: 'About' },
