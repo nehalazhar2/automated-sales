@@ -1,0 +1,64 @@
+---
+title: "Why Pipedrive lead assignment is broken for most sales teams — and how to fix it"
+description: "Most lead routing tools increment a counter and call it done. LeadRouter reads your live Pipedrive data — performance, history, and team — and routes accordingly."
+date: "2026-06-08"
+category: "Pipedrive"
+author: "Automated Sales"
+draft: false
+---
+
+Most lead routing tools have one thing in common: they have no idea what's actually happening in your CRM.
+
+Round-robin assignment is the default answer to "how do we distribute leads fairly?" and it is understandable why. It is simple, it is easy to explain to the team, and it is easy to build in Zapier. Keep a counter, increment it, assign the next rep.
+
+The problem is that it treats every deal the same and every rep the same. Your top closer and your newest recruit get identical lead flow. A returning customer who previously worked with your most experienced rep gets whoever is next in line. A deal worth £50,000 gets the same routing logic as a £500 one.
+
+## What other tools cannot do
+
+Every other lead routing tool — Zapier round-robins, Pipedrive's native assignment, HubSpot rotation — works the same way. It keeps a position counter and has no awareness of anything else.
+
+It does not know:
+
+- Which rep has performed best this month
+- Whether this contact has an open deal with someone already
+- Which rep closed business with this company before
+- Whether the deal was created by the rep themselves
+- Which pipeline this deal came from and which team should handle it
+
+It just increments a counter.
+
+## What changes when routing has real context
+
+When your routing logic actually reads your live CRM data, several things get better.
+
+**Returning customers get continuity.** A contact submits a new enquiry. LeadRouter checks their deal history, finds a previous won deal with a specific rep, and sends the new deal straight to them. The customer picks up where they left off. That rep does not have to rebuild the relationship from scratch.
+
+**Performance actually drives lead flow.** If weighting is enabled, LeadRouter pulls the last 30 days of Pipedrive data — won deals, revenue, conversion rate — scores each rep, and weights the rotation accordingly. Not a static score set by a manager. Live data, updated automatically.
+
+**Self-sourced deals stay with the rep who sourced them.** If a rep creates a deal in Pipedrive and assigns it to themselves, they sourced it. Routing it to someone else destroys trust fast. LeadRouter checks whether the creator and the assigned owner are the same person, and skips assignment entirely if they are.
+
+**Multi-brand teams stop bleeding into each other.** If you run multiple pipelines or brands, you can assign each pipeline to a specific team with its own rep pool. Team A deals go to Team A reps. Team B stays completely separate. No cross-contamination.
+
+## The five rules, in order
+
+LeadRouter runs every new deal through the same sequence — pulling live Pipedrive data at each step:
+
+1. **Open deal guard** — contact already has an open deal? Route to the same rep and notify them. Always fires first.
+2. **Same-day deduplication** — multiple enquiries from the same contact on the same day go to the same rep.
+3. **Deal continuity** — returning customer? Back to whoever worked them before, if they are still active.
+4. **Self-sourced guard** — rep created and self-assigned the deal? Leave it with them.
+5. **Round robin** — everything else goes into the rotation, equal or weighted by performance.
+
+Each rule is a guard that prevents the next one from firing incorrectly. The order matters.
+
+## The result
+
+The practical difference is this: your best rep gets more deals because the system knows they are your best rep. Your returning customers get the rep they already trust. Your prospecting effort does not get reassigned. And you have a full audit log of every decision the system made.
+
+None of that requires manual intervention once it is set up.
+
+[Try LeadRouter free for 14 days →](https://leadrouter.automated-sales.com)
+
+---
+
+We built LeadRouter after rebuilding the same routing logic for client after client. If you are dealing with this problem in Zapier right now, [get in touch](/contact-2/) — we can usually diagnose the gap in 20 minutes.
