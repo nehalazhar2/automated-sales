@@ -1,0 +1,55 @@
+---
+title: "Building LeadRouter — Pipedrive lead routing SaaS"
+description: "How we built a multi-tenant Pipedrive lead routing SaaS from scratch — real-time deal assignment with performance weighting, deal continuity, and multi-team separation."
+date: "2026-06-08"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/leadrouter.png"
+draft: false
+---
+
+After rebuilding the same Pipedrive lead routing logic for client after client, we decided to build it once — properly — as a standalone SaaS product.
+
+## The problem
+
+Every Pipedrive team we work with has the same gap. Leads come in, someone has to assign them, and whatever process exists — manual assignment, a Zapier round-robin, a spreadsheet — breaks the moment the team grows or a manager goes on holiday.
+
+The deeper issue is that existing tools treat every deal identically and have no awareness of what's happening in the CRM. They keep a counter and increment it. They don't know which rep closed business with this contact before, which rep has performed best this month, or whether this deal was self-sourced by the rep who created it.
+
+## What we built
+
+**LeadRouter** is a multi-tenant SaaS that connects to Pipedrive via OAuth and webhook, and routes every new deal through five rules in sequence:
+
+1. **Open deal guard** — if the contact already has an open deal, route to the same rep
+2. **Same-day deduplication** — multiple enquiries from the same contact on the same day go to the same rep
+3. **Deal continuity** — returning customers go back to whoever worked them before
+4. **Self-sourced guard** — if a rep created and self-assigned a deal, leave it with them
+5. **Round robin** — everything else, equal or weighted by real-time performance data
+
+The performance weighting pulls live data from Pipedrive — won deals, revenue, conversion rate, activity score — and weights the rotation accordingly. Not a static score set manually. Live data, updated on a daily cron.
+
+## Technical build
+
+- **Stack:** Node.js, Express, PostgreSQL, Digital Ocean (Ubuntu 24.04)
+- **Auth:** JWT, Pipedrive OAuth
+- **Billing:** Stripe (£10/rep/month, 14-day trial)
+- **Email:** Resend (welcome email, password reset)
+- **Frontend:** Single-page app served as static HTML
+
+The architecture is fully multi-tenant — every query is scoped by `account_id`, accounts are completely isolated from each other. A new client registers, connects their Pipedrive account, adds one webhook, and the engine starts routing immediately.
+
+## Key features
+
+**Teams** — accounts can create multiple teams, each with their own rep pool and routing rules. Pipelines are assigned to teams via auto-discovery from the Pipedrive API. Useful for multi-brand setups where different pipelines should go to different sales teams.
+
+**Performance weighting** — four scoring metrics (revenue, won deals, conversion rate, activity score) with configurable period, rebalance schedule and weighting strength. Configurable per team.
+
+**Full audit log** — every assignment decision is logged with the rule that fired, the rep assigned, and the outcome. CSV export with date range and outcome filters.
+
+**Billing overrides** — an admin API allows free or discounted access per account, used for consulting clients and beta users.
+
+## Outcome
+
+LeadRouter is live at [leadrouter.automated-sales.co](https://leadrouter.automated-sales.co) with a 14-day free trial. The landing page is at [leadrouter.automated-sales.com](https://leadrouter.automated-sales.com).
+
+The product solves a problem we encountered on virtually every Pipedrive engagement — and is now available as a self-serve tool for any Pipedrive team.
