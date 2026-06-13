@@ -1,6 +1,6 @@
 ---
 title: "Pipedrive Activity Report Tool — From Manual Export to Instant Report"
-description: "How we replaced a client's weekly manual reporting process with a self-serve browser tool that reads directly from Pipedrive exports and renders a formatted activity report instantly."
+description: "How we replaced a client's weekly manual reporting process with a hosted web app that pulls live data from Pipedrive and automatically emails the report every Friday."
 date: "2026-06-13"
 category: "Pipedrive"
 author: "Automated Sales"
@@ -20,11 +20,9 @@ The existing spreadsheet had no connection to live Pipedrive data. It relied on 
 
 ## What we built
 
-A single self-contained HTML file. No server, no database, no login required.
+A hosted web application that connects directly to Pipedrive via API. The team log in online, and the report is always there — live data, no exports, no manual steps.
 
-The user exports their deals from Pipedrive as an `.xlsx` file — a standard export anyone can run in two clicks — and uploads it to the tool. The report generates instantly in the browser.
-
-The tool auto-detects whichever export format Pipedrive produces (it has two: a compact Insights export and a full data export) and maps the relevant columns accordingly. Monthly and weekly views are both supported, with ISO week numbers used for weekly mode so date boundaries are unambiguous.
+Every Friday the report is automatically emailed to the management team. It can also be downloaded at any time from the web app, and generated on demand whenever it's needed outside the normal schedule.
 
 ## Categorisation logic
 
@@ -38,7 +36,7 @@ The original report grouped deals into four categories. The logic for doing so w
 
 **Variations** — any deal in a pipeline whose name contains "variation", regardless of status. Won variations also appear in Orders — intentional, as the client tracks them separately.
 
-The version number is parsed directly from the deal title, which the client's team already formats consistently (e.g. `QT-50401/0 - Customer Name - Project Description`). No custom Pipedrive fields need to be added for categorisation to work.
+The version number is parsed directly from the deal title, which the client's team already formats consistently (e.g. `QT-50401/0 - Customer Name - Project Description`). No custom Pipedrive fields needed, no changes to how the team works.
 
 ## Date filtering
 
@@ -55,20 +53,17 @@ Each of the four sections renders as a table with subtotals. Columns include:
 - Value columns per Business Unit (Food Projects, SPEC, Crest, Special Project)
 - Grand Total, GP £, OHR £, GP % with a proportional bar per row
 
-Negative values appear in red. A summary row at the top shows total pipeline value, total GP, overhead recovery, and deal count by category.
+Negative values appear in red. A summary row at the top shows total pipeline value, total GP, overhead recovery, and deal count by category. Monthly and weekly views are both available.
 
 ## Technology
 
-Everything runs in the browser. There is no backend to maintain.
-
-SheetJS handles reading the `.xlsx` file. Everything else — parsing, categorising, filtering, rendering — is plain JavaScript. The whole thing is one file the client saves to their desktop and opens in any browser.
-
-## What's coming next
-
-Phase 2 will remove the manual export step entirely. A lightweight Flask application on Digital Ocean will connect to the Pipedrive API directly, pull deal data on a scheduled Friday job, and send the report as an inline HTML email plus PDF attachment via SendGrid. A simple web UI and `/send-now` endpoint will allow on-demand generation. Infrastructure cost is expected to be around £5/month.
+- **Backend:** Flask on Digital Ocean
+- **Data:** Pipedrive API — live deal data, no manual exports
+- **Scheduling:** Friday 5pm automated email via SendGrid
+- **Frontend:** Web app accessible via browser login
 
 ## The broader point
 
 This project is a good example of a recurring pattern: a genuinely useful internal report that has become a bottleneck because it's tied to one person doing a manual task every week.
 
-The right fix is rarely a new dashboard product. It's the same report, on time, without the manual work — built around how the team already works and what Pipedrive already exports.
+The right fix is rarely a new dashboard product. It's the same report, on time, without the manual work — connected directly to the data that already exists in Pipedrive.
