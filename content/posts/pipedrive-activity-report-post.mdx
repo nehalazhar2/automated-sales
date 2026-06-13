@@ -1,6 +1,6 @@
 ---
 title: "From Weekly Spreadsheet to Instant Report — Automating a Pipedrive Activity Report"
-description: "How we replaced a fragile Friday afternoon spreadsheet routine with a self-serve browser tool that generates a formatted activity report from a standard Pipedrive export in seconds."
+description: "How we replaced a fragile Friday afternoon spreadsheet routine with a hosted web app that pulls live data from Pipedrive and emails the report automatically every week."
 date: "2026-06-13"
 category: "Pipedrive"
 author: "Automated Sales"
@@ -16,11 +16,11 @@ The report itself was fine. It showed everything management needed — deals quo
 
 ## What we replaced it with
 
-A single HTML file that lives on the desktop.
+A hosted web app connected directly to Pipedrive via API.
 
-The user runs their standard Pipedrive data export — something anyone with access can do in two clicks — uploads the `.xlsx` to the tool, and the report appears instantly in the browser. No server. No login. No installation.
+The management team log in online and the report is always there — live data pulled straight from Pipedrive, no exports, no manual steps. Every Friday it lands in their inbox automatically. If someone needs it mid-week, they can generate and download it on demand at any time.
 
-It auto-detects whichever export format Pipedrive produces, maps the columns, and renders four sections — Orders, Quotes, Requotes, Variations — each with colour-coded Business Unit columns, GP and overhead figures, and subtotals. There's a monthly view and a weekly view with ISO week numbers so the date boundaries are precise.
+The report covers four sections — Orders, Quotes, Requotes, Variations — each with colour-coded Business Unit columns, GP and overhead figures, and subtotals. Monthly and weekly views are both available.
 
 ## The categorisation problem
 
@@ -33,16 +33,16 @@ Deals are sorted into four groups automatically:
 - **Requotes** — open deals, not in Variations, with title suffix `/1` or higher
 - **Variations** — any deal in a pipeline containing "variation"
 
-The key insight was detecting Quotes vs Requotes from the version number already in the deal title. The client's team names deals consistently: `QT-50401/0`, `QT-50401/1`, `QT-50401/2`. The tool just parses that suffix. No custom Pipedrive fields needed, no tagging discipline required from the team.
+The key insight was detecting Quotes vs Requotes from the version number already in the deal title. The client's team names deals consistently: `QT-50401/0`, `QT-50401/1`, `QT-50401/2`. The tool just parses that suffix. No custom Pipedrive fields needed, no change to how the team works.
 
 ## Why not just use a dashboard tool?
 
 The categorisation logic is bespoke. The Business Unit column layout is specific to how this client structures their pipeline. The GP and overhead recovery figures come from custom Pipedrive fields. Getting any off-the-shelf tool to reproduce this layout exactly would have required more configuration than building it from scratch — and the result would have been dependent on a third-party subscription.
 
-A bespoke tool built around how the client already works is often simpler and more durable than a general-purpose one configured to approximate it.
+A bespoke tool built around how the client already works, connected directly to their Pipedrive data, is simpler and more durable than a general-purpose one configured to approximate it.
 
-## What's next
+## The result
 
-Phase 2 will remove the manual export step entirely. A small Flask app on Digital Ocean will pull deal data from the Pipedrive API directly on a Friday schedule, render the same report, and send it as an inline HTML email with a PDF attachment. Around £5/month in infrastructure, no manual steps at all.
+No more Friday afternoon spreadsheet work. The report goes out automatically, it's always based on live data, and anyone on the team can pull it whenever they need it.
 
 If you've got a report that works well but costs someone an hour a week to produce, [get in touch](/contact) — this is exactly the kind of thing we enjoy fixing.
