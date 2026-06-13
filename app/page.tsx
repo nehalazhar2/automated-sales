@@ -42,10 +42,10 @@ const SERVICES = [
 
 const PROJECTS = [
   {
-    href: '/automating-lettings-agencys-process/',
-    title: 'Automated Estate Agent',
-    body: 'A Pipedrive and automation rebuild for a UK lettings business.',
-    image: '/images/projects/lettings-agent.png',
+       href: '/leadrouter-case-study/',
+    title: 'Building LeadRouter — Pipedrive lead routing SaaS',
+    body: 'After rebuilding the same Pipedrive lead routing logic for client after client, we built it once — properly — as a standalone SaaS product with performance weighting, deal continuity, and multi-team support.',
+    image: '/images/projects/leadrouter.png',
   },
   {
     href: '/taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive/',
@@ -54,10 +54,10 @@ const PROJECTS = [
     image: '/images/projects/pipeline.jpeg',
   },
   {
-    href: '/automating-sales-outreach/',
-    title: 'Pipedrive Expert Workflow',
-    body: 'Multi-channel outreach machine built in Pipedrive, Zapier and ActiveCampaign.',
-    image: '/images/projects/outreach.png',
+    href: '/pipedrive-activity-report/',
+    title: 'Pipedrive Activity Report Tool',
+    body: 'We replaced a client\'s weekly manual spreadsheet routine with a hosted web app that pulls live data from Pipedrive and automatically emails the report every Friday.',
+    image: '/images/projects/pipedrive-activity-report.png',
   },
 ];
 
