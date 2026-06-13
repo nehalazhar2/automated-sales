@@ -1,0 +1,48 @@
+title	From Weekly Spreadsheet to Instant Report — Automating a Pipedrive Activity Report
+description	How we replaced a fragile Friday afternoon spreadsheet routine with a self-serve browser tool that generates a formatted activity report from a standard Pipedrive export in seconds.
+date	2026-06-13
+category	Pipedrive
+author	Automated Sales
+ogImage	/images/blog/pipedrive-activity-report.png
+draft	false
+
+Every Friday afternoon, someone at our client's office would open Pipedrive, export a spreadsheet, paste figures into a formatted Excel template, fix the formulas, and email the result to the management team.
+
+It took the better part of an hour. If the person who knew how to do it was on leave, the report didn't go out. If they made a mistake in the copy-paste, nobody noticed until a manager queried a figure in the meeting.
+
+The report itself was fine. It showed everything management needed — deals quoted and won that week, GP and overhead recovery per deal, Business Unit breakdown, pipeline health at a glance. The problem was entirely in how it was produced.
+
+## What we replaced it with
+
+A single HTML file that lives on the desktop.
+
+The user runs their standard Pipedrive data export — something anyone with access can do in two clicks — uploads the `.xlsx` to the tool, and the report appears instantly in the browser. No server. No login. No installation.
+
+It auto-detects whichever export format Pipedrive produces, maps the columns, and renders four sections — Orders, Quotes, Requotes, Variations — each with colour-coded Business Unit columns, GP and overhead figures, and subtotals. There's a monthly view and a weekly view (ISO week numbers, so the date boundaries are precise).
+
+## The categorisation problem
+
+The trickiest part wasn't building the report. It was encoding the categorisation logic that previously lived only in the spreadsheet author's head.
+
+Deals are sorted into four groups:
+
+- **Orders** — Status = Won (any pipeline)
+- **Quotes** — open deals, not in Variations, with title suffix `/0`
+- **Requotes** — open deals, not in Variations, with title suffix `/1` or higher
+- **Variations** — any deal in a pipeline containing "variation"
+
+That last rule — detecting Quotes vs Requotes from the version number in the deal title — turned out to be the key insight. The client's team already names deals consistently: `QT-50401/0`, `QT-50401/1`, `QT-50401/2`. The tool just parses that suffix. No custom Pipedrive fields needed, no tagging discipline required.
+
+## Why not just use a dashboard tool?
+
+We looked at whether an existing reporting product could replace the spreadsheet. The honest answer is that none of them would have been a better fit than this.
+
+The categorisation logic is bespoke. The Business Unit column layout is specific to how this client structures their pipeline. The GP and overhead recovery figures come from custom Pipedrive fields. Getting any off-the-shelf tool to reproduce this layout exactly would have required more configuration than building it from scratch — and the result would have been dependent on a third-party subscription.
+
+A bespoke tool built around how the client already works is often simpler and more durable than a general-purpose one configured to approximate it.
+
+## What's next
+
+Phase 2 will remove the manual export step entirely. A small Flask app on Digital Ocean will pull deal data from the Pipedrive API directly on a Friday schedule, render the same report, and send it as an inline HTML email with a PDF attachment. Around £5/month in infrastructure, no manual steps at all.
+
+If you've got a report that works well but costs someone an hour a week to produce, [get in touch](/contact) — this is exactly the kind of thing we enjoy fixing.
