@@ -137,16 +137,16 @@ export default function Page() {
       <RecentProjects
         projects={[
           {
-            slug: 'increasing-sales-for-a-high-tech-high-growth-startup',
-            title: 'Pipedrive launch in 2 weeks',
-            body: 'Full Pipedrive implementation for a Los Angeles fintech — data cleansing, dedupe, timezone formulas and a sales dashboard built against an aggressive deadline.',
-            image: '/images/projects/data-import.jpeg',
+            slug: 'leadrouter-case-study',
+      title: 'Building LeadRouter — Pipedrive lead routing SaaS',
+      body: 'After rebuilding the same Pipedrive lead routing logic for client after client, we built it once — properly — as a standalone SaaS product with performance weighting, deal continuity, and multi-team support.',
+      image: '/images/projects/leadrouter.png',
           },
           {
-            slug: 'taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive',
-            title: 'Offline to Pipedrive',
-            body: 'A US non-profit moved off spreadsheets onto Pipedrive — every awareness, qualification and tablet-shipment step automated against the right deal.',
-            image: '/images/projects/pipeline.jpeg',
+           slug: 'pipedrive-activity-report',
+      title: 'Pipedrive Activity Report Tool',
+      body: 'We replaced a client\'s weekly manual spreadsheet routine with a hosted web app that pulls live data from Pipedrive and automatically emails the report every Friday.',
+      image: '/images/projects/pipedrive-activity-report.png',
           },
           {
             slug: 'automating-lettings-agencys-process',
