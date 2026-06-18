@@ -149,10 +149,10 @@ export default function Page() {
       image: '/images/projects/pipedrive-activity-report.png',
           },
           {
-            slug: 'automating-lettings-agencys-process',
-            title: 'Automated lettings pipeline',
-            body: 'End-to-end Pipedrive automation for a fast-growing Canadian lettings agency — saving them an entire FTE.',
-            image: '/images/projects/lettings-agent.png',
+            slug: 'pipedrive-claude-mcp-recent-project',
+            title: 'Pipedrive Claude MCP',
+            body: 'Building a private MCP for Claude, allowing teams to uncover deep insights into sales performance using AI.',
+            image: '/images/projects/Pipedrive_Claude_MCP.png',
           },
         ]}
       />
