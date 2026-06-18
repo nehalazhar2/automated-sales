@@ -61,10 +61,10 @@ export default function Page() {
             body: 'Narrow AI agents and transcription introduced into a regulated sales process, with audit trails and a human in the loop where decisions touch a customer.',
           },
           {
-            slug: 'automating-sales-outreach',
-            title: 'AI-assisted outreach at scale',
-            body: 'Subject-line and first-line drafting plus AI call summaries feeding Pipedrive — 3.4× outreach volume at flat headcount, brand voice intact.',
-            image: '/images/projects/outreach.png',
+            slug: 'pipedrive-claude-mcp-recent-project/',
+            title: 'Pipedrive MCP Integration with Claude',
+            body: 'Connecting Pipedrive with Claude so CRM data can be queried in natural language.',
+            image: '/images/projects/Pipedrive_Claude_MCP.png',
           },
         ]}
       />
