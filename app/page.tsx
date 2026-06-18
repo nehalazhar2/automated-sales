@@ -51,7 +51,7 @@ const PROJECTS = [
   title: "Pipedrive MCP Integration with Claude",
   body: "Connecting Pipedrive with Claude so CRM data can be queried in natural language.",
   href: "/projects/pipedrive-claude-mcp-recent-project/",
-  image: "/images/projects/pipedrive-claude-mcp.png",
+  image: "/images/projects/Pipedrive_Claude_MCP.png",
   },
   {
     href: '/pipedrive-activity-report/',
