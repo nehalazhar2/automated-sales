@@ -48,10 +48,10 @@ const PROJECTS = [
     image: '/images/projects/leadrouter.png',
   },
   {
-    href: '/taking-an-offline-lead-management-process-online-and-automating-it-through-pipedrive/',
-    title: 'Pipedrive Pipeline',
-    body: 'Taking an offline lead management process online for a US non-profit.',
-    image: '/images/projects/pipeline.jpeg',
+  title: "Pipedrive MCP Integration with Claude",
+  body: "Connecting Pipedrive with Claude so CRM data can be queried in natural language.",
+  href: "/projects/pipedrive-claude-mcp-integration",
+  image: "/images/projects/pipedrive-claude-mcp.png",
   },
   {
     href: '/pipedrive-activity-report/',
