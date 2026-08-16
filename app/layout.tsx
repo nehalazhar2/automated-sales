@@ -9,13 +9,11 @@ import StructuredData from '@/components/seo/StructuredData';
 import { professionalServiceSchema } from '@/components/seo/schemas';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/site';
 import './globals.css';
-
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
 });
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -61,7 +59,6 @@ export const metadata: Metadata = {
     ? { google: process.env.GOOGLE_VERIFICATION_CODE }
     : undefined,
 };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
@@ -81,6 +78,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="outfunnel" strategy="afterInteractive">
           {`window.OFID="61c35a14eb73af43f3a33b7f";(function(){var script=document.createElement("script");var url='https://cdn.outfunnel.com/c.js?v='+new Date().toISOString().substring(0,10);script.setAttribute('src',url);document.getElementsByTagName('head')[0].appendChild(script);})();`}
         </Script>
+        <Script id="as-tracker-config" strategy="afterInteractive">
+          {`window.AS_TRACKER_API_URL = "https://attribution.automated-sales.co/t/automated-sales";
+window.AS_TRACKER_KEY = "2dc070e366bb87f69d60584d0522a2f7";`}
+        </Script>
+        <Script
+          src="https://attribution.automated-sales.co/automated-sales-tracker.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
