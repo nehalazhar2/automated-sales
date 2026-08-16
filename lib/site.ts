@@ -46,6 +46,7 @@ export const FOOTER_LINKS = {
     { href: '/free-pipedrive-trial-extended/', label: 'Pipedrive Free Trial' },
     { href: 'https://leadrouter.automated-sales.com/', label: 'Pipedrive Lead Router' },
     { href: 'https://pipedrivemcp.automated-sales.co/', label: 'Pipedrive Claude MCP' },
+    { href: 'https://attribution.automated-sales.co/', label: 'Pipedrive Source Attribution' }
   ],
   Company: [
     { href: '/about-2/', label: 'About' },
