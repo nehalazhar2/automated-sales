@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AttributionTracker from '@/components/AttributionTracker';
+import AttributionRouteTracker from '@/components/AttributionRouteTracker';
 import ChatWidget from '@/components/ChatWidget';
 import StructuredData from '@/components/seo/StructuredData';
 import { professionalServiceSchema } from '@/components/seo/schemas';
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StructuredData data={professionalServiceSchema()} />
         <a className="skip-link" href="#main">Skip to content</a>
         <AttributionTracker />
+        <AttributionRouteTracker />
         <Header />
         <main id="main" className="site-main" role="main">
           {children}
