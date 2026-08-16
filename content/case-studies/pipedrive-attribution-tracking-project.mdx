@@ -1,0 +1,126 @@
+---
+title: "Prospect Journey Attribution for Pipedrive"
+slug: "pipedrive-prospect-journey-attribution"
+description: "A recent project building a multi-touch attribution tool that writes a prospect's full journey — ads, website visits, emails and sales activity — straight onto Pipedrive Person and Deal records."
+date: "2026-08-16"
+type: "Recent Project"
+ogImage: /images/projects/Attribution_Tracking.png
+client: "Confidential"
+industry: "CRM, Marketing Attribution, Sales Operations"
+services:
+  - Pipedrive API Integration
+  - Marketing Attribution
+  - Custom Field Automation
+  - Website Tracking
+  - Dashboard Reporting
+featured: true
+---
+
+# Prospect Journey Attribution for Pipedrive
+
+## Recent Project Overview
+
+Automated Sales recently built a **prospect journey attribution tool for Pipedrive**, giving sales and marketing teams a clear view of the full path a prospect took before becoming a deal — not just the last thing they clicked.
+
+The tool tracks paid ad clicks, website visits, email activity and sales activity already logged in Pipedrive, stitches them into a single timeline per prospect, and writes the key attribution data straight onto the Person and Deal records the sales team already works in every day.
+
+The result is a way to answer "where did this deal actually come from?" without leaving Pipedrive, exporting anything, or asking someone to build a report.
+
+---
+
+## The Challenge
+
+Most attribution stops at whichever ad or email a prospect clicked last. That tells you what closed the deal, but not what opened it.
+
+Businesses running paid ads, email campaigns and content marketing alongside Pipedrive commonly run into the same gaps:
+
+- Which channel actually started the conversation — the first touch, not the last?
+- How many times did a prospect engage before a deal was even created?
+- Which campaigns are quietly doing the early-stage work that later touches get credit for?
+- Is marketing spend actually connected to what the sales team sees in the pipeline?
+- How do you report on any of this without stitching together ad platform exports, email tool data and CRM records by hand?
+
+Answering these usually means jumping between Google Ads, email platforms and Pipedrive, then manually reconciling everything in a spreadsheet — a process most teams don't have time to repeat regularly.
+
+---
+
+## The Solution
+
+We built a lightweight tracking layer that sits between a business's website and their Pipedrive account.
+
+A single script tag, Google Tag Manager container, or WordPress plugin captures every ad click, page visit and campaign parameter for a visitor. Once that visitor identifies themselves — filling in a form, booking a call, becoming a lead — their tracked history is linked to their Pipedrive Person, and every subsequent sales activity (calls, stage changes, emails) is folded into the same timeline.
+
+From there, the tool writes first-touch and last-touch attribution — channel, source, medium, campaign and landing page — directly onto custom fields on the Deal, alongside a one-click link to view the complete journey.
+
+---
+
+## What We Built
+
+The project included:
+
+- A tracking snippet (script tag, Google Tag Manager tag, or WordPress plugin) that captures ad clicks, UTM parameters and page visits without needing a developer to maintain it
+- Automatic identity resolution, linking anonymous website activity to a Pipedrive Person once they convert
+- A full visual timeline combining website behaviour with Pipedrive's own activity and deal-stage history
+- Custom Pipedrive fields populated automatically with first-touch and last-touch channel, source, medium and campaign — filterable, sortable and reportable like any other Pipedrive field
+- A dashboard summarising channel performance and recently active prospects across the whole account, with CSV export
+- Multi-tenant support, so the same tool can serve multiple client accounts independently
+
+---
+
+## Example Use Cases
+
+### Marketing Attribution
+
+See which campaigns and channels are genuinely responsible for starting the conversations that turn into pipeline, rather than crediting whichever touchpoint happened to come last.
+
+### Sales Context on Every Deal
+
+Sales reps can open a Deal and immediately see the ad, email or page that brought a prospect in — useful context for a call, without asking marketing.
+
+### Marketing and Sales Reporting
+
+Because attribution lands on real Pipedrive fields, it can be filtered, grouped and reported on using Pipedrive's own tools — no separate attribution platform to maintain.
+
+### Campaign Performance Review
+
+The dashboard's channel breakdown makes it straightforward to spot which sources are driving genuinely engaged prospects versus which are generating clicks that go nowhere.
+
+---
+
+## The Outcome
+
+The project delivered a working attribution layer that connects website and ad activity to Pipedrive without disrupting how the sales team already works — no new system to log into, no extra data entry, and no waiting on an app marketplace review to go live.
+
+It also creates a foundation for further reporting and automation, such as:
+
+- Automatic lead scoring based on channel and engagement history
+- Campaign-level ROI reporting alongside Pipedrive's existing pipeline reports
+- Alerts when high-value channels produce a new lead
+
+---
+
+## Why It Matters
+
+This project is a good example of layering useful data onto a CRM without replacing it or adding friction for the team using it day to day.
+
+Pipedrive continues to be the single place the sales team works. The attribution tool simply makes sure the data marketing already has — which ad, which email, which page — actually reaches that record, instead of staying locked inside separate ad and email platforms.
+
+For businesses spending on paid ads or email marketing and using Pipedrive to manage the pipeline, that connection is often the missing link between marketing spend and sales results.
+
+---
+
+## Project Highlights
+
+- Full prospect journey, not just last-click attribution
+- Writes directly to Pipedrive custom fields — no separate dashboard required to see it
+- Works via script tag, Google Tag Manager, or a WordPress plugin
+- Combines website, ad, email and Pipedrive sales activity in one timeline
+- Multi-tenant, so it can support several client accounts from one deployment
+
+---
+
+## Interested in Attribution for Pipedrive?
+
+Automated Sales helps businesses get more value from Pipedrive through CRM strategy, automation, reporting, integrations and tools like this one.
+
+If your team runs paid ads or email campaigns alongside Pipedrive and wants to see which of them are actually driving pipeline, we can help scope and build the right solution.
