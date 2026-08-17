@@ -43,17 +43,23 @@ async function call(
  * Creates a new file in the repo via the Contents API. Fails if the path already
  * exists (no `sha` is passed, which the API requires for overwrites) — callers
  * must resolve slug collisions before calling this.
+ *
+ * `content` is UTF-8 text by default (MDX bodies); pass `encoding: 'base64'`
+ * when `content` is already base64-encoded binary data (image uploads).
  */
 export async function createContentFile(input: {
   path: string;
   content: string;
   message: string;
+  encoding?: 'utf8' | 'base64';
 }): Promise<{ commitSha: string }> {
+  const base64 =
+    input.encoding === 'base64' ? input.content : Buffer.from(input.content, 'utf8').toString('base64');
   const data = (await call(`/repos/${repoSlug()}/contents/${input.path}`, {
     method: 'PUT',
     body: JSON.stringify({
       message: input.message,
-      content: Buffer.from(input.content, 'utf8').toString('base64'),
+      content: base64,
       branch: branch(),
     }),
   })) as { commit?: { sha?: string } };

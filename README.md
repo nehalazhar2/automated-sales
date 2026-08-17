@@ -213,10 +213,21 @@ curl -X POST https://www.automated-sales.com/api/blog \
 | `category` | no | Shown as a tag; also drives the listing page's category filter. |
 | `author` | no | Defaults to "Automated Sales". |
 | `date` | no | ISO string; defaults to now. |
-| `ogImage` | no | Hero image URL for the detail page and social cards. |
+| `ogImage` | no | The featured/thumbnail image — same image is used for the listing card thumbnail and the detail-page hero. Either a public `http(s)` URL (used as-is, rendered as a plain `<img>` since it isn't a local asset), or a `data:image/png\|jpeg\|webp\|gif;base64,…` data URI (uploaded to `public/images/blog/<slug>.<ext>` as its own commit and referenced locally, which gets it proper Next.js image optimization). Data URIs are capped around 3.3MB of image data (~4.5MB base64) to stay under Vercel's request body limit. If the upload fails, the post still publishes — just without an image (logged server-side). |
 | `collection` | no | `"posts"` (default) or `"case-studies"`. |
 
-Success — `201`: `{ "success": true, "slug": "...", "path": "/.../" }`. Errors: `400` (missing/invalid fields, or a title with no letters/numbers), `401` (bad/missing `x-blog-api-key`), `500` (misconfiguration or GitHub API failure — check server logs for the `[/api/blog]`-prefixed error).
+Success — `201`: `{ "success": true, "slug": "...", "path": "/.../" }`. Errors: `400` (missing/invalid fields, a title with no letters/numbers, or a malformed `ogImage`), `401` (bad/missing `x-blog-api-key`), `500` (misconfiguration or GitHub API failure — check server logs for the `[/api/blog]`-prefixed error).
 
-No drafts, no update/delete — this is append-only, matching the "Adding a new blog post" flow above. To edit or remove a post, edit or delete the `.mdx` file directly.
+No drafts or updates — this is append/delete only, matching the "Adding a new blog post" flow above. To edit a post, edit its `.mdx` file directly.
+
+### Deleting a post via the API
+
+```bash
+curl -X DELETE "https://www.automated-sales.com/api/blog/<slug>/" \
+  -H "x-blog-api-key: $BLOG_API_KEY"
+```
+
+Looks the slug up in `content/posts/` then `content/case-studies/` (or pass `?collection=posts`/`?collection=case-studies` to check only one) and commits its removal, along with any `public/images/blog/<slug>.*` featured image uploaded for it. Same async-deploy caveat as publishing — the live page 404s once the triggered deploy finishes.
+
+Success — `200`: `{ "success": true, "slug": "...", "deletedFrom": "posts" }`. Errors: `400` (invalid slug format), `401`, `404` (no post with that slug), `500`.
 # automated-sales

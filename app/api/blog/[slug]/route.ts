@@ -4,6 +4,17 @@ import { getContentFile, deleteContentFile } from '@/lib/github';
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const COLLECTIONS = ['posts', 'case-studies'] as const;
 type Collection = (typeof COLLECTIONS)[number];
+const IMAGE_EXTENSIONS = ['png', 'jpg', 'webp', 'gif'];
+
+async function deleteFeaturedImage(slug: string): Promise<void> {
+  for (const ext of IMAGE_EXTENSIONS) {
+    const path = `public/images/blog/${slug}.${ext}`;
+    const file = await getContentFile(path);
+    if (!file) continue;
+    await deleteContentFile({ path, sha: file.sha, message: `blog: delete featured image for "${slug}"` });
+    return;
+  }
+}
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const authError = checkBlogApiKey(req);
@@ -31,6 +42,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ slug:
         sha: file.sha,
         message: `blog: delete "${slug}"`,
       });
+
+      try {
+        await deleteFeaturedImage(slug);
+      } catch (err) {
+        console.error('[/api/blog DELETE] Post deleted but failed to delete its featured image:', err);
+      }
 
       return Response.json({ success: true, slug, deletedFrom: collection }, { status: 200 });
     }

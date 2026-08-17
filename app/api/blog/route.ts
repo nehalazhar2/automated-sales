@@ -3,6 +3,11 @@ import { getUniqueSlug, slugify } from '@/lib/mdx';
 import { htmlToMarkdown } from '@/lib/htmlToMarkdown';
 import { createContentFile } from '@/lib/github';
 import { checkBlogApiKey } from '@/lib/blogAuth';
+import { isImageDataUri, parseImageDataUri } from '@/lib/images';
+
+// ~4.5MB, matching Vercel's serverless request body limit (base64 inflates
+// binary size by ~33%, so this caps the actual image around 3.3MB).
+const MAX_IMAGE_DATA_URI_LENGTH = 4_500_000;
 
 const Body = z.object({
   title: z.string().trim().min(1),
@@ -11,7 +16,13 @@ const Body = z.object({
   category: z.string().trim().min(1).optional(),
   author: z.string().trim().min(1).optional(),
   date: z.string().min(1).optional(),
-  ogImage: z.string().url().optional(),
+  ogImage: z
+    .string()
+    .max(MAX_IMAGE_DATA_URI_LENGTH)
+    .refine((v) => /^https?:\/\//i.test(v) || isImageDataUri(v), {
+      message: 'ogImage must be a public http(s) URL or a PNG/JPEG/WEBP/GIF data URI.',
+    })
+    .optional(),
   collection: z.enum(['posts', 'case-studies']).optional(),
 });
 
@@ -26,9 +37,10 @@ export async function POST(req: Request) {
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());
-  } catch {
+  } catch (err) {
+    const ogImageIssue = err instanceof z.ZodError ? err.issues.find((i) => i.path[0] === 'ogImage') : undefined;
     return Response.json(
-      { error: 'Title, description, and content are required.' },
+      { error: ogImageIssue?.message || 'Title, description, and content are required.' },
       { status: 400 }
     );
   }
@@ -47,6 +59,30 @@ export async function POST(req: Request) {
     const date = body.date || new Date().toISOString();
     const collection = body.collection || 'posts';
 
+    let ogImage = body.ogImage;
+    if (ogImage && isImageDataUri(ogImage)) {
+      const parsed = parseImageDataUri(ogImage);
+      if (!parsed) {
+        return Response.json(
+          { error: 'ogImage data URI must be PNG, JPEG, WEBP or GIF.' },
+          { status: 400 }
+        );
+      }
+      try {
+        const imagePath = `public/images/blog/${slug}.${parsed.extension}`;
+        await createContentFile({
+          path: imagePath,
+          content: parsed.base64,
+          encoding: 'base64',
+          message: `blog: upload featured image for "${body.title.trim()}"`,
+        });
+        ogImage = `/images/blog/${slug}.${parsed.extension}`;
+      } catch (err) {
+        console.error('[/api/blog] Failed to upload ogImage, publishing without it:', err);
+        ogImage = undefined;
+      }
+    }
+
     const frontmatterLines = [
       '---',
       `title: ${frontmatterValue(body.title.trim())}`,
@@ -54,7 +90,7 @@ export async function POST(req: Request) {
       `date: ${frontmatterValue(date)}`,
       body.category ? `category: ${frontmatterValue(body.category.trim())}` : null,
       `author: ${frontmatterValue(body.author?.trim() || 'Automated Sales')}`,
-      body.ogImage ? `ogImage: ${frontmatterValue(body.ogImage)}` : null,
+      ogImage ? `ogImage: ${frontmatterValue(ogImage)}` : null,
       '---',
       '',
     ].filter((line): line is string => line !== null);
