@@ -1,8 +1,8 @@
-import crypto from 'node:crypto';
 import { z } from 'zod';
 import { getUniqueSlug, slugify } from '@/lib/mdx';
 import { htmlToMarkdown } from '@/lib/htmlToMarkdown';
 import { createContentFile } from '@/lib/github';
+import { checkBlogApiKey } from '@/lib/blogAuth';
 
 const Body = z.object({
   title: z.string().trim().min(1),
@@ -15,28 +15,13 @@ const Body = z.object({
   collection: z.enum(['posts', 'case-studies']).optional(),
 });
 
-function timingSafeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return crypto.timingSafeEqual(bufA, bufB);
-}
-
 function frontmatterValue(value: string): string {
   return JSON.stringify(value);
 }
 
 export async function POST(req: Request) {
-  const apiKey = process.env.BLOG_API_KEY;
-  if (!apiKey) {
-    console.error('[/api/blog] BLOG_API_KEY not configured');
-    return Response.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
-  }
-
-  const provided = req.headers.get('x-blog-api-key') || '';
-  if (!provided || !timingSafeEqual(provided, apiKey)) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const authError = checkBlogApiKey(req);
+  if (authError) return authError;
 
   let body: z.infer<typeof Body>;
   try {

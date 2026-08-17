@@ -16,7 +16,11 @@ function branch(): string {
   return process.env.GITHUB_BRANCH || 'main';
 }
 
-async function call(path: string, init: RequestInit = {}): Promise<unknown> {
+async function call(
+  path: string,
+  init: RequestInit = {},
+  opts: { allow404?: boolean } = {}
+): Promise<unknown> {
   const res = await fetch(`https://api.github.com${path}`, {
     ...init,
     headers: {
@@ -27,6 +31,7 @@ async function call(path: string, init: RequestInit = {}): Promise<unknown> {
     },
     cache: 'no-store',
   });
+  if (res.status === 404 && opts.allow404) return null;
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`GitHub ${res.status}: ${text.slice(0, 500)}`);
@@ -54,5 +59,33 @@ export async function createContentFile(input: {
   })) as { commit?: { sha?: string } };
   const commitSha = data.commit?.sha;
   if (!commitSha) throw new Error('GitHub createContentFile: no commit sha returned');
+  return { commitSha };
+}
+
+/** Returns the file's blob sha, or null if it doesn't exist at `path` on the target branch. */
+export async function getContentFile(path: string): Promise<{ sha: string } | null> {
+  const data = (await call(
+    `/repos/${repoSlug()}/contents/${path}?ref=${branch()}`,
+    {},
+    { allow404: true }
+  )) as { sha?: string } | null;
+  return data?.sha ? { sha: data.sha } : null;
+}
+
+export async function deleteContentFile(input: {
+  path: string;
+  sha: string;
+  message: string;
+}): Promise<{ commitSha: string }> {
+  const data = (await call(`/repos/${repoSlug()}/contents/${input.path}`, {
+    method: 'DELETE',
+    body: JSON.stringify({
+      message: input.message,
+      sha: input.sha,
+      branch: branch(),
+    }),
+  })) as { commit?: { sha?: string } };
+  const commitSha = data.commit?.sha;
+  if (!commitSha) throw new Error('GitHub deleteContentFile: no commit sha returned');
   return { commitSha };
 }
