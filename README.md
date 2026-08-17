@@ -178,4 +178,45 @@ Honeypot field + in-memory rate limit (5 submissions / minute / IP). For higher 
 ## Adding a new case study
 
 Same as a post, but file goes in `content/case-studies/`. It appears on `/projects/` automatically.
+
+## Publishing a post via the API
+
+`POST /api/blog` lets a script, AI agent, or automation publish a post without touching git directly.
+
+There is no CMS or database behind this — the endpoint commits a new `.mdx` file straight to `GITHUB_REPO` on `GITHUB_BRANCH` via the GitHub Contents API, and Vercel's git integration deploys it from there. That means publishing is **not instant**: the post goes live once the triggered deploy finishes (typically 1–2 minutes), and it requires the site to be on a Vercel project connected to that repo/branch.
+
+### Setup
+
+1. Generate a GitHub fine-grained PAT scoped to this repo only, with **Contents: read and write** permission.
+2. Set `BLOG_API_KEY` (any long random string), `GITHUB_TOKEN`, `GITHUB_REPO` (`owner/repo`), and `GITHUB_BRANCH` in Vercel env vars — see `.env.example`.
+
+### Request
+
+```bash
+curl -X POST https://www.automated-sales.com/api/blog \
+  -H "Content-Type: application/json" \
+  -H "x-blog-api-key: $BLOG_API_KEY" \
+  -d '{
+    "title": "Which CRM system is right for you?",
+    "description": "A pragmatic guide to choosing the right CRM for SMEs.",
+    "content": "<h2>Overview</h2><p>Modern sales teams need more than a spreadsheet…</p>",
+    "category": "CRM",
+    "collection": "posts"
+  }'
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `title` | yes | Must contain at least one letter or number — used to derive the slug. |
+| `description` | yes | Shown on the listing card and used as the meta description. |
+| `content` | yes | HTML body. Sanitized (script tags, unknown attributes, non-http(s)/mailto links stripped) then converted to Markdown for the MDX body. Unrecognised wrapper tags (`<div>`, `<section>`, …) are stripped but their children kept; images (`<img>`, `<figure><img>`) pass straight through as external URLs — there is no image upload/hosting step, so `src` must already be a public HTTPS URL. |
+| `category` | no | Shown as a tag; also drives the listing page's category filter. |
+| `author` | no | Defaults to "Automated Sales". |
+| `date` | no | ISO string; defaults to now. |
+| `ogImage` | no | Hero image URL for the detail page and social cards. |
+| `collection` | no | `"posts"` (default) or `"case-studies"`. |
+
+Success — `201`: `{ "success": true, "slug": "...", "path": "/.../" }`. Errors: `400` (missing/invalid fields, or a title with no letters/numbers), `401` (bad/missing `x-blog-api-key`), `500` (misconfiguration or GitHub API failure — check server logs for the `[/api/blog]`-prefixed error).
+
+No drafts, no update/delete — this is append-only, matching the "Adding a new blog post" flow above. To edit or remove a post, edit or delete the `.mdx` file directly.
 # automated-sales

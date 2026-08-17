@@ -34,4 +34,20 @@ export const mdxComponents: MDXComponents = {
   code: (props) => (
     <code style={{ background: 'var(--slate-100)', padding: '2px 6px', borderRadius: 6, fontSize: 14 }} {...props} />
   ),
+  // eslint-disable-next-line @next/next/no-img-element
+  img: ({ alt, ...rest }) => (
+    <img
+      alt={alt || ''}
+      loading="lazy"
+      style={{
+        width: '100%',
+        height: 'auto',
+        display: 'block',
+        borderRadius: 16,
+        margin: '32px 0',
+        border: '1px solid var(--slate-200)',
+      }}
+      {...rest}
+    />
+  ),
 };

@@ -2,7 +2,7 @@ import PageHero from '@/components/PageHero';
 import CtaBox from '@/components/CtaBox';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
-import Image from 'next/image';
+import CoverImage from '@/components/CoverImage';
 import { getAllCaseStudies } from '@/lib/mdx';
 
 export const metadata = buildMetadata({
@@ -45,7 +45,7 @@ export default function Page() {
                 <article key={s.slug} className="as-card">
                   {s.frontmatter.ogImage && (
                     <Link href={`/${s.slug}/`} className="as-card-image">
-                      <Image
+                      <CoverImage
                         src={s.frontmatter.ogImage}
                         alt={s.frontmatter.title}
                         width={1000}

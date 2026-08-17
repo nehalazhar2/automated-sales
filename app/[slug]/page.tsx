@@ -2,9 +2,10 @@ import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
-import Image from 'next/image';
-import { getAllMdxSlugs, getMdxBySlug } from '@/lib/mdx';
+import { getAllMdxSlugs, getMdxBySlug, getRelatedPosts, estimateReadingTime } from '@/lib/mdx';
 import { mdxComponents } from '@/components/MdxComponents';
+import CoverImage from '@/components/CoverImage';
+import CtaBox from '@/components/CtaBox';
 import { buildMetadata } from '@/lib/seo';
 import StructuredData from '@/components/seo/StructuredData';
 import { blogPostingSchema, breadcrumbSchema } from '@/components/seo/schemas';
@@ -40,6 +41,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const crumbBase = isCaseStudy
     ? { name: 'Projects', path: '/projects/' }
     : { name: 'Blog', path: '/blog/' };
+  const relatedPosts = isCaseStudy ? [] : getRelatedPosts(slug, record.frontmatter.category);
 
   return (
     <>
@@ -72,7 +74,11 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         <h1>{record.frontmatter.title}</h1>
         <p className="as-lead">{record.frontmatter.description}</p>
         <p style={{ marginTop: 16, fontSize: 14, color: 'var(--slate-500)' }}>
+          {record.frontmatter.author || 'Automated Sales'}
+          {' · '}
           {new Date(record.frontmatter.date).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+          {' · '}
+          {estimateReadingTime(record.body)} min read
         </p>
 
         {record.frontmatter.ogImage && (
@@ -86,14 +92,13 @@ export default async function Page({ params }: { params: Promise<Params> }) {
               background: 'var(--slate-50)',
             }}
           >
-            <Image
+            <CoverImage
               src={record.frontmatter.ogImage}
               alt={record.frontmatter.title}
               width={1600}
               height={1200}
               sizes="(max-width:820px) 100vw, 820px"
               priority
-              style={{ width: '100%', height: 'auto', display: 'block' }}
             />
           </figure>
         )}
@@ -130,7 +135,31 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             </div>
           </aside>
         )}
+
+        {!isCaseStudy && relatedPosts.length > 0 && (
+          <aside style={{ marginTop: 56 }}>
+            <span className="as-eyebrow" style={{ marginBottom: 20 }}>Keep reading</span>
+            <div className="as-grid-3">
+              {relatedPosts.map((p) => (
+                <article key={p.slug} className="as-card">
+                  {p.frontmatter.category && <span className="as-tag">{p.frontmatter.category}</span>}
+                  <h3><Link href={`/${p.slug}/`}>{p.frontmatter.title}</Link></h3>
+                  <p>{p.frontmatter.description}</p>
+                </article>
+              ))}
+            </div>
+          </aside>
+        )}
       </article>
+
+      {!isCaseStudy && (
+        <CtaBox
+          heading="Want help putting this into practice?"
+          body="Book a discovery call and we'll map out what this looks like for your team's Pipedrive, Zapier and ActiveCampaign setup."
+          primary={{ href: '/contact-2/', label: 'Book a discovery call →' }}
+          secondary={{ href: '/pipedrive-zapier-active-campaign-services/', label: 'See all services' }}
+        />
+      )}
     </>
   );
 }
