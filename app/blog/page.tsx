@@ -11,15 +11,29 @@ export const metadata = buildMetadata({
   path: '/blog/',
 });
 
+const POSTS_PER_PAGE = 9;
+
 type Props = {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; page?: string }>;
 };
 
+function pageHref(category: string | undefined, page: number): string {
+  const params = new URLSearchParams();
+  if (category) params.set('category', category);
+  if (page > 1) params.set('page', String(page));
+  const qs = params.toString();
+  return qs ? `/blog/?${qs}` : '/blog/';
+}
+
 export default async function Page({ searchParams }: Props) {
-  const { category } = await searchParams;
+  const { category, page: pageParam } = await searchParams;
   const posts = getAllPosts();
   const categories = getAllCategories();
   const filtered = category ? posts.filter((p) => p.frontmatter.category === category) : posts;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / POSTS_PER_PAGE));
+  const page = Math.min(Math.max(1, Number(pageParam) || 1), totalPages);
+  const paginated = filtered.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE);
 
   return (
     <>
@@ -51,7 +65,7 @@ export default async function Page({ searchParams }: Props) {
             <p>Posts coming soon.</p>
           ) : (
             <div className="as-grid-3">
-              {filtered.map((p) => (
+              {paginated.map((p) => (
                 <article key={p.slug} className="as-card">
                   {p.frontmatter.ogImage && (
                     <Link href={`/${p.slug}/`} className="as-card-image">
@@ -75,6 +89,31 @@ export default async function Page({ searchParams }: Props) {
                 </article>
               ))}
             </div>
+          )}
+
+          {totalPages > 1 && (
+            <nav className="as-pagination" aria-label="Blog pagination">
+              {page > 1 ? (
+                <Link href={pageHref(category, page - 1)}>← Prev</Link>
+              ) : (
+                <span className="is-disabled">← Prev</span>
+              )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <Link
+                  key={n}
+                  href={pageHref(category, n)}
+                  className={n === page ? 'is-active' : undefined}
+                  aria-current={n === page ? 'page' : undefined}
+                >
+                  {n}
+                </Link>
+              ))}
+              {page < totalPages ? (
+                <Link href={pageHref(category, page + 1)}>Next →</Link>
+              ) : (
+                <span className="is-disabled">Next →</span>
+              )}
+            </nav>
           )}
         </div>
       </section>
