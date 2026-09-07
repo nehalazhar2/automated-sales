@@ -1,10 +1,7 @@
 'use client';
-
 import { useActionState, useEffect, useRef } from 'react';
 import { submitContact, type ContactState } from '@/app/contact-2/actions';
-
 const initial: ContactState = { status: 'idle' };
-
 const SERVICES = [
   'Pipedrive implementation',
   'Pipedrive consultancy',
@@ -16,13 +13,11 @@ const SERVICES = [
   'ActiveCampaign',
   'Reporting',
 ];
-
 export default function ContactForm() {
   const [state, formAction, pending] = useActionState(submitContact, initial);
   const errors = state.status === 'error' ? state.fieldErrors || {} : {};
   const attributionRef = useRef<HTMLInputElement>(null);
   const currentPathRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem('as_attribution');
@@ -32,7 +27,6 @@ export default function ContactForm() {
       // ignore
     }
   }, []);
-
   if (state.status === 'success') {
     return (
       <div className="as-admin-note" role="status">
@@ -40,30 +34,25 @@ export default function ContactForm() {
       </div>
     );
   }
-
   return (
     <form className="as-form" action={formAction} noValidate>
       {state.status === 'error' && state.message && (
         <div className="as-admin-note" role="alert">{state.message}</div>
       )}
-
       <label>
         Name
         <input name="name" type="text" required placeholder="Your name" aria-invalid={!!errors.name} />
         {errors.name && <small style={{ color: '#b91c1c' }}>{errors.name}</small>}
       </label>
-
       <label>
         Email
         <input name="email" type="email" required placeholder="you@company.com" aria-invalid={!!errors.email} />
         {errors.email && <small style={{ color: '#b91c1c' }}>{errors.email}</small>}
       </label>
-
       <label>
         Company
         <input name="company" type="text" placeholder="Company name" />
       </label>
-
       <label>
         What do you need help with?
         <select name="service" defaultValue="">
@@ -73,7 +62,6 @@ export default function ContactForm() {
           ))}
         </select>
       </label>
-
       <label>
         Project details
         <textarea
@@ -84,10 +72,8 @@ export default function ContactForm() {
         />
         {errors.message && <small style={{ color: '#b91c1c' }}>{errors.message}</small>}
       </label>
-
       <input ref={attributionRef} type="hidden" name="attribution" defaultValue="" />
       <input ref={currentPathRef} type="hidden" name="currentPath" defaultValue="" />
-
       {/* Honeypot — must remain empty */}
       <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
         <label>
@@ -95,6 +81,14 @@ export default function ContactForm() {
           <input name="website" type="text" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+
+      <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '-0.5rem' }}>
+        By submitting this form, you consent to Automated Sales contacting you about your
+        enquiry and, where relevant, sending you occasional updates, tips, and offers by
+        email. You can opt out or ask us to remove your details at any time by emailing{' '}
+        <a href="mailto:info@automated-sales.com">info@automated-sales.com</a> or using the
+        unsubscribe link in any email.
+      </p>
 
       <button className="as-btn as-btn-primary" type="submit" disabled={pending}>
         {pending ? 'Sending…' : 'Send enquiry →'}
