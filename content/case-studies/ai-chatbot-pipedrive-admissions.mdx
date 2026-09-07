@@ -1,0 +1,84 @@
+---
+title: "AI Chatbot and Admissions Assistant Connected to Pipedrive"
+description: "How we designed a multi-channel AI assistant that could answer customer questions, continue conversations across webchat and WhatsApp, capture enquiries, and pass structured attribution and lead data into Pipedrive."
+date: "2026-09-07"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/ai-chatbot-pipedrive-admissions.png"
+draft: false
+---
+
+Many businesses are interested in AI chatbots, but the real value is not simply adding a chat widget to a website. The useful version is an AI assistant that can answer questions accurately, capture structured enquiry data, connect to the CRM, and improve over time based on what real customers are asking.
+
+For this client — a large nursery group with more than 70 locations — the goal was to create an AI-powered admissions assistant that could support prospective parents across the enquiry journey, while keeping Pipedrive as the central system for sales and admissions activity. The assistant needed to work across multiple channels, answer questions relating to each specific location, provide the correct booking links, and avoid giving inaccurate or unsupported answers.
+
+## The problem
+
+Prospective parents could have questions about nursery locations, availability, tours, calls, fees, timings, facilities, admissions, and next steps. These questions varied depending on the specific venue, and the correct action was not always the same — a parent interested in one location might need an in-person tour booking link, while another might need a phone call booking link for a different venue.
+
+The client needed a system that could answer common questions quickly, understand which location the parent was interested in, provide the correct venue-specific booking links, capture useful enquiry information conversationally, continue conversations across webchat and WhatsApp, pass lead and attribution data back into Pipedrive, and avoid hallucinating or giving inaccurate information.
+
+Accuracy, control, escalation, and human handover were key parts of the design. Parents are making important decisions about childcare — the assistant could not behave like a generic chatbot that guesses or makes unsupported claims.
+
+## What we built
+
+A custom AI chatbot and admissions assistant connected to Pipedrive, sitting on the website as a webchat experience and also supporting WhatsApp conversations. A user could start on the website and continue via WhatsApp, or start on WhatsApp and later continue the same journey elsewhere — with the AI retaining relevant conversation memory across channels.
+
+This meant the parent did not need to repeat themselves if they changed channel. The system remembered previous context such as the location they were interested in, the type of booking they wanted, and the questions they had already asked.
+
+## Venue-specific answers and booking links
+
+A major part of the project was handling 70+ locations. The assistant needed to identify the relevant nursery, answer location-specific questions, provide the correct booking link for that venue, distinguish between in-person tour bookings and phone call bookings, and guide the user to the most appropriate next step.
+
+This made the assistant much more useful than a generic FAQ bot. Instead of simply saying "book a tour", it could direct the parent to the appropriate booking route for the location and enquiry type.
+
+## Preventing hallucinations
+
+One of the most important requirements was making sure the AI could not simply make things up. If the assistant gave incorrect information about a nursery, availability, policies, or booking route, that could create confusion for parents and extra work for the admissions team.
+
+The assistant was therefore designed to work from approved information and follow clear guardrails: answer from approved content where possible, use venue-specific data where relevant, ask clarifying questions when needed, avoid inventing information, escalate or hand over when the answer was not known, and make it clear when a human follow-up was required.
+
+The goal was not to make the assistant sound clever. The goal was to make it useful, accurate, and safe.
+
+## Multi-channel conversation memory
+
+The assistant supported conversations across both website chat and WhatsApp, with a prospective parent able to start on the website and continue later on WhatsApp without starting from scratch. This cross-channel memory was important because real customer journeys are rarely linear — people might browse on desktop, switch to mobile, ask a question later, or return after speaking with a partner.
+
+## Pipedrive integration
+
+The assistant was connected back into Pipedrive so that conversations did not sit in a separate chatbot inbox. Depending on the conversation, the system could create or update a Person, create or update a Lead or Deal, record the location of interest, capture the preferred type of follow-up, add conversation summaries and notes for the admissions team, create follow-up activities, and route the enquiry to the right team or process.
+
+This meant the admissions team could pick up the conversation with context, rather than starting cold.
+
+## Attribution capture
+
+Prospective parents would often engage with the chatbot before submitting a traditional web form. Without capturing that data properly, the business could lose visibility of where the enquiry originally came from. The assistant therefore parsed attribution data — UTM source, medium, campaign, landing page, referrer, paid search and social identifiers — and passed it back into Pipedrive.
+
+This was important because the chatbot might be the first meaningful interaction in the customer journey. By passing attribution data into Pipedrive, the client could better understand which campaigns, channels, and pages were driving enquiries, even when the user interacted with the chatbot before completing a form.
+
+## Monthly insight and continuous improvement
+
+The project was not just about launching the assistant and leaving it alone. Each month, conversation data could be reviewed to identify what questions customers were asking most often, which answers the assistant handled well, where it struggled or escalated, what information was missing from the knowledge base, and what new website content or FAQs should be created.
+
+Instead of guessing what parents care about, the client can use real conversation data to improve the assistant, the website, the sales process, and the supporting content. Over time, the AI assistant becomes more useful because the business learns from the questions customers are actually asking.
+
+## Technology
+
+- AI chatbot / admissions assistant
+- Website chat and WhatsApp conversation support
+- Cross-channel conversation memory
+- Approved-content knowledge base with guardrails
+- Venue-specific answer logic for 70+ locations
+- Dynamic booking-link routing
+- Pipedrive API integration — Person, Lead/Deal, Activity and Note creation
+- Conversation summaries and admissions team notes
+- UTM and attribution capture
+- Monthly conversation analysis and continuous improvement recommendations
+
+## The broader point
+
+This project is a good example of where AI becomes genuinely useful in a sales and admissions process. The assistant was not just a chatbot — it was a connected AI layer sitting between the website, WhatsApp, booking journeys, customer questions, and Pipedrive.
+
+For the customer, it created a faster and more helpful way to get answers. For the business, it created cleaner enquiries, better CRM data, improved attribution, and a way to learn from real customer conversations.
+
+For organisations already using Pipedrive, this kind of AI assistant can become a practical extension of the CRM rather than a disconnected chatbot tool — answering questions, guiding people to the right next step, capturing better data, reducing manual work, and helping the business improve over time.
