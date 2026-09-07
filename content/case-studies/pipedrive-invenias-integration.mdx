@@ -10,15 +10,15 @@ draft: false
 
 Invenias, part of the Bullhorn family, is a specialist CRM platform built for executive search firms. Many firms using Invenias also use Pipedrive for pipeline management, business development, or client relationship tracking — which creates an obvious need to keep the two systems in sync.
 
-For this client, a sync of sorts already existed. It had been built using Make.com, connecting Pipedrive events to Invenias actions via a series of automated scenarios. But the Make.com integration had become increasingly unreliable. Scenarios were failing silently, data wasn't reaching Invenias consistently, and the team had lost confidence in whether the two systems were actually in sync.
+For this client, a sync already existed. It had been built using Make.com, connecting Pipedrive events to Invenias actions via a series of automated scenarios. But the Make.com integration had become increasingly unreliable. Scenarios were failing silently, data wasn't reaching Invenias consistently, and the team had lost confidence in whether the two systems were actually in sync.
 
 The solution was to remove Make.com from the equation entirely and rebuild the integration as a direct API connection between Pipedrive and Invenias.
 
-## The problem with Make.com
+## The potential problem with solutions such as Make.com
 
-Third-party automation platforms like Make.com are useful for getting an integration up and running quickly. But they introduce a layer of dependency — on the platform's reliability, its API rate limits, its handling of errors, and its interpretation of data between two systems it wasn't specifically designed to connect.
+We're big fans of tools such as Make.com / Zapier and other integration tools as they can be incredibly useful for getting an integration up and running quickly. But they can introduce a layer of dependency — on the platform's reliability, its API rate limits, its handling of errors, and its interpretation of data between two systems it wasn't specifically designed to connect.
 
-For this integration, the failure points were compounding. When a Pipedrive event triggered a Make.com scenario, and that scenario failed to complete the Invenias action, there was no reliable recovery path. Records fell out of sync, and identifying which ones required manual investigation.
+For this particular integration, the failure points were compounding. When a Pipedrive event triggered a Make.com scenario, and that scenario failed to complete the Invenias action, there was no reliable recovery path. Records fell out of sync, and identifying which ones required manual investigation.
 
 The client needed something more robust — an integration that connected the two platforms directly, handled errors gracefully, and could be monitored and maintained without relying on a third-party platform in the middle.
 
@@ -58,8 +58,8 @@ With Make.com removed, the integration runs as a hosted application with direct 
 
 ## The broader point
 
-Make.com and similar platforms are a reasonable starting point for connecting two systems quickly. But when an integration becomes business-critical — when the sales team, the search team, and the data in both platforms depends on it working reliably every time — a direct API build is usually the more durable choice.
+Make.com and similar platforms can be a great starting point for connecting two systems quickly (and we use these tools regulary ourselves). They are also great when the requirements are relatively simple, or when the client wishes to manage themselves (without being a developer!) But when an integration becomes business-critical — when the sales team, the search team, and the data in both platforms depends on it working reliably every time — a direct API build can sometimes be the more durable choice.
 
-It gives you full control over the logic, full visibility into what's happening, and no dependency on a third platform's uptime, pricing changes, or API limits.
+It gives you full control over the logic with no dependency on a third platform's uptime, pricing changes, or API limits.
 
 For firms running Pipedrive alongside Invenias, keeping both platforms in sync doesn't have to be a source of uncertainty. A properly built direct integration makes it a background process that simply works.
