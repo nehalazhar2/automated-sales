@@ -1,0 +1,73 @@
+---
+title: "Glenigan + Pipedrive Integration — Turning Construction Intelligence Into Automated Sales Leads"
+description: "How we connected Glenigan with Pipedrive to automatically identify relevant construction projects across multiple sectors and regions, create populated CRM Leads, auto-assign them to the right sales rep, and keep project data continuously updated."
+date: "2024-08-01"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/glenigan-pipedrive-integration.png"
+draft: false
+---
+
+Glenigan is one of the UK's leading construction intelligence platforms, covering project data across every major construction sector — education, health, hotel and leisure, industrial, infrastructure, offices, private housing, retail, social housing, and utilities — and spanning all regions of the UK and the Republic of Ireland.
+
+For sales teams operating in construction, it contains an enormous amount of commercially valuable information. The challenge is getting that information into a CRM in a way that salespeople can actually use — and keeping it current as projects evolve.
+
+For this client, Glenigan was already being used to identify relevant construction opportunities. Pipedrive was being used to manage the sales process. But moving information between the two systems created a significant volume of manual work: finding relevant projects, copying company information across, locating contacts, entering values and dates, and then maintaining records as projects progressed.
+
+We built a custom integration that removed that process almost entirely — and added automatic lead assignment and sales rep notifications on top.
+
+## How the integration worked
+
+Every morning, the system ran automated sync passes against the client's configured Glenigan searches. New and recently updated projects matching those searches flowed into Pipedrive automatically as structured, populated Leads — without anyone having to manually find them first.
+
+This effectively turned Glenigan's search functionality into an automated daily lead-generation feed. The sales team no longer needed to log into Glenigan, work through results, and transfer data by hand. Relevant projects simply appeared in Pipedrive each morning, ready to act on.
+
+## Automatic assignment to the right sales rep
+
+One of the most important parts of the build was making sure each Lead landed with the right person.
+
+The integration automatically assigned incoming Leads to the appropriate sales rep based on configurable criteria — primarily territory and location, but extensible to project value, sector, or other fields. This meant leads were distributed without a manager having to review and route them manually.
+
+Once assigned, the integration triggered two further automated actions in Pipedrive:
+
+- A **follow-up Activity** was created on the Lead and assigned to the rep, prompting them to make contact with the prospect
+- An **email notification** was sent to the rep alerting them that a new project had been assigned to them
+
+This closed the loop between Glenigan identifying a project and a salesperson knowing they needed to act on it — without any manual steps in between.
+
+## Sector and geographic coverage
+
+Because Glenigan covers such a wide range of sectors and geographies, the filtering logic was an important part of the build. Each configured search represented a specific combination of sector, region, project stage, or value threshold relevant to the client's sales criteria.
+
+The integration labelled each Pipedrive Lead according to the search it matched, making it straightforward to filter opportunities, create separate sales views, and route work to the appropriate team or territory. A single project could carry multiple labels if it matched more than one search.
+
+## Companies and contacts
+
+Not every company attached to a Glenigan project was relevant. The integration filtered organisations by their role within the project, adding only those matching the approved role list. Where companies already existed in Pipedrive, the integration reused the existing record rather than creating duplicates. Where contacts were available through Glenigan, the system worked through a priority order of project roles to identify the most relevant person and attach them to the Lead.
+
+## What appeared on the Pipedrive Lead
+
+Each Lead created by the integration contained the key project details the sales team needed: project title, sector, status, value, dates, location, a direct link back to the Glenigan project record, relevant organisations and their roles, and the primary contact where one was available. All populated without manual data entry.
+
+## Protecting existing CRM data
+
+Existing Leads were refreshed daily as Glenigan project data was updated, with manually assigned owners, notes, and activities preserved. Only fields owned by the integration were updated automatically — the goal was for Glenigan to enrich and maintain the CRM, not overwrite the relationship work the sales team had already done inside it.
+
+## Technology
+
+- **CRM:** Pipedrive
+- **Construction intelligence:** Glenigan
+- **Integration:** Custom API integration
+- **Hosting:** DigitalOcean App Platform
+- **Automation:** Scheduled daily sync, auto-assignment by territory, automated Activities and email notifications
+- **Sector coverage:** Education, health, hotel and leisure, industrial, infrastructure, offices, private housing, retail, social housing, utilities
+- **Geographic coverage:** All UK regions and Republic of Ireland
+- **Data matching:** Project, company, contact and Pipedrive record matching
+
+## The broader point
+
+Glenigan contains genuinely useful sales intelligence. But intelligence only creates value when it reaches the people who can act on it — in the system they already use to manage their pipeline, assigned to the right person, with a prompt to follow up.
+
+This integration turned a daily manual process into an automated workflow. Relevant projects appeared in Pipedrive each morning, populated with the right companies, contacts, and project details, assigned to the correct rep, with a follow-up activity already created.
+
+We have since built a similar integration for a client using Barbour ABI. If your sales team is working with Glenigan, Barbour ABI, or another construction intelligence platform and spending time manually transferring project data into Pipedrive, this kind of integration is worth considering.
