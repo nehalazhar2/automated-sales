@@ -1,0 +1,65 @@
+---
+title: "Pipedrive + Invenias Integration — Replacing Make.com With a Direct API Build"
+description: "How we replaced an unreliable Make.com integration between Pipedrive and Invenias with a direct API build, keeping an executive search firm's CRM and search platform automatically in sync."
+date: "2025-12-15"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/pipedrive-invenias-integration.png"
+draft: false
+---
+
+Invenias, part of the Bullhorn family, is a specialist CRM platform built for executive search firms. Many firms using Invenias also use Pipedrive for pipeline management, business development, or client relationship tracking — which creates an obvious need to keep the two systems in sync.
+
+For this client, a sync of sorts already existed. It had been built using Make.com, connecting Pipedrive events to Invenias actions via a series of automated scenarios. But the Make.com integration had become increasingly unreliable. Scenarios were failing silently, data wasn't reaching Invenias consistently, and the team had lost confidence in whether the two systems were actually in sync.
+
+The solution was to remove Make.com from the equation entirely and rebuild the integration as a direct API connection between Pipedrive and Invenias.
+
+## The problem with Make.com
+
+Third-party automation platforms like Make.com are useful for getting an integration up and running quickly. But they introduce a layer of dependency — on the platform's reliability, its API rate limits, its handling of errors, and its interpretation of data between two systems it wasn't specifically designed to connect.
+
+For this integration, the failure points were compounding. When a Pipedrive event triggered a Make.com scenario, and that scenario failed to complete the Invenias action, there was no reliable recovery path. Records fell out of sync, and identifying which ones required manual investigation.
+
+The client needed something more robust — an integration that connected the two platforms directly, handled errors gracefully, and could be monitored and maintained without relying on a third-party platform in the middle.
+
+## What we built
+
+We reviewed all of the existing Make.com scenarios in detail — their triggers, logic, and actions — then rebuilt the equivalent functionality as a direct API integration.
+
+The integration handles three core sync flows:
+
+**New Organisation in Pipedrive → Find or Create Organisation in Invenias**
+When a new Organisation is created in Pipedrive, the integration checks whether a matching Organisation already exists in Invenias. If it does, the records are linked. If it doesn't, a new Organisation is created in Invenias using the Pipedrive data.
+
+**New Person in Pipedrive → Find or Create Person in Invenias**
+The same logic applies to People. When a new Person is added in Pipedrive, the integration searches Invenias for a matching record before creating a new one — avoiding duplicates across the two platforms.
+
+**Activity marked complete in Pipedrive → Create Journal in Invenias**
+When a Pipedrive Activity is marked as complete, the integration creates a corresponding Journal entry in Invenias, preserving the activity history against the right record in the executive search platform.
+
+## Why direct API matters
+
+With Make.com removed, the integration runs as a hosted application with direct connections to both the Pipedrive and Invenias APIs. This means:
+
+- Failures are caught and handled at the integration layer, not silently dropped
+- Each sync event is logged, so it's always possible to see what ran, what succeeded, and what needs attention
+- There's no third-party platform introducing rate limits, scenario timeouts, or its own interpretation of the data
+- The integration can be updated and extended without being constrained by what a visual automation tool supports
+
+## Technology
+
+- **CRM:** Pipedrive
+- **Executive search platform:** Invenias (Bullhorn)
+- **Previous integration:** Make.com (replaced)
+- **Replacement:** Direct API integration
+- **Sync flows:** Organisation sync, Person sync, Activity-to-Journal sync
+- **Matching logic:** Find-or-create to prevent duplicates across both platforms
+- **Hosting:** DigitalOcean App Platform
+
+## The broader point
+
+Make.com and similar platforms are a reasonable starting point for connecting two systems quickly. But when an integration becomes business-critical — when the sales team, the search team, and the data in both platforms depends on it working reliably every time — a direct API build is usually the more durable choice.
+
+It gives you full control over the logic, full visibility into what's happening, and no dependency on a third platform's uptime, pricing changes, or API limits.
+
+For firms running Pipedrive alongside Invenias, keeping both platforms in sync doesn't have to be a source of uncertainty. A properly built direct integration makes it a background process that simply works.
