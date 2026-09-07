@@ -1,0 +1,90 @@
+---
+title: "Turning Barbour ABI Construction Projects Into Automated Pipedrive Leads"
+description: "How we connected Barbour ABI with Pipedrive to automatically identify relevant construction projects, add companies and decision-makers, flag relevant materials and keep sales Leads continuously updated."
+date: "2026-09-07"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/barbour-abi-pipedrive-integration.png"
+draft: false
+---
+
+Construction intelligence platforms such as Barbour ABI contain huge amounts of valuable project data. The challenge is getting that information into a CRM in a way that salespeople can actually use.
+
+For this client, Barbour ABI was being used to identify relevant construction opportunities and Pipedrive to manage the sales process. But moving information between the two systems created a significant amount of manual work — relevant projects had to be identified, company information copied across, contacts located, values and dates entered, and the CRM then needed to be kept updated as projects changed.
+
+We built a custom integration that removes that process almost entirely. Every morning, the system checks Barbour ABI and automatically turns relevant projects into structured, populated and continually refreshed Pipedrive Leads.
+
+## The problem
+
+A construction project in Barbour ABI can contain a large amount of information: project name, location, value, dates, status, companies involved, their roles, named contacts, materials and ongoing updates. But simply copying everything into Pipedrive wouldn't have been useful. The sales team only needed specific organisations, specific contacts and specific project information relevant to their products and sales process.
+
+The integration needed to answer: which projects should come into Pipedrive? Which companies matter? Who is the best person to contact? Which project details are commercially useful? And what happens when Barbour updates the project later?
+
+## Three ways projects enter Pipedrive
+
+**1. Manually selected projects**
+
+If somebody finds an interesting project while working in Barbour ABI, they apply the tag `Add to CRM`. On the next sync, the system creates the corresponding Lead in Pipedrive — populated automatically, relevant companies attached, a primary contact selected where possible, ownership assigned to the person who tagged it. The Barbour tag then changes to `CRM`, putting the project into the ongoing refresh cycle.
+
+The sales team's workflow becomes: find useful project → click one tag → project appears in Pipedrive.
+
+**2. Automatically identified opportunities**
+
+The integration also monitors configured Barbour ABI saved searches. Any new or recently updated project matching those searches flows into Pipedrive automatically, without anyone having to find it first. This effectively turns Barbour's saved-search functionality into an automated lead-generation feed. Additional searches can be configured for different products, territories or business units.
+
+**3. Existing projects stay up to date**
+
+Construction projects change constantly — values change, dates move, new companies get involved, contacts are added, statuses shift. The integration performs a daily refresh pass across existing CRM-tagged projects, writing updated Barbour data back into the existing Pipedrive Lead. Manually assigned owners and labels are protected rather than overwritten. Pipedrive isn't receiving a snapshot — it stays connected to the evolving project.
+
+## Only relevant companies are added
+
+A large construction project can contain many organisations, most of which aren't relevant to the sales team. The integration filters companies based on their role within the project — for this implementation, approved roles included Client, Civil Engineer, Contractor, Architect, Quantity Surveyor, Drainage Subcontractor, Sustainability Consultant and Groundworks Contractor. Companies outside the relevant role list are ignored.
+
+The integration also recognises companies already in Pipedrive and reuses them rather than creating duplicates.
+
+## Automatically selecting the best contact
+
+The integration includes a fallback process for selecting a primary contact — working through relevant project roles in priority order, stopping as soon as a suitable named contact is found. This means Leads entering Pipedrive are significantly more actionable than a record containing just a project name.
+
+Beyond the contacts attached to the individual project, the system also reviews other contacts Barbour knows at each relevant organisation, checks them against a predefined list of relevant job titles, and adds only matching people to the Pipedrive Organisation — clearly labelled as `People on other Projects`. The integration helps answer both "who is working on this project?" and "who else at this company might be worth speaking to?"
+
+## Flagging the materials that matter
+
+Barbour includes information about materials associated with each construction project. Rather than requiring a salesperson to manually review this, the integration checks the material list against the client's own relevant product categories and writes any matches directly onto the Pipedrive Lead as a note. The note refreshes on every sync, so it always reflects the latest Barbour information.
+
+## Supporting multiple regions and product teams
+
+Saved searches can represent different geographic areas, product ranges or parts of the business. The integration automatically labels each Lead according to the saved search it matched, and a single project can carry multiple labels if it matches more than one search. This makes it straightforward to filter opportunities, create separate sales views, report by region and route work to the appropriate people — without building completely separate integrations.
+
+## What appears on the Pipedrive Lead
+
+Once a project reaches Pipedrive, the salesperson gets a structured record containing project title, sector, status, full project value, a client-specific calculated opportunity value, start and end dates, location, a direct link back to the Barbour project, relevant organisations and their roles, primary contact, additional useful contacts, relevant materials, and region/product labels. All populated automatically.
+
+## Protecting existing Pipedrive data
+
+Automations that aggressively overwrite CRM records can create as many problems as they solve. Several safeguards were built in: existing companies are reused where possible; contacts are matched using email or name/company combinations rather than duplicated; existing Leads are updated in place; manual owner changes, labels and notes are preserved. Only information owned by the integration is automatically refreshed.
+
+Barbour should enrich and maintain the CRM — not erase the work salespeople have already done inside it.
+
+## Reliability and monitoring
+
+Because the integration operates automatically every day, reliability was treated as part of the build rather than an afterthought. The system includes scheduled daily runs, automatic retry handling, failure notifications, activity logs and graceful handling when an external API is temporarily unavailable. Data-quality failures are monitored as well as technical failures — during the live implementation this identified and corrected issues including company address formatting, multi-line address handling, Pipedrive field restrictions and duplicate note prevention.
+
+## Technology
+
+- **CRM:** Pipedrive
+- **Construction intelligence:** Barbour ABI
+- **Integration:** Custom API integration
+- **Hosting:** DigitalOcean App Platform
+- **Automation:** Scheduled daily sync
+- **Monitoring:** Logs, automatic retries and failure alerts
+- **Data matching:** Project, company, contact and Pipedrive record matching
+- **Sales intelligence:** Saved searches, project roles, contact roles and material matching
+
+## The broader point
+
+Connecting two systems isn't usually the hardest part of an integration. The real work is deciding what information is useful and how it should behave once it reaches the CRM.
+
+A simple Barbour → Pipedrive integration could have created a new Lead containing a project name and some copied fields. But that would still leave the sales team doing much of the thinking. The more valuable approach was to embed the client's sales logic into the integration itself: which projects matter, which companies matter, which people matter, which materials create an opportunity, who should own the Lead, has this project changed since yesterday, does this organisation already exist, and what should be updated versus protected.
+
+That's the difference between moving data between systems and building an automated sales workflow.
