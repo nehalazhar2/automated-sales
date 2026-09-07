@@ -1,0 +1,104 @@
+---
+title: "Cleaning 4,000+ Pipedrive Contacts with Apollo — Email Verification, Job Changes & Automated Outreach"
+description: "How we used Apollo to enrich more than 4,000 Pipedrive contacts, validate email changes, preserve historic CRM data, identify job moves and build cleaner lists for automated sales outreach."
+date: "2026-09-07"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/pipedrive-apollo-data-enrichment.png"
+draft: false
+---
+
+A CRM database inevitably gets older. People change jobs. Companies rebrand. Email addresses change. Contacts get created with incomplete information, generic inboxes or no email address at all.
+
+For this client, Pipedrive contained around 4,000 contacts accumulated over several years. The database was valuable, but there was no reliable way of knowing which contact information was still current.
+
+The objective wasn't simply to run the database through Apollo. It was to create a repeatable process for enriching, validating and maintaining Pipedrive data without blindly overwriting information that might still be useful.
+
+## The problem
+
+Some contacts had missing work email addresses, old corporate emails, generic addresses such as hello@ or info@, outdated employers, old job titles, or missing LinkedIn profiles. Organisations had incomplete firmographic data.
+
+The bigger issue was that simply importing new Apollo data over the top of Pipedrive would have created another problem. If Apollo said somebody now worked for a different business, we didn't necessarily want to delete the old information immediately — the existing CRM record might contain years of email history, activities, deals and relationships.
+
+So rather than treating Apollo as the new source of truth, we built a comparison and validation layer inside Pipedrive.
+
+## Enriching the Pipedrive database with Apollo
+
+We exported the full contact database from Pipedrive and enriched it through Apollo, which returned current work email, employer, job title, LinkedIn profile, company website, industry, location, headcount, revenue data and company-level enrichment.
+
+The enriched data was matched back to the original Pipedrive records using the Pipedrive Person ID rather than relying on names or email addresses. Names and emails change — the Pipedrive ID gave us a stable identifier for updating the correct existing record.
+
+## Comparing Apollo against the existing CRM
+
+Instead of immediately replacing live Pipedrive fields, we created dedicated Apollo enrichment fields alongside the existing data. For example, an existing Pipedrive email and an Apollo email would sit side by side, with comparison fields showing whether the email matched, whether the employer matched, whether a new email had been found, and whether the contact appeared to have changed company.
+
+Each contact was classified into a status such as No material change, New email found, Email changed — same company, Likely changed company, or Manual review required. This made the enrichment actionable inside Pipedrive rather than producing another spreadsheet.
+
+## Validating email changes before updating Pipedrive
+
+A different email address doesn't automatically mean the Apollo address is better, so we introduced several layers of validation.
+
+**Missing emails** — the safest updates were contacts where Pipedrive had no work email and Apollo had confidently identified the same person. These could be populated without removing any existing information.
+
+**Different email, same company** — where the email had changed but the employer remained the same, we compared domains. A change within the same corporate domain was much stronger evidence than a change between two different domains entirely.
+
+**Company website validation** — where old and new email domains differed, we checked whether Apollo's new email domain matched the company's current website domain while the existing Pipedrive email did not. This resolved many records that would otherwise have required manual review.
+
+**Email history as a signal** — we brought Pipedrive's Last Email Received data into the validation process. If somebody had recently emailed from their existing address, that was strong evidence it was still active, and those records were retained or reviewed separately.
+
+This is why CRM enrichment works best when you combine external data with the relationship data already inside the CRM. Apollo knows a great deal about the wider market. Pipedrive knows what has actually happened between the company and the contact. Both matter.
+
+## Preserving the original data
+
+Whenever we replaced an existing email, we didn't discard the old address. We created additional Pipedrive fields — Original Pipedrive Email Address, Data Cleanup Updated Date, and Cleanup Action — so historic information remained available and every change had an audit trail.
+
+## Identifying contacts who have changed jobs
+
+Database cleaning also uncovered a much more interesting sales opportunity. Apollo's job change detection allowed saved contacts to be monitored for changes in employer or role. We loaded the Pipedrive contacts into Apollo and pushed job-change information back into dedicated fields: Job Change Detected, Job Change Detected Date, Previous Organisation, Previous Job Title, New Organisation, New Job Title, Job Change Priority, and Outreach Status.
+
+This created a clear distinction between "this CRM record is out of date" and "this person has moved company and there may be a good reason to reconnect."
+
+## Turning job changes into sales triggers
+
+A contact moving company can be one of the strongest reasons for proactive outreach. They already know the business — they may previously have been a customer, prospect or stakeholder — and they have moved into a new organisation where that existing relationship may open a door.
+
+We created filters inside Pipedrive to surface contacts where Apollo had detected a move but Pipedrive still showed the previous employer. This transforms database maintenance into a prospecting workflow:
+
+Apollo detects job change → Pipedrive contact flagged → owner reviews → follow-up opportunity created
+
+Rather than relying on salespeople remembering to check LinkedIn, the signal becomes part of the CRM.
+
+## Creating outreach-ready lists
+
+Once contact data has been verified, Apollo can be used to create segmented prospect lists for outbound campaigns. The workflow becomes: Pipedrive contacts → Apollo enrichment → email validation → segmentation → outreach sequence.
+
+Contacts can be grouped by industry, role, seniority, company size, job change, existing CRM relationship or previous engagement, and added to Apollo sequences with much greater confidence that the person, company and email are current.
+
+Data quality comes before automation. Running outreach against an unverified CRM simply allows bad data to be used faster.
+
+## Keeping Pipedrive as the central CRM
+
+Apollo is extremely useful for enrichment, prospecting and outbound activity — but we didn't want the client's customer and prospect history fragmented between multiple systems. Pipedrive remained the central CRM. Apollo supplied external intelligence; validated information was pushed back into Pipedrive so salespeople continued working from a single record containing current and historic contact information, relationship history, deals and activities, Apollo enrichment, job-change signals, cleanup history and outreach status.
+
+## Ongoing data maintenance
+
+A CRM cleanup should not be a one-off project. Even a perfectly clean database starts ageing immediately. The longer-term process is to periodically send contacts through Apollo, check for new enrichment, identify changes, validate high-confidence updates, and surface valuable changes to the sales team — turning data quality from an occasional manual exercise into an ongoing process.
+
+## Technology
+
+- **CRM:** Pipedrive
+- **Data enrichment:** Apollo
+- **Contact matching:** Pipedrive Person ID, LinkedIn and email validation
+- **Email validation:** Apollo data + corporate domain comparison + Pipedrive email history
+- **Job-change monitoring:** Apollo Job Change Alerts
+- **Outbound:** Apollo Lists and automated outreach sequences
+- **CRM audit trail:** Custom Pipedrive enrichment and cleanup fields
+- **Automation:** Pipedrive API, Zapier, Make or n8n for ongoing workflow automation
+
+## The broader point
+
+CRM data enrichment is easy to describe as: export contacts → enrich them → import them again. But that's usually the risky way to do it.
+
+The difficult part is deciding which information should actually replace the data already in the CRM. An old email might still work. A different company name might simply be a rebrand. A new employer might represent both a necessary CRM update and a valuable sales opportunity.
+
+The best enrichment workflows compare, validate, preserve history and turn meaningful changes into actions for the sales team. In this project, Apollo wasn't simply used to find more data — it became an external data-quality and sales-intelligence layer around Pipedrive, helping keep thousands of CRM records current while identifying new reasons to engage with existing contacts.
