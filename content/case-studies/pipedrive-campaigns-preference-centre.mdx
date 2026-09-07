@@ -1,0 +1,69 @@
+---
+title: "Pipedrive Campaigns Preference Centre — Custom Email Preferences by Category"
+description: "How we built a custom communications preference centre for Pipedrive Campaigns, allowing contacts to manage which types of emails they receive without relying on a global unsubscribe."
+date: "2026-09-07"
+category: "Pipedrive"
+author: "Automated Sales"
+ogImage: "/images/projects/pipedrive-campaigns-preference-centre.png"
+draft: false
+---
+
+Pipedrive Campaigns is a useful way to send marketing emails from inside the CRM, but like many built-in email tools, its native unsubscribe behaviour is fairly broad. A contact can unsubscribe from marketing emails, but there isn't a simple Mailchimp-style preference page where they can choose which categories of communication they still want to receive.
+
+For one client, that was a problem. They wanted to continue using Pipedrive Campaigns, but needed a more flexible way for contacts to manage communication preferences — newsletters, events, general programme information, and follow-up communications relating to programmes they had already attended.
+
+## The problem
+
+The standard Pipedrive Campaigns setup already handles the most important compliance requirement: whether someone is subscribed or unsubscribed from marketing emails. Pipedrive's Campaigns functionality only successfully sends to contacts with a subscribed marketing status, and campaigns include an unsubscribe footer for opting out entirely.
+
+But the client needed something more granular. They didn't just want subscribed or unsubscribed — they wanted contacts to be able to manage categories such as General Programme Information, Newsletters, Events, and Programmes already attended.
+
+This meant building a custom preferences layer on top of Pipedrive Campaigns, while still keeping Pipedrive's native marketing status as the main consent control.
+
+## What we built
+
+A hosted communications preference centre connected directly to Pipedrive via API.
+
+Each contact receives a personalised preference link in their Pipedrive Campaign email. When they click it, they land on a branded page where they can review the categories of communication available and untick any they no longer wish to receive — both general categories (General Programme Information, Newsletters, Events) and specific programmes they have already attended.
+
+When the contact saves their choices, the page updates a custom multi-option field on their Pipedrive Person record. This gives the client a category-level preference centre without moving their marketing data out of Pipedrive.
+
+## How the token logic works
+
+Each Pipedrive Person has a unique preference token stored in a custom field. The preference link looks like `/preferences?token=unique-contact-token`.
+
+When someone opens the page, the app uses the token to find the correct Person record in Pipedrive, reads their current communication preferences, and displays the relevant checkboxes as selected. When the form is submitted, the app writes the updated values back to that same Person record.
+
+No contact details are exposed in the URL, and the recipient does not need to log in. The token acts as a private identifier that connects the preference page to the correct Pipedrive contact.
+
+## Existing contact setup
+
+For go-live, we generated tokens for every existing Pipedrive contact with an email address via a controlled export/import process — exporting People from Pipedrive, generating a unique token for every contact, preserving any existing test tokens, and re-importing the token values back using the Person ID. This meant the client's entire existing contact base was ready before the preference link went into live campaigns.
+
+## Automatic token generation
+
+New contacts are handled automatically via a secure webhook endpoint on the hosted app. When a Person is created or updated in Pipedrive, the app checks whether they have an email address and whether the token field is blank — and if so, generates a new UUID token and writes it back to the Person record.
+
+We also added a protected admin endpoint that can scan Pipedrive and fill any missing tokens, which is useful after large imports where webhook behaviour can sometimes vary depending on how records were created.
+
+## Campaign filtering
+
+The custom preference centre does not replace Pipedrive's native marketing status — that remains the primary permission layer. Campaign audiences should still be built using Marketing status = Subscribed AND the relevant preference category. A newsletter campaign goes only to subscribed contacts whose preferences include Newsletters; an events campaign only to those who include Events.
+
+This keeps the system clean: Pipedrive controls whether someone can receive marketing emails at all, while the custom preference field controls which types they want.
+
+## Technology
+
+- **Backend:** Node.js / Express
+- **Hosting:** DigitalOcean App Platform
+- **Data:** Pipedrive API
+- **CRM fields:** Custom Person token field and custom multi-option preference field
+- **Automation:** Pipedrive webhooks for new and updated People
+- **Security:** Private webhook secret and unique per-contact preference tokens
+- **Frontend:** Branded responsive HTML preference page
+
+## The broader point
+
+This project is a good example of extending Pipedrive without replacing it. The client did not need to move to a separate email marketing platform just to get better preference management — their contacts, consent status, and campaign activity were already in Pipedrive. The missing piece was a lightweight custom layer that gave recipients more choice and gave the client better segmentation.
+
+The result is a preference centre that feels familiar to contacts, updates Pipedrive automatically, and keeps Campaigns as the main email-sending tool. Not a separate marketing database — Pipedrive, with the missing preference-management layer added around it.
