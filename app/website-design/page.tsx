@@ -4,6 +4,7 @@ import CtaBox from '@/components/CtaBox';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
+import FaqAsk from '@/components/FaqAsk';
 
 export const metadata = buildMetadata({
   title: 'Website Design — Company Websites Built In 7 days!',
@@ -219,6 +220,7 @@ export default function Page() {
                 <p style={{ marginTop: 12 }}>{f.a}</p>
               </details>
             ))}
+            <FaqAsk />
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ import { TESTIMONIALS } from '@/lib/testimonials';
 import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema, breadcrumbSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
+import FaqAsk from '@/components/FaqAsk';
 
 export const metadata = buildMetadata({
   title: 'Pipedrive Setup — Fixed-Scope Pipedrive Configuration',
@@ -187,6 +188,7 @@ export default function Page() {
                 <p style={{ marginTop: 12 }}>{f.a}</p>
               </details>
             ))}
+            <FaqAsk />
           </div>
         </div>
       </section>

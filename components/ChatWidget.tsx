@@ -3,21 +3,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { greetingFor } from '@/lib/chat/greetings';
+import { stripNavMarker } from '@/lib/chat/navMarker';
+import { CHAT_OPEN_EVENT, type ChatOpenDetail } from '@/lib/chat/events';
 
 type Msg = { role: 'user' | 'assistant'; content: string; images?: string[] };
 
 const MAX_IMAGE_BYTES = 4_000_000; // 4 MB per image
 const MAX_IMAGES_PER_MESSAGE = 4;
-
-// Strip the [[nav:/path]] marker from streamed text, including a
-// partial marker at the end (e.g. "[[na" while a token is mid-stream)
-// so the marker never flashes in the chat bubble.
-function stripNavMarker(s: string): string {
-  let out = s.replace(/\[\[nav:\/[a-z0-9\-\/]*\]\]/gi, '');
-  const tailMatch = out.match(/\[\[(?:n(?:a(?:v(?::(?:\/[a-z0-9\-\/]*)?)?)?)?)?$/i);
-  if (tailMatch) out = out.slice(0, tailMatch.index);
-  return out.trimEnd();
-}
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -194,6 +186,19 @@ export default function ChatWidget() {
     return () => clearTimeout(timer);
     // Intentionally only run once on mount — auto-open is session-wide, not per page.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // "Continue in chat" from an FAQ Ask card: seed the conversation and open.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const detail = (e as CustomEvent<ChatOpenDetail>).detail;
+      if (!detail?.messages?.length) return;
+      setMessages((prev) => [...prev, ...detail.messages]);
+      setProactive(null);
+      setIsOpen(true);
+    };
+    window.addEventListener(CHAT_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(CHAT_OPEN_EVENT, onOpen);
   }, []);
 
   const dismissProactive = useCallback(() => {

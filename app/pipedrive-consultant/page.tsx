@@ -11,6 +11,7 @@ import StructuredData from '@/components/seo/StructuredData';
 import { faqSchema } from '@/components/seo/schemas';
 import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
+import FaqAsk from '@/components/FaqAsk';
 
 export const metadata = buildMetadata({
   title: 'Pipedrive Consultant – Certified Pipedrive Experts',
@@ -176,6 +177,7 @@ export default function Page() {
                 <p style={{ marginTop: 12 }}>{f.a}</p>
               </details>
             ))}
+            <FaqAsk />
           </div>
         </div>
       </section>

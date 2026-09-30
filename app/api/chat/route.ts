@@ -18,7 +18,16 @@ const Body = z.object({
     .min(1)
     .max(20),
   pathname: z.string().max(500),
+  source: z.enum(['chat', 'faq']).optional(),
 });
+
+// FAQ "Ask me anything" cards show a single answer inline, so the agent
+// must answer immediately instead of opening with lead capture.
+const FAQ_INSTRUCTION =
+  'This question was typed into the "Ask me anything" item of the FAQ section on the page, ' +
+  'not the chat widget. Answer the question directly and completely in a few short paragraphs, ' +
+  "as an FAQ answer would. Do not ask for the visitor's name, email or other contact details, " +
+  'do not ask follow-up questions, and do not include any [[nav:...]] marker.';
 
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 30;
@@ -72,8 +81,10 @@ export async function POST(req: Request) {
               id: promptId,
               variables: { pathname: body.pathname },
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            input: body.messages.map((m): any => {
+            input: [
+              ...(body.source === 'faq' ? [{ role: 'developer' as const, content: FAQ_INSTRUCTION }] : []),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ...body.messages.map((m): any => {
               if (m.role === 'assistant') {
                 return { role: 'assistant', content: m.content || '' };
               }
@@ -88,7 +99,8 @@ export async function POST(req: Request) {
               }
               if (parts.length === 0) parts.push({ type: 'input_text', text: '' });
               return { role: 'user', content: parts };
-            }),
+              }),
+            ],
             stream: true,
           },
           { signal: abort.signal }
