@@ -193,15 +193,15 @@ export default function Page() {
         style={{
           textAlign: 'center',
           fontSize: 14,
-          opacity: 0.7,
-          margin: '0 auto',
-          padding: '0 24px 32px',
+          color: '#9aa3af',
+          margin: 0,
+          padding: '24px 24px 8px',
         }}
       >
         Pipedrive consultants by region:{' '}
-        <Link href="/pipedrive-consultant-uk/">UK</Link> ·{' '}
-        <Link href="/pipedrive-consultant-uae/">UAE</Link> ·{' '}
-        <Link href="/pipedrive-consultant-usa/">USA</Link>
+        <Link href="/pipedrive-consultant-uk/" style={{ color: 'inherit', textDecoration: 'underline' }}>UK</Link> ·{' '}
+        <Link href="/pipedrive-consultant-uae/" style={{ color: 'inherit', textDecoration: 'underline' }}>UAE</Link> ·{' '}
+        <Link href="/pipedrive-consultant-usa/" style={{ color: 'inherit', textDecoration: 'underline' }}>USA</Link>
       </p>
 
       <CtaBox
