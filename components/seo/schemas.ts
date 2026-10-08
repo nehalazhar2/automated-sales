@@ -58,7 +58,10 @@ export function founderSchema() {
     jobTitle: 'Founder',
     worksFor: { '@id': `${SITE_URL}/#organization` },
     knowsAbout: ['Pipedrive', 'Pipedrive implementation', 'CRM automation', 'Zapier', 'AI sales automation'],
-    sameAs: ['https://www.upwork.com/freelancers/pipedriveconsultant'],
+    sameAs: [
+      'https://www.linkedin.com/in/dan-strutt-331a195a/',
+      'https://www.upwork.com/freelancers/pipedriveconsultant',
+    ],
   };
 }
 
