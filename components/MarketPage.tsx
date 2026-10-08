@@ -27,7 +27,7 @@ export type MarketPageProps = {
   audience: string;
   faqs: Array<{ q: string; a: string }>;
   serviceName: string;
-  otherMarket: { href: string; label: string };
+  otherMarkets: Array<{ href: string; label: string }>;
 };
 
 const SERVICES = [
@@ -198,8 +198,13 @@ export default function MarketPage(p: MarketPageProps) {
         <div className="as-container">
           <p>
             Also see our{' '}
-            <Link href={p.otherMarket.href}>{p.otherMarket.label}</Link>, or read more about our{' '}
-            <Link href="/pipedrive-consultant/">Pipedrive consultancy services</Link>.
+            {p.otherMarkets.map((m, i) => (
+              <span key={m.href}>
+                {i > 0 && (i === p.otherMarkets.length - 1 ? ' and ' : ', ')}
+                <Link href={m.href}>{m.label}</Link>
+              </span>
+            ))}
+            , or read more about our <Link href="/pipedrive-consultant/">Pipedrive consultancy services</Link>.
           </p>
         </div>
       </section>

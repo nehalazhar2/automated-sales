@@ -49,7 +49,10 @@ export default function Page() {
       why="Fast-moving sales teams often manage leads across WhatsApp, email, portals and spreadsheets. Pipedrive brings them into one pipeline, and a consultant makes sure every enquiry is assigned, followed up and visible to management."
       audience="UAE businesses with a sales process to organise, from owner-led companies to growing sales teams in real estate, recruitment, agencies, professional services and software."
       faqs={FAQS}
-      otherMarket={{ href: '/pipedrive-consultant-uk/', label: 'Pipedrive consultant in the UK' }}
+      otherMarkets={[
+        { href: '/pipedrive-consultant-uk/', label: 'Pipedrive consultant in the UK' },
+        { href: '/pipedrive-consultant-usa/', label: 'Pipedrive consultant in the USA' },
+      ]}
     />
   );
 }

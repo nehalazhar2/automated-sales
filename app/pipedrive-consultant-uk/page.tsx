@@ -49,7 +49,10 @@ export default function Page() {
       why="Most teams buy Pipedrive, import a spreadsheet and stop there. A good consultant makes sure the pipeline reflects how you really sell, reps update it without being chased, and managers can trust the numbers."
       audience="UK businesses that sell to other businesses and have outgrown spreadsheets, or want more from the CRM they already have, across professional services, property, agencies, software and more."
       faqs={FAQS}
-      otherMarket={{ href: '/pipedrive-consultant-uae/', label: 'Pipedrive consultant in the UAE' }}
+      otherMarkets={[
+        { href: '/pipedrive-consultant-uae/', label: 'Pipedrive consultant in the UAE' },
+        { href: '/pipedrive-consultant-usa/', label: 'Pipedrive consultant in the USA' },
+      ]}
     />
   );
 }
