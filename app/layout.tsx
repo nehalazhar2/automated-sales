@@ -7,7 +7,7 @@ import AttributionTracker from '@/components/AttributionTracker';
 import AttributionRouteTracker from '@/components/AttributionRouteTracker';
 import ChatWidget from '@/components/ChatWidget';
 import StructuredData from '@/components/seo/StructuredData';
-import { professionalServiceSchema } from '@/components/seo/schemas';
+import { professionalServiceSchema, founderSchema } from '@/components/seo/schemas';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/site';
 import './globals.css';
 const inter = Inter({
@@ -65,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable}>
       <body>
         <StructuredData data={professionalServiceSchema()} />
+        <StructuredData data={founderSchema()} />
         <a className="skip-link" href="#main">Skip to content</a>
         <AttributionTracker />
         <AttributionRouteTracker />

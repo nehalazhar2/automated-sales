@@ -10,7 +10,23 @@ export function professionalServiceSchema() {
     description: SITE_DESCRIPTION,
     logo: `${SITE_URL}/images/logo.png`,
     image: `${SITE_URL}/images/logo.png`,
-    areaServed: 'Worldwide',
+    areaServed: [
+      { '@type': 'Country', name: 'United Kingdom' },
+      { '@type': 'Country', name: 'United Arab Emirates' },
+      { '@type': 'Country', name: 'United States' },
+    ],
+    slogan: 'Pipedrive, AI and automation consultancy',
+    knowsAbout: [
+      'Pipedrive',
+      'Pipedrive implementation',
+      'Pipedrive automation',
+      'CRM integration',
+      'Zapier',
+      'ActiveCampaign',
+      'AI sales automation',
+      'Model Context Protocol (MCP)',
+    ],
+    memberOf: { '@type': 'Organization', name: 'Pipedrive Partner Program (Platinum Partner, Advisory Council)' },
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Cardiff',
@@ -23,11 +39,28 @@ export function professionalServiceSchema() {
       url: `${SITE_URL}/contact-2/`,
       availableLanguage: ['English'],
     },
+    founder: { '@id': `${SITE_URL}/#dan-strutt` },
     sameAs: [
       'https://www.linkedin.com/company/automated-sales/',
       'https://twitter.com/automated_sales',
       'https://www.facebook.com/automatedsales',
       'https://www.instagram.com/automatedsales1/',
+    ],
+  };
+}
+
+export function founderSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${SITE_URL}/#dan-strutt`,
+    name: 'Dan Strutt',
+    jobTitle: 'Founder',
+    worksFor: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: ['Pipedrive', 'Pipedrive implementation', 'CRM automation', 'Zapier', 'AI sales automation'],
+    sameAs: [
+      'https://www.linkedin.com/in/dan-strutt-331a195a/',
+      'https://www.upwork.com/freelancers/pipedriveconsultant',
     ],
   };
 }

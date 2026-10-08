@@ -190,6 +190,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      <p
+        style={{
+          textAlign: 'center',
+          fontSize: 14,
+          color: '#9aa3af',
+          margin: 0,
+          padding: '24px 24px 8px',
+        }}
+      >
+        Pipedrive consultants by region:{' '}
+        <Link href="/pipedrive-consultant-uk/" style={{ color: 'inherit', textDecoration: 'underline' }}>UK</Link> ·{' '}
+        <Link href="/pipedrive-consultant-uae/" style={{ color: 'inherit', textDecoration: 'underline' }}>UAE</Link> ·{' '}
+        <Link href="/pipedrive-consultant-usa/" style={{ color: 'inherit', textDecoration: 'underline' }}>USA</Link>
+      </p>
+
       <section className="as-cta">
         <div className="as-container">
           <div className="as-cta-box">
