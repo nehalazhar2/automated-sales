@@ -14,9 +14,10 @@ import Link from 'next/link';
 import FaqAsk from '@/components/FaqAsk';
 
 export const metadata = buildMetadata({
-  title: 'Pipedrive Consultant – Certified Pipedrive Experts',
+  title: 'Pipedrive Consultant | Platinum Partner, 200+ Projects',
+  titleAbsolute: true,
   description:
-    'Pipedrive Consultant. Sales Strategy. Sales Ops. We create sales processes that scale and Pipedrive setups that your team actually uses.',
+    'Platinum Pipedrive Partner and Advisory Council member. CRM setup, automation, integrations and training from a team with 200+ Pipedrive projects. Book a free CRM audit.',
   path: '/pipedrive-consultant/',
 });
 

@@ -6,9 +6,9 @@ const PIPEDRIVE_AFFILIATE_URL =
   'https://app.pipedrive.com/affiliate/pdp-automated-sales?utm_content=copy_text&utm_medium=partners_program&utm_source=Automated%20Sales&utm_term=pdp-automated-sales';
 
 export const metadata = buildMetadata({
-  title: 'Extended Free Pipedrive Trial — Free Pipedrive Consultation',
+  title: 'Extended Pipedrive Free Trial: 30 Days, Not 14',
   description:
-    'Try Pipedrive free for 30 days — twice as long as the standard trial. Plus a free 30-minute consultation from a Pipedrive Partner.',
+    'Get a 30-day Pipedrive free trial, double the standard 14 days, plus a free 30-minute setup consultation from a Platinum Pipedrive Partner.',
   path: '/free-pipedrive-trial-extended/',
 });
 
