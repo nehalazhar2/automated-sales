@@ -189,6 +189,21 @@ export default function Page() {
 
       <RelatedServices currentPath="/pipedrive-consultant/" />
 
+      <p
+        style={{
+          textAlign: 'center',
+          fontSize: 14,
+          opacity: 0.7,
+          margin: '0 auto',
+          padding: '0 24px 32px',
+        }}
+      >
+        Pipedrive consultants by region:{' '}
+        <Link href="/pipedrive-consultant-uk/">UK</Link> ·{' '}
+        <Link href="/pipedrive-consultant-uae/">UAE</Link> ·{' '}
+        <Link href="/pipedrive-consultant-usa/">USA</Link>
+      </p>
+
       <CtaBox
         heading="Ready to scale your sales operation?"
         body="Tell us about your Pipedrive (or current CRM), your sales process and your tooling. We will tell you what to fix first."
