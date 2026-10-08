@@ -194,20 +194,28 @@ export default function MarketPage(p: MarketPageProps) {
 
       <RelatedPipedriveServices currentPath="/pipedrive-partner/" heading="Specialised Pipedrive services." />
 
-      <section className="as-section">
-        <div className="as-container">
-          <p>
-            Also see our{' '}
-            {p.otherMarkets.map((m, i) => (
-              <span key={m.href}>
-                {i > 0 && (i === p.otherMarkets.length - 1 ? ' and ' : ', ')}
-                <Link href={m.href}>{m.label}</Link>
-              </span>
-            ))}
-            , or read more about our <Link href="/pipedrive-consultant/">Pipedrive consultancy services</Link>.
-          </p>
-        </div>
-      </section>
+      <p
+        style={{
+          textAlign: 'center',
+          fontSize: 14,
+          color: '#9aa3af',
+          margin: 0,
+          padding: '24px 24px 8px',
+        }}
+      >
+        Also see our{' '}
+        {p.otherMarkets.map((m, i) => (
+          <span key={m.href}>
+            {i > 0 && (i === p.otherMarkets.length - 1 ? ' and ' : ', ')}
+            <Link href={m.href} style={{ color: 'inherit', textDecoration: 'underline' }}>{m.label}</Link>
+          </span>
+        ))}
+        , or read more about our{' '}
+        <Link href="/pipedrive-consultant/" style={{ color: 'inherit', textDecoration: 'underline' }}>
+          Pipedrive consultancy services
+        </Link>
+        .
+      </p>
 
       <CtaBox
         heading="Not sure what you need?"
