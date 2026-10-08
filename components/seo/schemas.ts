@@ -39,12 +39,26 @@ export function professionalServiceSchema() {
       url: `${SITE_URL}/contact-2/`,
       availableLanguage: ['English'],
     },
+    founder: { '@id': `${SITE_URL}/#dan-strutt` },
     sameAs: [
       'https://www.linkedin.com/company/automated-sales/',
       'https://twitter.com/automated_sales',
       'https://www.facebook.com/automatedsales',
       'https://www.instagram.com/automatedsales1/',
     ],
+  };
+}
+
+export function founderSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${SITE_URL}/#dan-strutt`,
+    name: 'Dan Strutt',
+    jobTitle: 'Founder',
+    worksFor: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: ['Pipedrive', 'Pipedrive implementation', 'CRM automation', 'Zapier', 'AI sales automation'],
+    sameAs: ['https://www.upwork.com/freelancers/pipedriveconsultant'],
   };
 }
 
