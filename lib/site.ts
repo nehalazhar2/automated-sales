@@ -43,6 +43,8 @@ export const FOOTER_LINKS = {
     { href: '/pipedrive-integration/', label: 'Pipedrive Integration' },
     { href: '/pipedrive-automation/', label: 'Pipedrive Automation' },
     { href: '/pipedrive-partner/', label: 'Pipedrive Partner' },
+    { href: '/pipedrive-consultant-uk/', label: 'Pipedrive Consultant UK' },
+    { href: '/pipedrive-consultant-uae/', label: 'Pipedrive Consultant UAE' },
     { href: '/free-pipedrive-trial-extended/', label: 'Pipedrive Free Trial' },
     { href: 'https://leadrouter.automated-sales.com/', label: 'Pipedrive Lead Router' },
     { href: 'https://pipedrivemcp.automated-sales.co/', label: 'Pipedrive Claude MCP' },
