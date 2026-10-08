@@ -7,6 +7,7 @@ const STATIC_ROUTES: Array<{ path: string; priority: number; changeFrequency: Me
   { path: '/pipedrive-consultant/',                         priority: 0.9, changeFrequency: 'monthly' },
   { path: '/pipedrive-consultant-uk/',                      priority: 0.8, changeFrequency: 'monthly' },
   { path: '/pipedrive-consultant-uae/',                     priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/pipedrive-consultant-usa/',                     priority: 0.8, changeFrequency: 'monthly' },
   { path: '/ai-consultants/',                               priority: 0.9, changeFrequency: 'monthly' },
   { path: '/zapier-consultants/',                           priority: 0.8, changeFrequency: 'monthly' },
   { path: '/active-campaign-consultants/',                  priority: 0.8, changeFrequency: 'monthly' },
