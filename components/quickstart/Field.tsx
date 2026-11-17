@@ -35,6 +35,7 @@ export default function Field({ question: q, value, error, onChange }: Props) {
   ) : null
   const hintEl = q.hint ? <div id={hintId} className="qs-hint">{q.hint}</div> : null
   const options = q.options ?? []
+  const req = q.required ? <span className="qs-req" aria-hidden="true"> *</span> : null
 
   if (q.type === 'multi') {
     const selected = Array.isArray(value) ? value : []
@@ -45,7 +46,7 @@ export default function Field({ question: q, value, error, onChange }: Props) {
         aria-invalid={invalid}
         aria-describedby={[q.hint ? hintId : null, error ? eid : null].filter(Boolean).join(' ') || undefined}
       >
-        <legend>{q.label}</legend>
+        <legend>{q.label}{req}</legend>
         <div className="qs-chips">
           {options.map((o) => (
             <label key={o.value} className="qs-chip">
@@ -70,12 +71,13 @@ export default function Field({ question: q, value, error, onChange }: Props) {
     const current = typeof value === 'string' ? value : ''
     return (
       <fieldset className="qs-field" data-qs-field={q.key} aria-invalid={invalid} aria-describedby={describedBy}>
-        <legend>{q.label}</legend>
+        <legend>{q.label}{req}</legend>
         <div className="qs-chips">
           {options.map((o) => (
             <label key={o.value} className="qs-chip">
               <input
                 type="radio"
+                required={q.required}
                 name={q.key}
                 value={o.value}
                 checked={current === o.value}
@@ -94,13 +96,14 @@ export default function Field({ question: q, value, error, onChange }: Props) {
   const str = typeof value === 'string' ? value : ''
   return (
     <div className="qs-field" data-qs-field={q.key}>
-      <label className="qs-label" htmlFor={id}>{q.label}</label>
+      <label className="qs-label" htmlFor={id}>{q.label}{req}</label>
       {q.type === 'select' ? (
         <select
           id={id}
           className="qs-select"
           value={str}
           aria-invalid={invalid}
+          aria-required={q.required || undefined}
           aria-describedby={describedBy}
           onChange={(e) => onChange(q.key, e.target.value)}
         >
@@ -116,6 +119,7 @@ export default function Field({ question: q, value, error, onChange }: Props) {
           value={str}
           maxLength={2000}
           aria-invalid={invalid}
+          aria-required={q.required || undefined}
           aria-describedby={describedBy}
           onChange={(e) => onChange(q.key, e.target.value)}
         />
@@ -128,6 +132,7 @@ export default function Field({ question: q, value, error, onChange }: Props) {
           autoComplete={q.key === 'email' ? 'email' : q.key === 'name' ? 'name' : q.key === 'company' ? 'organization' : q.key === 'website' ? 'url' : 'off'}
           value={str}
           aria-invalid={invalid}
+          aria-required={q.required || undefined}
           aria-describedby={describedBy}
           onChange={(e) => onChange(q.key, e.target.value)}
         />

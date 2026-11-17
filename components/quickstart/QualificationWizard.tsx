@@ -186,6 +186,7 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
         aria-valuemin={1}
         aria-valuemax={STEPS.length}
         aria-valuenow={step}
+        aria-valuetext={`Step ${step} of ${STEPS.length}: ${meta.title}`}
       >
         {STEPS.map((s) => (
           <i key={s.n} className={s.n <= step ? 'on' : undefined} />
@@ -193,10 +194,15 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
       </div>
       <div className="qs-stepmeta">
         <span>Step {step} of {STEPS.length}</span>
-        <span>{meta.title}</span>
+        <span>About 4 minutes in total</span>
       </div>
-      <h2 className="qs-title" ref={titleRef} tabIndex={-1}>{meta.title}</h2>
-      <p className="qs-sub">Choose &ldquo;Not sure&rdquo; if you don&apos;t know. We&apos;ll go through it with you.</p>
+      <h2 className="qs-title" ref={titleRef} tabIndex={-1}>
+        <span className="qs-vh">Step {step} of {STEPS.length}: </span>{meta.title}
+      </h2>
+      {step > 1 && step < STEPS.length && (
+        <p className="qs-sub">Choose &ldquo;Not sure&rdquo; if you don&apos;t know. We&apos;ll go through it with you.</p>
+      )}
+      <p className="qs-hint" style={{ marginTop: 0 }}><span className="qs-req" aria-hidden="true">*</span> marks a required question.</p>
 
       <form ref={formRef} className="qs-form" onSubmit={onSubmit} noValidate>
         {visible.map((q) => (
