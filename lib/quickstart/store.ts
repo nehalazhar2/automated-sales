@@ -104,14 +104,17 @@ function fileBackend(root: string): Backend {
 // del(pathname); list({ prefix, cursor }) -> { blobs[{pathname}], hasMore, cursor }.
 // Token is read from BLOB_READ_WRITE_TOKEN by the SDK.
 function blobBackend(): Backend {
+  // Preview and production share one Blob store: namespace by environment.
+  const ns = `${process.env.VERCEL_ENV ?? 'local'}/`
+  const strip = (k: string) => (k.startsWith(ns) ? k.slice(ns.length) : k)
   return {
     async read(key) {
-      const res = await blobGet(key, { access: 'private', useCache: false })
+      const res = await blobGet(ns + key, { access: 'private', useCache: false })
       if (!res || res.statusCode !== 200) return null
       return new Response(res.stream).text()
     },
     async write(key, value) {
-      await blobPut(key, value, {
+      await blobPut(ns + key, value, {
         access: 'private',
         addRandomSuffix: false,
         allowOverwrite: true,
@@ -119,14 +122,14 @@ function blobBackend(): Backend {
       })
     },
     async remove(key) {
-      await blobDel(key)
+      await blobDel(ns + key)
     },
     async listKeys(prefix) {
       const keys: string[] = []
       let cursor: string | undefined
       do {
-        const page = await blobList({ prefix, cursor })
-        keys.push(...page.blobs.map((x) => x.pathname))
+        const page = await blobList({ prefix: ns + prefix, cursor })
+        keys.push(...page.blobs.map((x) => strip(x.pathname)))
         cursor = page.hasMore ? page.cursor : undefined
       } while (cursor)
       return keys
@@ -134,9 +137,13 @@ function blobBackend(): Backend {
   }
 }
 
-/** Reads env at call time. Blob when BLOB_READ_WRITE_TOKEN is set, else local files. */
+/** Reads env at call time. Blob when BLOB_READ_WRITE_TOKEN is set, else local files (never on Vercel). */
 export function getStore(): Store {
   if (process.env.BLOB_READ_WRITE_TOKEN) return makeStore(blobBackend())
+  // Serverless filesystems are ephemeral: without Blob every lead would be lost.
+  if (process.env.VERCEL) {
+    throw new Error('QuickStart storage not configured: set BLOB_READ_WRITE_TOKEN')
+  }
   const root = process.env.QUICKSTART_DATA_DIR ?? path.join(process.cwd(), '.data/quickstart')
   return makeStore(fileBackend(root))
 }

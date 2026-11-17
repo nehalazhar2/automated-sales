@@ -4,12 +4,24 @@ import os from 'node:os'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 
-const effectsMock = vi.hoisted(() => ({ useMock: false, syncThrows: false }))
+const effectsMock = vi.hoisted(() => ({
+  useMock: false,
+  syncThrows: false,
+  live: false,
+  notify: vi.fn(async (_subject: string, _text: string) => {}),
+}))
 
 vi.mock('@/lib/quickstart/effects', async (orig) => {
   const real = await orig<typeof import('@/lib/quickstart/effects')>()
   return {
     ...real,
+    isLive: () => (effectsMock.live ? true : real.isLive()),
+    lookupExistingOpportunity: (email: string) =>
+      effectsMock.live
+        ? Promise.resolve({ personId: null, existingOpportunity: false })
+        : real.lookupExistingOpportunity(email),
+    notifyStaff: (subject: string, text: string) =>
+      effectsMock.live ? effectsMock.notify(subject, text) : real.notifyStaff(subject, text),
     syncQualificationToPipedrive: vi.fn(async (p: Parameters<typeof real.syncQualificationToPipedrive>[0]) => {
       if (effectsMock.syncThrows) throw new Error('pipedrive boom')
       return real.syncQualificationToPipedrive(p)
@@ -63,10 +75,14 @@ beforeEach(() => {
   delete process.env.BLOB_READ_WRITE_TOKEN
   delete process.env.VERCEL_ENV
   delete process.env.QUICKSTART_TEST_MODE
+  delete process.env.VERCEL
   effectsMock.syncThrows = false
+  effectsMock.live = false
+  effectsMock.notify.mockClear()
   __resetForTests()
 })
 afterEach(() => {
+  delete process.env.VERCEL
   vi.restoreAllMocks()
   delete process.env.QUICKSTART_DATA_DIR
   fs.rmSync(dir, { recursive: true, force: true })
@@ -136,6 +152,43 @@ describe('POST /api/quickstart/qualify', () => {
     expect(await getStore().list()).toHaveLength(0)
   })
 
+  it('invalid email -> fieldErrors keyed by field, not by "answers"', async () => {
+    const res = await POST(req(valid({ email: 'not-an-email' })))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.fieldErrors.email).toBeDefined()
+    expect(json.fieldErrors.answers).toBeUndefined()
+  })
+
+  it('store not configured on Vercel in live mode -> 500 store_failed and staff emailed the lead', async () => {
+    process.env.VERCEL = '1'
+    effectsMock.live = true
+    const res = await POST(req(valid()))
+    expect(res.status).toBe(500)
+    expect((await res.json()).error).toBe('store_failed')
+    expect(effectsMock.notify).toHaveBeenCalledTimes(1)
+    const [subject, text] = effectsMock.notify.mock.calls[0]
+    expect(subject).toContain('STORE FAILED')
+    expect(text).toContain('lead not saved')
+    expect(text).toContain('jane@example.com')
+    expect(text).toContain('Acme Ltd')
+    expect(text).toContain('quickstart')
+    expect(text).toContain('"users_now": "1_5"')
+    expect(text).toContain('QuickStart storage not configured')
+  })
+
+  it('store write failing in live mode -> staff emailed; in test mode -> no email', async () => {
+    const file = path.join(dir, 'not-a-dir')
+    fs.writeFileSync(file, 'x')
+    process.env.QUICKSTART_DATA_DIR = file // ENOTDIR on every access
+    effectsMock.live = false
+    expect((await POST(req(valid()))).status).toBe(500)
+    expect(effectsMock.notify).not.toHaveBeenCalled()
+    effectsMock.live = true
+    expect((await POST(req(valid()))).status).toBe(500)
+    expect(effectsMock.notify).toHaveBeenCalledTimes(1)
+  })
+
   it('malformed JSON -> 400', async () => {
     const res = await POST(req('{nope'))
     expect(res.status).toBe(400)
@@ -172,5 +225,28 @@ describe('POST /api/quickstart/qualify', () => {
     let last = 0
     for (let i = 0; i < 11; i++) last = (await POST(req({ bad: 1 }, ip))).status
     expect(last).toBe(429)
+  })
+})
+
+describe('isLive matrix', () => {
+  const env = { ...process.env }
+  afterEach(() => {
+    process.env = { ...env }
+  })
+  const cases: Array<[string | undefined, string | undefined, boolean]> = [
+    ['production', undefined, true],
+    ['production', '1', false],
+    ['preview', undefined, false],
+    ['preview', '1', false],
+    [undefined, undefined, false],
+    [undefined, '1', false],
+  ]
+  it.each(cases)('VERCEL_ENV=%s QUICKSTART_TEST_MODE=%s -> %s', async (vercelEnv, testMode, expected) => {
+    if (vercelEnv === undefined) delete process.env.VERCEL_ENV
+    else process.env.VERCEL_ENV = vercelEnv
+    if (testMode === undefined) delete process.env.QUICKSTART_TEST_MODE
+    else process.env.QUICKSTART_TEST_MODE = testMode
+    const real = await vi.importActual<typeof import('@/lib/quickstart/effects')>('@/lib/quickstart/effects')
+    expect(real.isLive()).toBe(expected)
   })
 })

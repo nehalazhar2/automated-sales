@@ -4,7 +4,7 @@ import type { ZodError } from 'zod'
 import { PACKAGES, SCOPE_VERSION } from './packages'
 import { qualSubmitSchema, type QualAnswers } from './qualification/schema'
 import { routeQualification } from './qualification/routing'
-import { getStore } from './store'
+import { getStore, type Store } from './store'
 import { isLive, lookupExistingOpportunity, syncQualificationToPipedrive, notifyStaff } from './effects'
 import type { Project } from './types'
 
@@ -48,10 +48,43 @@ function responseFor(p: Project): Result {
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e))
 
+/** Best-effort: when the store is down in live mode, email the lead so it is not lost. */
+async function notifyStoreFailure(
+  project: Project,
+  answers: QualAnswers,
+  failure: unknown
+): Promise<void> {
+  if (!isLive()) return
+  try {
+    await notifyStaff(
+      `STORE FAILED - lead not saved: ${project.contact.company} (${project.qualification.candidate})`,
+      [
+        'STORE FAILED - lead not saved. Follow up manually.',
+        `Error: ${errMsg(failure)}`,
+        `${project.contact.name} <${project.contact.email}> from ${project.contact.company}`,
+        `Outcome: ${project.qualification.candidate}`,
+        `Reasons: ${project.qualification.reason_codes.join(', ')}`,
+        `Project: ${project.project_id}`,
+        '',
+        'Answers:',
+        JSON.stringify(answers, null, 2),
+      ].join('\n')
+    )
+  } catch (e) {
+    console.error('[quickstart] store-failure notify failed', e)
+  }
+}
+
 async function runQualify(submissionId: string, answers: QualAnswers): Promise<Result> {
-  const store = getStore()
-  const existing = await store.findBySubmissionId(submissionId)
-  if (existing) return responseFor(existing)
+  let store: Store | null = null
+  let storeError: unknown
+  try {
+    store = getStore()
+    const existing = await store.findBySubmissionId(submissionId)
+    if (existing) return responseFor(existing)
+  } catch (e) {
+    storeError = e
+  }
 
   let existingOpportunity = false
   let lookupError: string | undefined
@@ -95,9 +128,11 @@ async function runQualify(submissionId: string, answers: QualAnswers): Promise<R
   }
 
   try {
+    if (!store || storeError) throw storeError ?? new Error('store unavailable')
     await store.put(project)
   } catch (e) {
-    console.error('[quickstart] store.put failed', e)
+    console.error('[quickstart] store failed', e)
+    await notifyStoreFailure(project, answers, e)
     return { status: 500, body: { ok: false, error: 'store_failed' } }
   }
 

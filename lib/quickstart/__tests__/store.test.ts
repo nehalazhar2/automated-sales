@@ -109,3 +109,22 @@ describe('file store', () => {
     expect(await s.findBySubmissionId('../x')).toBeNull()
   })
 })
+
+describe('getStore configuration', () => {
+  const env = { ...process.env }
+  afterEach(() => {
+    process.env = { ...env }
+  })
+
+  it('throws on Vercel without BLOB_READ_WRITE_TOKEN', () => {
+    delete process.env.BLOB_READ_WRITE_TOKEN
+    process.env.VERCEL = '1'
+    expect(() => getStore()).toThrow('QuickStart storage not configured: set BLOB_READ_WRITE_TOKEN')
+  })
+
+  it('uses local files when not on Vercel and no token', () => {
+    delete process.env.BLOB_READ_WRITE_TOKEN
+    delete process.env.VERCEL
+    expect(() => getStore()).not.toThrow()
+  })
+})
