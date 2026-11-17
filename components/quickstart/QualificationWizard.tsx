@@ -34,6 +34,17 @@ function validateStep(answers: Answers, step: number): Errors {
   return errors
 }
 
+/** crypto.randomUUID needs a secure context; fall back to a random id the server accepts. */
+function newSubmissionId(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  } catch {
+    /* fall through */
+  }
+  const hex = (n: number) => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+  return `${hex(8)}-${hex(4)}-4${hex(3)}-${'89ab'[Math.floor(Math.random() * 4)]}${hex(3)}-${hex(12)}`
+}
+
 export default function QualificationWizard({ initialReferralDetail = '' }: { initialReferralDetail?: string }) {
   const [step, setStep] = useState(1)
   const [answers, setAnswers] = useState<Answers>(() =>
@@ -50,19 +61,11 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
   const formRef = useRef<HTMLFormElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const mounted = useRef(false)
+  const errorFocusPending = useRef(false)
 
   const visible = useMemo(() => visibleFor(answers, step), [answers, step])
   const meta = STEPS.find((s) => s.n === step)!
   const isLast = step === STEPS.length
-
-  // Focus first invalid field after a failed Continue / server rejection.
-  useEffect(() => {
-    if (!focusTick) return
-    const el = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')
-    if (!el) return
-    if (el.tagName === 'FIELDSET') el.querySelector<HTMLElement>('input')?.focus()
-    else el.focus()
-  }, [focusTick])
 
   // Move focus to the step heading when the step changes (not on first render).
   useEffect(() => {
@@ -70,8 +73,25 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
       mounted.current = true
       return
     }
+    // A pending error focus (e.g. server 400 moved us to the step with the bad field) wins.
+    if (errorFocusPending.current) return
     titleRef.current?.focus()
   }, [step])
+
+  // Focus first invalid field after a failed Continue / server rejection.
+  useEffect(() => {
+    if (!focusTick) return
+    errorFocusPending.current = false
+    const el = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')
+    if (!el) return
+    if (el.tagName === 'FIELDSET') el.querySelector<HTMLElement>('input')?.focus()
+    else el.focus()
+  }, [focusTick])
+
+  function requestErrorFocus() {
+    errorFocusPending.current = true
+    setFocusTick((t) => t + 1)
+  }
 
   function onChange(key: Question['key'], value: string | string[]) {
     setAnswers((a) => ({ ...a, [key]: value }))
@@ -83,10 +103,10 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
   }
 
   async function submit() {
-    if (!submissionId.current) submissionId.current = crypto.randomUUID()
     setPending(true)
     setSubmitError(null)
     try {
+      if (!submissionId.current) submissionId.current = newSubmissionId()
       const res = await fetch('/api/quickstart/qualify/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -126,9 +146,12 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
         if (firstKey) {
           setErrors(mapped)
           setStep(firstKey.step)
-          setFocusTick((t) => t + 1)
+          requestErrorFocus()
+          setSubmitError({ message: 'Some answers need another look. Please check the highlighted fields and try again.', retryable: false })
+          return
         }
-        setSubmitError({ message: 'Some answers need another look. Please check the highlighted fields and try again.', retryable: false })
+        // Nothing we can point at: treat as a retryable failure rather than a dead end.
+        setSubmitError({ message: 'Something went wrong sending your answers. Nothing has been lost, so please try again.', retryable: true })
         return
       }
       setSubmitError({ message: 'Something went wrong sending your answers. Nothing has been lost, so please try again.', retryable: true })
@@ -145,7 +168,7 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
     const errs = validateStep(answers, step)
     setErrors(errs)
     if (Object.keys(errs).length) {
-      setFocusTick((t) => t + 1)
+      requestErrorFocus()
       return
     }
     if (isLast) void submit()
@@ -187,7 +210,7 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
         ))}
 
         <div className="qs-honeypot" aria-hidden="true">
-          <input ref={honeypot} type="text" name="company_website_url" tabIndex={-1} autoComplete="off" defaultValue="" />
+          <input ref={honeypot} type="text" name="qs_hp_x" tabIndex={-1} autoComplete="new-password" defaultValue="" />
         </div>
 
         {submitError && (
