@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { UserRow } from '@/lib/quickstart/onboarding/sections'
 
 const MAX_USERS = 50
@@ -35,6 +35,8 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
   const parsed = toUserRows(value)
   const rows = parsed.length ? parsed : [BLANK]
   const named = rows.filter((r) => r.name.trim() !== '').length
+  // Emails the customer has left (blur) at least once: format is only judged after that, not per keystroke.
+  const [blurred, setBlurred] = useState<ReadonlySet<number>>(() => new Set())
   const root = useRef<HTMLDivElement>(null)
   const pendingFocus = useRef<string | null>(null)
   useEffect(() => {
@@ -43,6 +45,7 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
     pendingFocus.current = null
     el?.focus()
   })
+  const showBad = (i: number, r: UserRow) => badEmail(r.email) && (emailInvalid || blurred.has(i))
   const setRow = (i: number, patch: Partial<UserRow>) => onChange(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)))
 
   return (
@@ -59,18 +62,28 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
             <label className="qs-sublabel" htmlFor={`${id}-${i}-email`}>Work email</label>
             <input id={`${id}-${i}-email`} className="qs-input" type="email" inputMode="email" value={r.email} disabled={disabled}
               maxLength={200} autoComplete="off"
-              aria-invalid={emailInvalid && badEmail(r.email) ? true : undefined}
-              aria-describedby={emailInvalid && badEmail(r.email) ? describedBy : undefined}
+              aria-invalid={showBad(i, r) ? true : undefined}
+              aria-describedby={showBad(i, r) ? `${id}-${i}-email-err` : undefined}
+              onBlur={() => setBlurred((b) => (b.has(i) ? b : new Set(b).add(i)))}
               onChange={(e) => setRow(i, { email: e.target.value })} />
+            {showBad(i, r) && (
+              <div id={`${id}-${i}-email-err`} className="qs-error">
+                {r.name.trim() ? `${r.name.trim()}’s` : `Team member ${i + 1}’s`} email “{r.email.trim()}” doesn’t look right. Check for a missing @ or domain.
+              </div>
+            )}
           </div>
-          <div>
-            <label className="qs-sublabel" htmlFor={`${id}-${i}-role`}>Access</label>
-            <select id={`${id}-${i}-role`} className="qs-select" value={r.role} disabled={disabled}
-              onChange={(e) => setRow(i, { role: e.target.value === 'admin' ? 'admin' : 'regular' })}>
-              <option value="regular">Regular user</option>
-              <option value="admin">Administrator</option>
-            </select>
-          </div>
+          <fieldset className="qs-user-access">
+            <legend>Access<span className="qs-vh"> for {r.name.trim() || `team member ${i + 1}`}</span></legend>
+            <div className="qs-chips">
+              {(['regular', 'admin'] as const).map((v) => (
+                <label key={v} className="qs-chip">
+                  <input type="radio" name={`${id}-${i}-role`} value={v} checked={r.role === v} disabled={disabled}
+                    onChange={() => setRow(i, { role: v })} />
+                  <span>{v === 'admin' ? 'Administrator' : 'Regular user'}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <div>
             <label className="qs-sublabel" htmlFor={`${id}-${i}-team`}>Team (optional)</label>
             <input id={`${id}-${i}-team`} className="qs-input" type="text" value={r.team ?? ''} disabled={disabled} maxLength={200}
@@ -78,7 +91,10 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
           </div>
           {!disabled && rows.length > 1 && (
             <button type="button" className="qs-linkbtn qs-user-remove" aria-label={`Remove team member ${i + 1}`}
-              onClick={() => onChange(rows.filter((_, j) => j !== i))}>
+              onClick={() => {
+                setBlurred(new Set())
+                onChange(rows.filter((_, j) => j !== i))
+              }}>
               Remove
             </button>
           )}

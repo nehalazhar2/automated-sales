@@ -123,6 +123,9 @@ export default function OnboardingForm({
   const prevValues = useRef<Record<string, unknown>>({})
   const staleRefEl = useRef<HTMLDivElement>(null)
   const focusKey = useRef<string | null>(null)
+  const summaryRef = useRef<HTMLDivElement>(null)
+  const [summaryTick, setSummaryTick] = useState(0)
+  const [navOpen, setNavOpen] = useState(false)
   const [advancing, setAdvancing] = useState(false)
   const advancingRef = useRef(false)
 
@@ -309,22 +312,6 @@ export default function OnboardingForm({
     titleRef.current?.focus()
   }, [step])
 
-  // Bring the current section into view in the mobile strip.
-  // Scrolls only the strip itself (never the page), and not on first render.
-  const stripMounted = useRef(false)
-  useEffect(() => {
-    if (!stripMounted.current) {
-      stripMounted.current = true
-      return
-    }
-    const cur = formRef.current?.querySelector<HTMLElement>('.qs-sec.cur')
-    const strip = formRef.current?.querySelector<HTMLElement>('.qs-side-list')
-    if (!cur || !strip || strip.scrollWidth <= strip.clientWidth) return
-    const c = cur.getBoundingClientRect()
-    const r = strip.getBoundingClientRect()
-    strip.scrollLeft += c.left - r.left - (r.width - c.width) / 2
-  }, [step])
-
   // When saving stops because the draft changed elsewhere, make the banner impossible to miss.
   useEffect(() => {
     if (!stale) return
@@ -333,7 +320,12 @@ export default function OnboardingForm({
     el?.scrollIntoView({ block: 'nearest' })
   }, [stale])
 
-  // After a rejected submit (or a click on a missing question), focus that field
+  // After a rejected submit, focus the error summary (declared after the heading effect so it wins).
+  useEffect(() => {
+    if (summaryTick) summaryRef.current?.focus()
+  }, [summaryTick])
+
+  // After a click on a missing question), focus that field
   // (declared after the heading effect so it wins).
   useEffect(() => {
     if (!focusTick) return
@@ -353,7 +345,11 @@ export default function OnboardingForm({
   const errSections = SECTIONS.map((s, i) =>
     s.fields.some((f) => errors[f.key] && isFieldVisible(f, answers)) ? i : -1
   ).filter((i) => i >= 0)
-  const otherErr = errSections.filter((i) => i !== step)
+  const errList = SECTIONS.flatMap((s, i) =>
+    s.fields
+      .filter((f) => errors[f.key] && isFieldVisible(f, answers))
+      .map((f) => ({ i, key: f.key, label: f.label }))
+  )
 
   /** Jump to a section and focus one question (used by the Review list). */
   function goToField(i: number, key: string) {
@@ -440,8 +436,8 @@ export default function OnboardingForm({
         if (idx >= 0) {
           setErrors(mapped)
           setStep(idx)
-          setFocusTick((t) => t + 1)
-          setSubmitError('Some answers need another look. We have taken you to the first one.')
+          setSummaryTick((t) => t + 1)
+          setSubmitError('Some answers need another look.')
           return
         }
       }
@@ -483,8 +479,20 @@ export default function OnboardingForm({
       <aside className="qs-side" aria-label="Sections">
         <p className="qs-side-co">{company}</p>
         <div className="qs-side-pk">{pkg.name}</div>
-        <nav>
-          <ol className="qs-side-list">
+        <nav aria-label="Onboarding sections">
+          <div className="qs-mnav">
+            <div className="qs-mnav-row">
+              <span className="qs-mnav-title">
+                Section {step + 1} of {REVIEW + 1} · {section ? section.title : 'Review & submit'}
+              </span>
+              <button type="button" className="qs-linkbtn" aria-expanded={navOpen} aria-controls="qs-sec-list"
+                onClick={() => setNavOpen((o) => !o)}>
+                {navOpen ? 'Hide sections' : 'All sections'}
+              </button>
+            </div>
+            <div className="qs-mnav-bar" aria-hidden="true"><i style={{ width: `${((step + 1) / (REVIEW + 1)) * 100}%` }} /></div>
+          </div>
+          <ol className={`qs-side-list${navOpen ? ' is-open' : ''}`} id="qs-sec-list">
             {SECTIONS.map((s, i) => {
               const cur = i === step
               const done =
@@ -496,7 +504,7 @@ export default function OnboardingForm({
                     type="button"
                     className={`qs-sec${cur ? ' cur' : ''}${done ? ' done' : ''}${err ? ' err' : ''}`}
                     aria-current={cur ? 'step' : undefined}
-                    onClick={() => void go(i)}
+                    onClick={() => { setNavOpen(false); void go(i) }}
                     disabled={submitting}
                   >
                     <span className="qs-dot" aria-hidden="true">{err ? '!' : done ? '✓' : i + 1}</span>
@@ -513,7 +521,7 @@ export default function OnboardingForm({
                 type="button"
                 className={`qs-sec${step === REVIEW ? ' cur' : ''}`}
                 aria-current={step === REVIEW ? 'step' : undefined}
-                onClick={() => void go(REVIEW)}
+                onClick={() => { setNavOpen(false); void go(REVIEW) }}
                 disabled={submitting}
               >
                 <span className="qs-dot" aria-hidden="true">{REVIEW + 1}</span>
@@ -539,18 +547,24 @@ export default function OnboardingForm({
           </div>
         )}
 
-        {section && (submitError || otherErr.length > 0) && (
-          <div className="qs-alert" role={submitError ? 'alert' : undefined} style={{ marginTop: 0, marginBottom: 14 }}>
-            {submitError}
-            {otherErr.length > 0 && (
-              <div className="qs-alert-list">
-                <span>{otherErr.length === 1 ? '1 other section needs attention:' : `${otherErr.length} other sections need attention:`}</span>
-                {otherErr.map((i) => (
-                  <button key={i} type="button" className="qs-linkbtn" onClick={() => void go(i)}>{SECTIONS[i].title}</button>
-                ))}
-              </div>
-            )}
+        {section && errList.length > 0 && (
+          <div className="qs-alert qs-summary" role={submitError ? 'alert' : undefined} tabIndex={-1} ref={summaryRef}
+            style={{ marginTop: 0, marginBottom: 14 }}>
+            <strong>{errList.length === 1 ? 'There is 1 thing to fix' : `There are ${errList.length} things to fix`}</strong>
+            {submitError && <> <span>{submitError}</span></>}
+            <ul className="qs-alert-list">
+              {errList.map((e) => (
+                <li key={e.key}>
+                  <button type="button" className="qs-linkbtn" onClick={() => goToField(e.i, e.key)}>
+                    {SECTIONS[e.i].title}: {e.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
+        )}
+        {section && errList.length === 0 && submitError && (
+          <div className="qs-alert" role="alert" style={{ marginTop: 0, marginBottom: 14 }}>{submitError}</div>
         )}
 
         {section ? (
