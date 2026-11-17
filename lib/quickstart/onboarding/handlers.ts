@@ -95,25 +95,31 @@ async function guard(req: Request, token: string): Promise<Guard> {
   return { found }
 }
 
-export async function getOnboarding(req: Request, token: string): Promise<Response> {
-  const g = await guard(req, token)
-  if (!g.found) return json(g.result)
-  const { project, pkg } = g.found
+function snapshot(project: Project, pkg: PackageLimits) {
   const ob = project.onboarding
   const untouched = ob.status === 'not_sent' && Object.keys(ob.answers).length === 0
   const answers = untouched ? pruneHidden(seedFromQualification(project.qualification.answers)) : ob.answers
-  return json({
-    status: 200,
-    body: {
-      ok: true,
-      company: project.contact.company,
-      package: pkg,
-      answers,
-      status: ob.status,
-      warnings: checkScope(answers, pkg),
-      ...(ob.saved_at ? { savedAt: ob.saved_at } : {}),
-    },
-  })
+  return {
+    company: project.contact.company,
+    package: pkg,
+    answers,
+    status: ob.status,
+    warnings: checkScope(answers, pkg),
+    savedAt: ob.saved_at ?? null,
+  }
+}
+
+/** Server-component loader: same data as GET, without rate limiting. null = not found. */
+export async function loadOnboarding(token: string) {
+  const found = await resolve(token)
+  return found ? snapshot(found.project, found.pkg) : null
+}
+
+export async function getOnboarding(req: Request, token: string): Promise<Response> {
+  const g = await guard(req, token)
+  if (!g.found) return json(g.result)
+  const { savedAt, ...rest } = snapshot(g.found.project, g.found.pkg)
+  return json({ status: 200, body: { ok: true, ...rest, ...(savedAt ? { savedAt } : {}) } })
 }
 
 export async function saveDraft(req: Request, token: string): Promise<Response> {

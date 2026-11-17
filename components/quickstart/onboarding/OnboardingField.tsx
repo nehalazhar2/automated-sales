@@ -1,0 +1,126 @@
+'use client'
+import { NOT_SURE, type OnbField } from '@/lib/quickstart/onboarding/sections'
+import type { PackageLimits } from '@/lib/quickstart/packages'
+import { errorId, fieldId, toggleMulti } from '../Field'
+import PipelinesEditor from './PipelinesEditor'
+import UsersEditor from './UsersEditor'
+
+type Props = {
+  field: OnbField
+  value: unknown
+  error?: string
+  pkg: PackageLimits
+  onChange: (key: string, value: unknown) => void
+}
+
+function emptyFor(f: OnbField): unknown {
+  return f.type === 'multi' || f.type === 'users' || f.type === 'pipelines' ? [] : ''
+}
+
+export default function OnboardingField({ field: f, value, error, pkg, onChange }: Props) {
+  const id = fieldId(f.key)
+  const eid = errorId(f.key)
+  const hintId = `${id}-hint`
+  const notSure = value === NOT_SURE
+  const invalid = error ? true : undefined
+  const describedBy = [f.hint ? hintId : null, error ? eid : null].filter(Boolean).join(' ') || undefined
+  const hintEl = f.hint ? <div id={hintId} className="qs-hint">{f.hint}</div> : null
+  const errorEl = error ? <div id={eid} className="qs-error">{error}</div> : null
+  const options = f.options ?? []
+  const set = (v: unknown) => onChange(f.key, v)
+
+  const notSureEl = f.allowNotSure ? (
+    <label className="qs-notsure">
+      <input
+        type="checkbox"
+        checked={notSure}
+        onChange={(e) => set(e.target.checked ? NOT_SURE : emptyFor(f))}
+      />
+      <span>Not sure — let&apos;s cover it on the discovery call</span>
+    </label>
+  ) : null
+
+  const str = typeof value === 'string' && !notSure ? value : ''
+
+  if (f.type === 'multi' || (f.type === 'select' && options.length <= 4)) {
+    const multi = f.type === 'multi'
+    const selected = multi && Array.isArray(value) ? (value as string[]) : []
+    return (
+      <fieldset className="qs-field" data-qs-field={f.key} aria-invalid={invalid} aria-describedby={describedBy}>
+        <legend>{f.label}{f.required ? <span className="qs-req"> *</span> : null}</legend>
+        <div className="qs-chips">
+          {options.map((o) => (
+            <label key={o.value} className="qs-chip">
+              <input
+                type={multi ? 'checkbox' : 'radio'}
+                name={f.key}
+                value={o.value}
+                disabled={notSure}
+                checked={multi ? selected.includes(o.value) : str === o.value}
+                onChange={(e) => (multi ? set(toggleMulti(selected, o.value, e.target.checked)) : set(o.value))}
+              />
+              <span>{o.label}</span>
+            </label>
+          ))}
+        </div>
+        {hintEl}
+        {notSureEl}
+        {errorEl}
+      </fieldset>
+    )
+  }
+
+  if (f.type === 'users' || f.type === 'pipelines') {
+    return (
+      <fieldset className="qs-field" data-qs-field={f.key}>
+        <legend>{f.label}{f.required ? <span className="qs-req"> *</span> : null}</legend>
+        {f.type === 'users' ? (
+          <UsersEditor id={id} value={value} disabled={notSure} maxUsers={pkg.maxUsers}
+            describedBy={describedBy} invalid={!!error} onChange={set} />
+        ) : (
+          <PipelinesEditor id={id} value={value} disabled={notSure} suggestions={f.suggestions}
+            maxPipelines={pkg.maxPipelines} maxStages={pkg.maxStagesPerPipeline}
+            describedBy={describedBy} invalid={!!error} onChange={set} />
+        )}
+        {hintEl}
+        {notSureEl}
+        {errorEl}
+      </fieldset>
+    )
+  }
+
+  return (
+    <div className="qs-field" data-qs-field={f.key}>
+      <label className="qs-label" htmlFor={id}>{f.label}{f.required ? <span className="qs-req"> *</span> : null}</label>
+      {f.type === 'select' ? (
+        <select id={id} className="qs-select" value={str} disabled={notSure} aria-invalid={invalid}
+          aria-describedby={describedBy} onChange={(e) => set(e.target.value)}>
+          <option value="">Choose…</option>
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      ) : f.type === 'textarea' ? (
+        <textarea id={id} className="qs-textarea" value={str} disabled={notSure} maxLength={2000}
+          aria-invalid={invalid} aria-describedby={describedBy} onChange={(e) => set(e.target.value)} />
+      ) : (
+        <input
+          id={id}
+          className="qs-input"
+          type={f.type === 'email' ? 'email' : f.type === 'date' ? 'date' : f.type === 'number' ? 'number' : 'text'}
+          inputMode={f.type === 'email' ? 'email' : f.type === 'url' ? 'url' : undefined}
+          autoComplete="off"
+          maxLength={2000}
+          value={f.type === 'number' && typeof value === 'number' ? String(value) : str}
+          disabled={notSure}
+          aria-invalid={invalid}
+          aria-describedby={describedBy}
+          onChange={(e) => set(e.target.value)}
+        />
+      )}
+      {hintEl}
+      {notSureEl}
+      {errorEl}
+    </div>
+  )
+}
