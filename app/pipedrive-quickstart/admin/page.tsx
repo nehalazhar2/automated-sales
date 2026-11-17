@@ -4,7 +4,7 @@ import { ADMIN_COOKIE, isAdminCookie } from '@/lib/quickstart/adminAuth'
 import { getStore } from '@/lib/quickstart/store'
 import { QUESTIONS } from '@/lib/quickstart/qualification/questions'
 import type { Project } from '@/lib/quickstart/types'
-import { LoginForm, ApproveForm, RegenerateForm } from '@/components/quickstart/AdminForms'
+import { LoginForm, ProjectActions } from '@/components/quickstart/AdminForms'
 import { logout } from './actions'
 import '../quickstart.css'
 
@@ -30,6 +30,7 @@ function Row({ p }: { p: Project }) {
   const ob = p.onboarding
   const approved = q.approval_status === 'approved'
   const leadId = p.sync.pipedrive_lead_id
+  const leadUrl = p.sync.pipedrive_lead_url
   return (
     <article className="qs-card" style={{ marginBottom: 18, borderRadius: 16, padding: 20 }}>
       <h2 className="qs-title" style={{ marginBottom: 4 }}>
@@ -57,7 +58,11 @@ function Row({ p }: { p: Project }) {
       <p className="qs-hint">
         Pipedrive:{' '}
         {leadId ? (
-          <a href={`https://app.pipedrive.com/leads/inbox/${encodeURIComponent(leadId)}`} target="_blank" rel="noreferrer">lead {leadId}</a>
+          leadUrl && /^https:\/\//.test(leadUrl) ? (
+            <a href={leadUrl} target="_blank" rel="noreferrer">lead {leadId}</a>
+          ) : (
+            <>Lead {leadId}</>
+          )
         ) : 'no lead synced'}
         {p.sync.error && <span style={{ color: '#b91c1c', fontWeight: 700 }}> &middot; Sync error: {p.sync.error}</span>}
       </p>
@@ -77,8 +82,12 @@ function Row({ p }: { p: Project }) {
             </div>
           ))}
         </dl>
-        {ob.status !== 'submitted' && <ApproveForm id={p.project_id} candidate={q.candidate} />}
-        {approved && ob.status !== 'submitted' && <RegenerateForm id={p.project_id} />}
+        <ProjectActions
+          id={p.project_id}
+          candidate={q.candidate}
+          approvalStatus={q.approval_status}
+          submitted={ob.status === 'submitted'}
+        />
         <p style={{ marginTop: 14 }}>
           <a className="as-btn as-btn-secondary" href={`/api/quickstart/admin/project/${p.project_id}/`} download>Download JSON</a>
         </p>

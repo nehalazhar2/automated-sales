@@ -1,5 +1,5 @@
 import 'server-only'
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
 
 export const ADMIN_COOKIE = 'qs_admin'
 export const ADMIN_COOKIE_MAX_AGE = 12 * 60 * 60
@@ -10,9 +10,9 @@ function key(): string | null {
 }
 
 function safeEqual(a: string, b: string): boolean {
-  const x = Buffer.from(a)
-  const y = Buffer.from(b)
-  if (x.length !== y.length) return false
+  // Compare fixed-length digests so the length of the secret never leaks.
+  const x = createHash('sha256').update(a).digest()
+  const y = createHash('sha256').update(b).digest()
   return timingSafeEqual(x, y)
 }
 

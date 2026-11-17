@@ -42,8 +42,34 @@ export function LoginForm() {
   )
 }
 
-export function ApproveForm({ id, candidate }: { id: string; candidate: string }) {
-  const [state, action, pending] = useActionState<LinkState, FormData>(approve, {})
+const ERROR_TEXT: Record<string, string> = {
+  already_submitted: "The customer has already submitted onboarding; the package can't be changed now.",
+}
+const errorText = (e: string) => ERROR_TEXT[e] ?? e
+
+type LinkAction = (prev: LinkState, formData: FormData) => Promise<LinkState>
+
+/** Runs a server action and reports any new link to the parent, which shows only one link at a time. */
+function useLinkAction(action: LinkAction, onLink: (link: string) => void) {
+  return useActionState<LinkState, FormData>(async (prev, fd) => {
+    const r = await action(prev, fd)
+    if (r.link) onLink(r.link)
+    return { error: r.error }
+  }, {})
+}
+
+function ApproveForm({
+  id,
+  candidate,
+  onLink,
+  changing,
+}: {
+  id: string
+  candidate: string
+  onLink: (link: string) => void
+  changing?: boolean
+}) {
+  const [state, action, pending] = useLinkAction(approve, onLink)
   const def = candidate === 'quickstart' || candidate === 'plus' ? candidate : ''
   return (
     <form action={action} className="qs-form">
@@ -57,25 +83,59 @@ export function ApproveForm({ id, candidate }: { id: string; candidate: string }
       <label className="qs-label" htmlFor={`why-${id}`}>Rationale</label>
       <textarea id={`why-${id}`} name="rationale" className="qs-textarea" style={{ minHeight: 70 }} />
       <p className="qs-hint">Required (10+ characters) when overriding the candidate, or when the candidate is review or bespoke.</p>
-      {state.error && <p className="qs-error" role="alert">{state.error}</p>}
+      {state.error && <p className="qs-error" role="alert">{errorText(state.error)}</p>}
       <button className="as-btn as-btn-primary" type="submit" disabled={pending} style={{ marginTop: 10 }}>
-        {pending ? 'Approving…' : 'Approve and generate link'}
+        {pending ? 'Working…' : changing ? 'Change package and generate new link' : 'Approve and generate link'}
       </button>
-      {state.link && <CopyLink link={state.link} />}
     </form>
   )
 }
 
-export function RegenerateForm({ id }: { id: string }) {
-  const [state, action, pending] = useActionState<LinkState, FormData>(regenerate, {})
+function RegenerateForm({ id, onLink }: { id: string; onLink: (link: string) => void }) {
+  const [state, action, pending] = useLinkAction(regenerate, onLink)
   return (
     <form action={action} className="qs-form" style={{ marginTop: 12 }}>
       <input type="hidden" name="id" value={id} />
       <button className="as-btn as-btn-secondary" type="submit" disabled={pending}>
         {pending ? 'Working…' : 'Regenerate link (old link stops working)'}
       </button>
-      {state.error && <p className="qs-error" role="alert">{state.error}</p>}
-      {state.link && <CopyLink link={state.link} />}
+      {state.error && <p className="qs-error" role="alert">{errorText(state.error)}</p>}
     </form>
+  )
+}
+
+/**
+ * Per-project actions. Pending projects get the approve form; approved projects get a collapsed
+ * "change package" form plus "Regenerate link". Submitted projects get neither. One link is shown
+ * at a time: a new link from either form replaces the previous one.
+ */
+export function ProjectActions({
+  id,
+  candidate,
+  approvalStatus,
+  submitted,
+}: {
+  id: string
+  candidate: string
+  approvalStatus: 'pending' | 'approved'
+  submitted: boolean
+}) {
+  const [link, setLink] = useState<string | null>(null)
+  return (
+    <div>
+      {!submitted && approvalStatus === 'pending' && <ApproveForm id={id} candidate={candidate} onLink={setLink} />}
+      {!submitted && approvalStatus === 'approved' && (
+        <>
+          <details style={{ marginTop: 12 }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 800 }}>
+              Change package (issues a new link and disables the old one)
+            </summary>
+            <ApproveForm id={id} candidate={candidate} onLink={setLink} changing />
+          </details>
+          <RegenerateForm id={id} onLink={setLink} />
+        </>
+      )}
+      {link && <CopyLink link={link} />}
+    </div>
   )
 }

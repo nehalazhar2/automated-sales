@@ -7,6 +7,8 @@ import { approveProject, regenerateLink, exportProject } from '../admin'
 import { isAdminCookie, adminCookieValue, checkAdminPassword } from '../adminAuth'
 import { loadOnboarding } from '../onboarding/handlers'
 import { getStore } from '../store'
+import { QUESTIONS } from '../qualification/questions'
+import { FIELD_BY_KEY } from '../onboarding/sections'
 import { hashToken } from '../tokens'
 import { GET } from '@/app/api/quickstart/admin/project/[id]/route'
 import type { Project } from '../types'
@@ -159,6 +161,28 @@ describe('exportProject + JSON route', () => {
     expect(out.onboarding).not.toHaveProperty('token_hash')
     expect(await exportProject('missing')).toBeNull()
   })
+  it('adds discovery.unresolved_questions and source_referrer', async () => {
+    const p = await seed('review')
+    const s = (await getStore().get(p.project_id))!
+    s.qualification.answers = { users_now: 'not_sure', connections: ['not_sure'], teams: 'one', referral: 'pipedrive', referral_detail: 'Sam' }
+    s.onboarding.answers = { launch_planning: 'not_sure', import_rows: 'up_to_1000', training_focus: ['not_sure'] }
+    await getStore().put(s)
+    const out = (await exportProject(p.project_id))!
+    const labelOf = (k: string) => QUESTIONS.find((q) => q.key === k)!.label
+    expect(out.discovery.unresolved_questions).toEqual([
+      labelOf('users_now'),
+      labelOf('connections'),
+      FIELD_BY_KEY.training_focus.label,
+      FIELD_BY_KEY.launch_planning.label,
+    ])
+    expect(out.source_referrer).toEqual({ referral: 'pipedrive', referral_detail: 'Sam' })
+  })
+  it('discovery is empty and referrer null when nothing is unresolved', async () => {
+    const p = await seed('quickstart')
+    const out = (await exportProject(p.project_id))!
+    expect(out.discovery).toEqual({ unresolved_questions: [] })
+    expect(out.source_referrer).toEqual({ referral: null, referral_detail: null })
+  })
   it('401 without or with bad cookie', async () => {
     const p = await seed()
     expect((await GET(req(), ctx(p.project_id))).status).toBe(401)
@@ -176,5 +200,14 @@ describe('exportProject + JSON route', () => {
     const text = await res.text()
     expect(text).not.toContain('token_hash')
     expect(JSON.parse(text).project_id).toBe(p.project_id)
+  })
+})
+
+describe('checkAdminPassword length independence', () => {
+  it('rejects different-length inputs without throwing', () => {
+    expect(checkAdminPassword('')).toBe(false)
+    expect(checkAdminPassword('k'.repeat(5))).toBe(false)
+    expect(checkAdminPassword('k'.repeat(500))).toBe(false)
+    expect(checkAdminPassword(KEY)).toBe(true)
   })
 })

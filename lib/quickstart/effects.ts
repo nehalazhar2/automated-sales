@@ -73,7 +73,7 @@ export async function syncQualificationToPipedrive(p: Project): Promise<Project[
     personId,
   })
   await createNote({ personId, leadId: lead.id, content: buildQualificationNoteHtml(p) })
-  return { pipedrive_person_id: personId, pipedrive_lead_id: lead.id }
+  return { pipedrive_person_id: personId, pipedrive_lead_id: lead.id, pipedrive_lead_url: lead.url }
 }
 
 export async function notifyStaff(subject: string, text: string): Promise<void> {

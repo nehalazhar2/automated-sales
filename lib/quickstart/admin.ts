@@ -2,6 +2,8 @@ import 'server-only'
 import { SITE_URL } from '@/lib/site'
 import { getStore } from './store'
 import { issueToken } from './tokens'
+import { QUESTIONS } from './qualification/questions'
+import { ALL_FIELDS } from './onboarding/sections'
 import type { PackageId } from './packages'
 import type { Project } from './types'
 
@@ -65,11 +67,41 @@ export async function regenerateLink(id: string, by = 'staff', now = new Date())
   return { ok: true, link: linkFor(t.token) }
 }
 
+export type ProjectExport = Project & {
+  discovery: { unresolved_questions: string[] }
+  source_referrer: { referral: unknown; referral_detail: unknown }
+}
+
+const isNotSure = (v: unknown) => v === 'not_sure' || (Array.isArray(v) && v.includes('not_sure'))
+
+/** Labels of questions the customer answered "not sure" (qualification first, then onboarding). */
+function unresolvedQuestions(p: Project): string[] {
+  const out: string[] = []
+  const seen = new Set<string>()
+  const add = (label: string) => {
+    if (!seen.has(label)) {
+      seen.add(label)
+      out.push(label)
+    }
+  }
+  for (const q of QUESTIONS) if (isNotSure(p.qualification.answers[q.key])) add(q.label)
+  for (const f of ALL_FIELDS) if (isNotSure(p.onboarding.answers[f.key])) add(f.label)
+  return out
+}
+
 /** Project for download: the token hash is never exported. */
-export async function exportProject(id: string): Promise<Project | null> {
+export async function exportProject(id: string): Promise<ProjectExport | null> {
   const p = await getStore().get(id)
   if (!p) return null
   const { token_hash: _omit, ...onboarding } = p.onboarding
   void _omit
-  return { ...p, onboarding: onboarding as Project['onboarding'] }
+  return {
+    ...p,
+    onboarding: onboarding as Project['onboarding'],
+    discovery: { unresolved_questions: unresolvedQuestions(p) },
+    source_referrer: {
+      referral: p.qualification.answers.referral ?? null,
+      referral_detail: p.qualification.answers.referral_detail ?? null,
+    },
+  }
 }
