@@ -23,6 +23,22 @@ const config: NextConfig = {
   experimental: {
     optimizePackageImports: ['next-mdx-remote'],
   },
+  async headers() {
+    return [
+      {
+        source: '/pipedrive-quickstart/:path*',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }],
+      },
+      {
+        source: '/pipedrive-quickstart/onboarding/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
+        source: '/pipedrive-quickstart/admin/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
+  },
   async redirects() {
     return [
       { source: '/index.php', destination: '/', permanent: true },
