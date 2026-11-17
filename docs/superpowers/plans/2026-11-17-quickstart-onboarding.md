@@ -157,3 +157,20 @@
 - [ ] Confirm no changes to existing pages, nav, sitemap.
 - [ ] Write `docs/quickstart.md`: env vars (`QUICKSTART_ADMIN_KEY`, `QUICKSTART_NOTIFY_TO`, `QUICKSTART_TEST_MODE`, `BLOB_READ_WRITE_TOKEN`), how to enable Blob in Vercel, pilot referral URL format.
 - [ ] Request code review (superpowers:requesting-code-review), fix findings, re-run all checks.
+
+### Task 10: Pipedrive deals at approval and onboarding submit
+
+**Spec:** `docs/superpowers/specs/2026-11-17-quickstart-pipedrive-deals-design.md`
+
+**Files:**
+- Modify: `lib/pipedrive/client.ts` (add `createDeal`, `updateDeal`, `archiveLead`; extend `createNote` to accept `dealId`), `lib/quickstart/types.ts` (sync: `pipedrive_deal_id?`, `pipedrive_deal_url?`), `lib/quickstart/effects.ts` (add `syncApprovalToPipedrive(p): Promise<Project['sync']>`, `syncOnboardingToPipedrive(p): Promise<Project['sync']>`), `lib/quickstart/admin.ts` (call after approve; never block), `lib/quickstart/onboarding/handlers.ts` (call after submit; never block), `app/pipedrive-quickstart/admin/page.tsx` (deal link), `.env.example`, `docs/quickstart.md`
+- Test: `lib/quickstart/__tests__/pipedrive-deals.test.ts`
+
+**Interfaces:**
+- `createDeal({ title, value, currency, personId, pipelineId?, stageId? }): Promise<{ id: number; url: string }>`; `updateDeal(id, { title?, value?, stageId? }): Promise<void>`; `archiveLead(leadId: string): Promise<void>`; `createNote({ personId?, leadId?, dealId?, content })`.
+- Env: `QUICKSTART_PIPEDRIVE_PIPELINE_ID`, `QUICKSTART_PIPEDRIVE_STAGE_SENT_ID`, `QUICKSTART_PIPEDRIVE_STAGE_RECEIVED_ID` (optional, integers).
+
+- [ ] Step 1: Tests (mock `fetch`, live mode via VERCEL_ENV=production): approval with no deal → POST deal with value 995/1995 GBP + person + pipeline/stage when env set (omitted when unset), lead archived, note on deal, sync stores deal id/url; re-approve with deal → PUT/PATCH value, no new deal; test mode → no fetch; Pipedrive 500 on approve → approval still ok, sync.error recorded; onboarding submit → note on deal containing escaped answers + exceptions + not-sure list, stage moved only when RECEIVED env set; submit without deal id → no Pipedrive call, no error.
+- [ ] Step 2: Run → FAIL.
+- [ ] Step 3: Verify each endpoint against the official Pipedrive API docs (v2 deals create/update, v1/v2 lead archive via `is_archived`, notes `deal_id`) before implementing; implement.
+- [ ] Step 4: `npm test`, `npm run typecheck`, `npm run build` → PASS. Commit.
