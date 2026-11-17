@@ -8,3 +8,6 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 .superpowers/
+
+# QuickStart local data
+.data/
