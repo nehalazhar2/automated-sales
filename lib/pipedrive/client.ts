@@ -18,6 +18,7 @@ async function call(path: string, init: RequestInit = {}): Promise<unknown> {
     ...init,
     headers: { ...headers(), ...(init.headers ?? {}) },
     cache: 'no-store',
+    signal: init.signal ?? AbortSignal.timeout(8000),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -51,15 +52,15 @@ export async function createPerson(input: { name: string; email: string }): Prom
 }
 
 export async function createNote(input: {
-  personId: number;
+  personId?: number;
   content: string;
   leadId?: string;
+  dealId?: number;
 }): Promise<number> {
-  const body: Record<string, unknown> = {
-    person_id: input.personId,
-    content: input.content,
-  };
+  const body: Record<string, unknown> = { content: input.content };
+  if (input.personId) body.person_id = input.personId;
   if (input.leadId) body.lead_id = input.leadId;
+  if (input.dealId) body.deal_id = input.dealId;
   const data = (await call('/api/v1/notes', {
     method: 'POST',
     body: JSON.stringify(body),
@@ -97,4 +98,54 @@ export async function createLead(input: {
   if (!id) throw new Error('Pipedrive createLead: no id returned');
   const domain = process.env.PIPEDRIVE_DOMAIN;
   return { id, url: `https://${domain}.pipedrive.com/leads/inbox/${id}` };
+}
+
+export async function countOpenDealsForPerson(personId: number): Promise<number> {
+  const data = (await call(
+    `/api/v2/deals?person_id=${encodeURIComponent(String(personId))}&status=open&limit=1`
+  )) as { data?: unknown[] };
+  return data.data?.length ?? 0;
+}
+
+export async function createDeal(input: {
+  title: string;
+  value: number;
+  currency: string;
+  personId: number;
+  pipelineId?: number;
+  stageId?: number;
+}): Promise<{ id: number; url: string }> {
+  const body: Record<string, unknown> = {
+    title: input.title,
+    value: input.value,
+    currency: input.currency,
+    person_id: input.personId,
+  };
+  if (input.pipelineId) body.pipeline_id = input.pipelineId;
+  if (input.stageId) body.stage_id = input.stageId;
+  const data = (await call('/api/v2/deals', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })) as { data?: { id?: number } };
+  const id = data.data?.id;
+  if (!id) throw new Error('Pipedrive createDeal: no id returned');
+  return { id, url: `https://${process.env.PIPEDRIVE_DOMAIN}.pipedrive.com/deal/${id}` };
+}
+
+export async function updateDeal(
+  id: number,
+  input: { title?: string; value?: number; stageId?: number }
+): Promise<void> {
+  const body: Record<string, unknown> = {};
+  if (input.title !== undefined) body.title = input.title;
+  if (input.value !== undefined) body.value = input.value;
+  if (input.stageId !== undefined) body.stage_id = input.stageId;
+  await call(`/api/v2/deals/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+}
+
+export async function archiveLead(leadId: string): Promise<void> {
+  await call(`/api/v1/leads/${encodeURIComponent(leadId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_archived: true }),
+  });
 }

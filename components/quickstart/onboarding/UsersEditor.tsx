@@ -1,0 +1,149 @@
+'use client'
+import { useEffect, useRef, useState } from 'react'
+import type { UserRow } from '@/lib/quickstart/onboarding/sections'
+
+const MAX_USERS = 50
+
+type Props = {
+  id: string
+  value: unknown
+  disabled?: boolean
+  maxUsers: number
+  describedBy?: string
+  invalid?: boolean
+  /** The server rejected one or more email addresses: mark the ones that fail a basic check. */
+  emailInvalid?: boolean
+  onChange: (rows: UserRow[]) => void
+}
+
+export function toUserRows(v: unknown): UserRow[] {
+  if (!Array.isArray(v)) return []
+  return v.map((u) => ({
+    name: typeof u?.name === 'string' ? u.name : '',
+    email: typeof u?.email === 'string' ? u.email : '',
+    role: u?.role === 'admin' ? 'admin' : 'regular',
+    ...(typeof u?.team === 'string' ? { team: u.team } : {}),
+  }))
+}
+
+/** Basic shape check, only used to point at the likely-wrong address after a server rejection. */
+const badEmail = (v: string) => v.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
+
+const BLANK: UserRow = { name: '', email: '', role: 'regular' }
+
+export default function UsersEditor({ id, value, disabled, maxUsers, describedBy, invalid, emailInvalid, onChange }: Props) {
+  const parsed = toUserRows(value)
+  const rows = parsed.length ? parsed : [BLANK]
+  const named = rows.filter((r) => r.name.trim() !== '').length
+  // Stable per-row ids (survive Remove / Add). When `value` changes from outside (e.g. "Load latest answers")
+  // the rows are different people, so fresh ids are minted and old blur state no longer matches anything.
+  const ids = useRef<string[]>([])
+  const counter = useRef(0)
+  const emitted = useRef<unknown>(null)
+  if (emitted.current !== value) {
+    ids.current = []
+    emitted.current = value
+  }
+  while (ids.current.length < rows.length) ids.current.push(`u${counter.current++}`)
+  ids.current.length = rows.length
+  const emit = (next: UserRow[]) => {
+    emitted.current = next
+    onChange(next)
+  }
+  // Rows whose email was bad when the customer last left the field. Format is judged on blur only:
+  // editing hides the message until the next blur (a valid value simply has nothing to show).
+  const [flagged, setFlagged] = useState<ReadonlySet<string>>(() => new Set())
+  const setFlag = (rid: string, on: boolean) =>
+    setFlagged((f) => {
+      if (f.has(rid) === on) return f
+      const n = new Set(f)
+      if (on) n.add(rid)
+      else n.delete(rid)
+      return n
+    })
+  const root = useRef<HTMLDivElement>(null)
+  const pendingFocus = useRef<string | null>(null)
+  useEffect(() => {
+    if (!pendingFocus.current) return
+    const el = root.current?.querySelector<HTMLElement>(`#${pendingFocus.current}`)
+    pendingFocus.current = null
+    el?.focus()
+  })
+  const showBad = (i: number, r: UserRow) => badEmail(r.email) && (emailInvalid || flagged.has(ids.current[i]))
+  const setRow = (i: number, patch: Partial<UserRow>) => emit(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)))
+
+  return (
+    <div className="qs-users" id={id} ref={root}>
+      {rows.map((r, i) => (
+        <div className="qs-user" key={ids.current[i]} role="group" aria-label={`Team member ${i + 1}`}>
+          <div>
+            <label className="qs-sublabel" htmlFor={`${id}-${i}-name`}>Name</label>
+            <input id={`${id}-${i}-name`} className="qs-input" type="text" value={r.name} disabled={disabled} maxLength={200}
+              autoComplete="off" aria-invalid={invalid && i === 0 ? true : undefined}
+              aria-describedby={i === 0 ? describedBy : undefined} onChange={(e) => setRow(i, { name: e.target.value })} />
+          </div>
+          <div>
+            <label className="qs-sublabel" htmlFor={`${id}-${i}-email`}>Work email</label>
+            <input id={`${id}-${i}-email`} className="qs-input" type="email" inputMode="email" value={r.email} disabled={disabled}
+              maxLength={200} autoComplete="off"
+              aria-invalid={showBad(i, r) ? true : undefined}
+              aria-describedby={showBad(i, r) ? `${id}-${i}-email-err` : undefined}
+              onBlur={(e) => setFlag(ids.current[i], badEmail(e.currentTarget.value))}
+              onChange={(e) => {
+                setFlag(ids.current[i], false)
+                setRow(i, { email: e.target.value })
+              }} />
+            {showBad(i, r) && (
+              <div id={`${id}-${i}-email-err`} className="qs-error">
+                {r.name.trim() ? `${r.name.trim()}’s` : `Team member ${i + 1}’s`} email “{r.email.trim()}” doesn’t look right. Check for a missing @ or domain.
+              </div>
+            )}
+          </div>
+          <fieldset className="qs-user-access">
+            <legend>Access<span className="qs-vh"> for {r.name.trim() || `team member ${i + 1}`}</span></legend>
+            <div className="qs-chips">
+              {(['regular', 'admin'] as const).map((v) => (
+                <label key={v} className="qs-chip">
+                  <input type="radio" name={`${id}-${i}-role`} value={v} checked={r.role === v} disabled={disabled}
+                    onChange={() => setRow(i, { role: v })} />
+                  <span>{v === 'admin' ? 'Administrator' : 'Regular user'}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div>
+            <label className="qs-sublabel" htmlFor={`${id}-${i}-team`}>Team (optional)</label>
+            <input id={`${id}-${i}-team`} className="qs-input" type="text" value={r.team ?? ''} disabled={disabled} maxLength={200}
+              onChange={(e) => setRow(i, { team: e.target.value })} />
+          </div>
+          {!disabled && rows.length > 1 && (
+            <button type="button" className="qs-linkbtn qs-user-remove" aria-label={`Remove team member ${i + 1}`}
+              onClick={() => {
+                const rid = ids.current[i]
+                ids.current.splice(i, 1)
+                setFlag(rid, false)
+                emit(rows.filter((_, j) => j !== i))
+              }}>
+              Remove
+            </button>
+          )}
+        </div>
+      ))}
+      {!disabled && (
+        <div className="qs-pipe-actions">
+          <button type="button" className="qs-addbtn" disabled={rows.length >= MAX_USERS}
+            onClick={() => {
+              pendingFocus.current = `${id}-${rows.length}-name`
+              ids.current.push(`u${counter.current++}`)
+              emit([...rows, { ...BLANK }])
+            }}>
+            + Add a person
+          </button>
+          <span className={`qs-count${named > maxUsers ? ' over' : ''}`} aria-live="polite">
+            {named} {named === 1 ? 'person' : 'people'} added ({maxUsers} included in your package{named > maxUsers ? '; we’ll talk through the extras' : ''})
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}

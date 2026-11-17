@@ -7,3 +7,10 @@ out/
 .env*.local
 *.tsbuildinfo
 next-env.d.ts
+.superpowers/
+
+# QuickStart local data
+.data/
+.playwright-mcp/
+.vercel
+.env*

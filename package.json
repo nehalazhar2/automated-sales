@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@next/mdx": "^15.0.0",
     "@types/mdx": "^2.0.13",
+    "@vercel/blob": "^2.9.0",
     "gray-matter": "^4.0.3",
     "next": "^15.0.0",
     "next-mdx-remote": "^6.0.0",
@@ -32,6 +34,7 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^5.1.0"
   }
 }
