@@ -25,10 +25,12 @@ describe('routeQualification acceptance (brief §7)', () => {
   });
   it('5 users, 1,000 clean rows, 3 workflows -> quickstart', () => {
     const r = routeQualification(mk({
+      current_system: 'spreadsheet',
       migration: 'yes', records: 'up_to_1000', data_types: ['contacts', 'companies'], clean_export: 'yes',
       workflows: 'simple', workflow_count: '1_3',
     }));
     expect(r.outcome).toBe('quickstart');
+    expect(r.reasons).toEqual(['FITS_QUICKSTART']);
   });
   it('6 users, one process, clean -> plus', () => {
     const r = routeQualification(mk({ users_now: '6_10', users_future: '6_10' }));
