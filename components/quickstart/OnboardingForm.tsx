@@ -7,7 +7,7 @@ import {
   pruneHidden,
   type OnbField,
 } from '@/lib/quickstart/onboarding/sections'
-import type { PackageLimits } from '@/lib/quickstart/packages'
+import { SCOPE_VERSION, type PackageLimits } from '@/lib/quickstart/packages'
 import OnboardingField from './onboarding/OnboardingField'
 
 type Answers = Record<string, unknown>
@@ -97,6 +97,9 @@ export default function OnboardingForm({
   const titleRef = useRef<HTMLHeadingElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
   const firstRender = useRef(true)
+  const prevValues = useRef<Record<string, unknown>>({})
+  const [advancing, setAdvancing] = useState(false)
+  const advancingRef = useRef(false)
 
   const apiBase = `/api/quickstart/onboarding/${token}/`
 
@@ -232,6 +235,19 @@ export default function OnboardingForm({
     [flush]
   )
 
+  const onNotSure = useCallback(
+    (key: string, checked: boolean, empty: unknown) => {
+      if (checked) {
+        const cur = answersRef.current[key]
+        if (cur !== undefined && cur !== NOT_SURE) prevValues.current[key] = cur
+        onChange(key, NOT_SURE)
+      } else {
+        onChange(key, prevValues.current[key] ?? empty)
+      }
+    },
+    [onChange]
+  )
+
   function loadLatest() {
     if (!stale) return
     const next = stale.answers
@@ -278,16 +294,25 @@ export default function OnboardingForm({
   const visibleFields = section ? stats[step].visible : []
 
   async function go(target: number) {
-    if (target === step) return
+    if (target === step || submitting || advancingRef.current) return
     setSubmitError(null)
     void flush() // fire and forget; navigation never waits on the network
     setStep(target)
   }
 
   async function saveAndContinue() {
-    await flush()
-    if (staleRef.current) return // banner is showing; stay put
-    setStep((s) => Math.min(s + 1, REVIEW))
+    if (advancingRef.current) return
+    advancingRef.current = true
+    setAdvancing(true)
+    const from = step
+    try {
+      await flush()
+      if (staleRef.current) return // banner is showing; stay put
+      setStep(Math.min(from + 1, REVIEW))
+    } finally {
+      advancingRef.current = false
+      setAdvancing(false)
+    }
   }
 
   async function submit() {
@@ -379,7 +404,7 @@ export default function OnboardingForm({
     <div className="qs-ob" ref={formRef}>
       <aside className="qs-side" aria-label="Sections">
         <h2 className="qs-side-co">{company}</h2>
-        <div className="qs-side-pk">{pkg.name} · scope pilot-v1</div>
+        <div className="qs-side-pk">{pkg.name} · scope {SCOPE_VERSION}</div>
         <nav>
           <ol className="qs-side-list">
             {SECTIONS.map((s, i) => {
@@ -392,6 +417,7 @@ export default function OnboardingForm({
                     className={`qs-sec${cur ? ' cur' : ''}${done ? ' done' : ''}`}
                     aria-current={cur ? 'step' : undefined}
                     onClick={() => void go(i)}
+                    disabled={submitting}
                   >
                     <span className="qs-dot" aria-hidden="true">{done ? '✓' : i + 1}</span>
                     <span>
@@ -408,6 +434,7 @@ export default function OnboardingForm({
                 className={`qs-sec${step === REVIEW ? ' cur' : ''}`}
                 aria-current={step === REVIEW ? 'step' : undefined}
                 onClick={() => void go(REVIEW)}
+                disabled={submitting}
               >
                 <span className="qs-dot" aria-hidden="true">{REVIEW + 1}</span>
                 <span>Review &amp; submit</span>
@@ -449,19 +476,20 @@ export default function OnboardingForm({
                   error={errors[f.key]}
                   pkg={pkg}
                   onChange={onChange}
+                  onNotSure={onNotSure}
                 />
               ))}
             </div>
             <div className="qs-btns">
               {step > 0 ? (
-                <button type="button" className="as-btn as-btn-secondary" onClick={() => void go(step - 1)}>
+                <button type="button" className="as-btn as-btn-secondary" onClick={() => void go(step - 1)} disabled={advancing}>
                   ← Back
                 </button>
               ) : (
                 <span />
               )}
-              <button type="button" className="as-btn as-btn-primary" onClick={() => void saveAndContinue()}>
-                {step === REVIEW - 1 ? 'Save & review →' : 'Save & continue →'}
+              <button type="button" className="as-btn as-btn-primary" disabled={advancing} onClick={() => void saveAndContinue()}>
+                {advancing ? 'Saving…' : step === REVIEW - 1 ? 'Save & review →' : 'Save & continue →'}
               </button>
             </div>
           </>
@@ -491,7 +519,7 @@ export default function OnboardingForm({
                         </div>
                       )}
                     </div>
-                    <button type="button" className="qs-linkbtn" onClick={() => void go(i)} aria-label={`Edit ${s.title}`}>
+                    <button type="button" className="qs-linkbtn" onClick={() => void go(i)} disabled={submitting} aria-label={`Edit ${s.title}`}>
                       Edit
                     </button>
                   </li>
@@ -500,7 +528,7 @@ export default function OnboardingForm({
             </ul>
             {submitError && <div className="qs-alert" role="alert">{submitError}</div>}
             <div className="qs-btns">
-              <button type="button" className="as-btn as-btn-secondary" onClick={() => void go(REVIEW - 1)}>
+              <button type="button" className="as-btn as-btn-secondary" onClick={() => void go(REVIEW - 1)} disabled={submitting}>
                 ← Back
               </button>
               <button type="button" className="as-btn as-btn-primary" onClick={() => void submit()} disabled={submitting || !!stale}>

@@ -11,13 +11,15 @@ type Props = {
   error?: string
   pkg: PackageLimits
   onChange: (key: string, value: unknown) => void
+  /** Toggle 'not sure'; the form remembers the previous answer so unticking restores it. */
+  onNotSure: (key: string, checked: boolean, empty: unknown) => void
 }
 
 function emptyFor(f: OnbField): unknown {
   return f.type === 'multi' || f.type === 'users' || f.type === 'pipelines' ? [] : ''
 }
 
-export default function OnboardingField({ field: f, value, error, pkg, onChange }: Props) {
+export default function OnboardingField({ field: f, value, error, pkg, onChange, onNotSure }: Props) {
   const id = fieldId(f.key)
   const eid = errorId(f.key)
   const hintId = `${id}-hint`
@@ -34,7 +36,7 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange 
       <input
         type="checkbox"
         checked={notSure}
-        onChange={(e) => set(e.target.checked ? NOT_SURE : emptyFor(f))}
+        onChange={(e) => onNotSure(f.key, e.target.checked, emptyFor(f))}
       />
       <span>Not sure — let&apos;s cover it on the discovery call</span>
     </label>
