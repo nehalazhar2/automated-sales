@@ -84,6 +84,16 @@ function Row({ p, nowMs }: { p: Project; nowMs: number }) {
             <>Lead {leadId}</>
           )
         ) : 'no lead synced'}
+        {p.sync.pipedrive_deal_id && (
+          <>
+            {' '}&middot;{' '}
+            {p.sync.pipedrive_deal_url && /^https:\/\//.test(p.sync.pipedrive_deal_url) ? (
+              <a href={p.sync.pipedrive_deal_url} target="_blank" rel="noreferrer">Deal in Pipedrive</a>
+            ) : (
+              <>Deal {p.sync.pipedrive_deal_id}</>
+            )}
+          </>
+        )}
         {p.sync.error && <span style={{ color: '#b91c1c', fontWeight: 700 }}> &middot; Sync error: {p.sync.error}</span>}
       </p>
       {ob.status === 'submitted' && ob.scope_exceptions.length > 0 && (

@@ -29,7 +29,14 @@ export type Project = {
     saved_at?: string | null
     versions: { at: string; answers: Record<string, unknown> }[]
   }
-  sync: { pipedrive_person_id?: number; pipedrive_lead_id?: string; pipedrive_lead_url?: string; error?: string }
+  sync: {
+    pipedrive_person_id?: number
+    pipedrive_lead_id?: string
+    pipedrive_lead_url?: string
+    pipedrive_deal_id?: number
+    pipedrive_deal_url?: string
+    error?: string
+  }
   approvals: { at: string; by: string; action: string; detail: string }[]
   blueprint: null
 }

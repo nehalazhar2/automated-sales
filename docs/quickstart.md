@@ -35,6 +35,21 @@ See `.env.example`.
 | `NEXT_PUBLIC_BASE_URL` | Builds the onboarding links. Set it on staging so links point at staging. |
 | `RESEND_API_KEY`, `CONTACT_FROM`, `PIPEDRIVE_API_TOKEN`, `PIPEDRIVE_DOMAIN` | Existing site settings, used for live notifications and Pipedrive sync. |
 
+## Pipedrive deals
+
+Live mode only (test mode logs and skips). Approved customers become deals so they can be tracked in a pipeline.
+
+- **On approval:** if the project has no deal, a deal `QuickStart · {company}` is created (value 995 / 1995 GBP, linked to the synced person; the person is found or created by email if missing), the original lead is archived, and a note with the approved package, scope version, override rationale and admin link is added. Re-approving (for example a package change) updates the deal's title and value and adds a "Package changed" note; it never creates a second deal. Regenerating a link changes nothing in Pipedrive.
+- **On onboarding submit:** a note with all answers (labelled, HTML-escaped), scope warnings and the "Not sure" items for the discovery call is added to the deal; the deal moves to the "received" stage when configured.
+- **Failures never block** approval or submission. Errors are appended to `sync.error` and shown in red in admin. Re-approving retries deal creation if no deal id was stored.
+- Admin shows a "Deal in Pipedrive" link (`https://{PIPEDRIVE_DOMAIN}.pipedrive.com/deal/{id}`).
+
+| Variable | Notes |
+| --- | --- |
+| `QUICKSTART_PIPEDRIVE_PIPELINE_ID` | Optional integer. Pipeline for new deals (default pipeline if unset). |
+| `QUICKSTART_PIPEDRIVE_STAGE_SENT_ID` | Optional integer. Stage on approval ("Onboarding sent"). |
+| `QUICKSTART_PIPEDRIVE_STAGE_RECEIVED_ID` | Optional integer. Stage on onboarding submit ("Onboarding received"). |
+
 ## Enabling Blob storage
 
 1. In the Vercel dashboard create a Blob store with **private** access.

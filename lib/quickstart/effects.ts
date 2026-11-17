@@ -6,8 +6,14 @@ import {
   createPerson,
   createLead,
   createNote,
+  createDeal,
+  updateDeal,
+  archiveLead,
 } from '@/lib/pipedrive/client'
 import { QUESTIONS } from './qualification/questions'
+import { SECTIONS, NOT_SURE, isFieldVisible, type OnbField, type UserRow, type PipelineRow } from './onboarding/sections'
+import { PACKAGES } from './packages'
+import { SITE_URL } from '@/lib/site'
 import type { Project } from './types'
 
 /** Live side effects only on production, unless explicitly forced into test mode. */
@@ -74,6 +80,135 @@ export async function syncQualificationToPipedrive(p: Project): Promise<Project[
   })
   await createNote({ personId, leadId: lead.id, content: buildQualificationNoteHtml(p) })
   return { pipedrive_person_id: personId, pipedrive_lead_id: lead.id, pipedrive_lead_url: lead.url }
+}
+
+function envId(name: string): number | undefined {
+  const v = process.env[name]
+  if (!v || !/^\d+$/.test(v.trim())) return undefined
+  const n = Number(v)
+  return Number.isSafeInteger(n) && n > 0 ? n : undefined
+}
+
+const addError = (sync: Project['sync'], e: unknown): Project['sync'] => {
+  const msg = e instanceof Error ? e.message : String(e)
+  return { ...sync, error: sync.error ? `${sync.error}; ${msg}` : msg }
+}
+
+export function buildApprovalNoteHtml(p: Project, changed: boolean): string {
+  const pkg = PACKAGES[p.qualification.approved_package!]
+  const q = p.qualification
+  const parts = changed
+    ? [`<p><strong>Package changed to ${esc(pkg.name)}</strong> (£${pkg.priceGbp}) — new onboarding link issued.</p>`]
+    : [
+        '<h3>QuickStart approved</h3>',
+        `<p><strong>Approved package:</strong> ${esc(pkg.name)} (£${pkg.priceGbp})</p>`,
+      ]
+  parts.push(`<p>Scope version: ${esc(q.scope_version)}</p>`)
+  if (q.override_rationale) parts.push(`<p><strong>Override rationale:</strong> ${esc(q.override_rationale)}</p>`)
+  const admin = `${SITE_URL}/pipedrive-quickstart/admin/`
+  parts.push(`<p>Project ${esc(p.project_id)} — <a href="${esc(admin)}">QuickStart admin</a></p>`)
+  return parts.join('\n')
+}
+
+/** After approval: create (or update) the Pipedrive deal. Never throws; errors land in sync.error. */
+export async function syncApprovalToPipedrive(p: Project): Promise<Project['sync']> {
+  if (!isLive()) {
+    skip(`syncApprovalToPipedrive ${p.project_id}`)
+    return p.sync
+  }
+  let sync: Project['sync'] = { ...p.sync }
+  const pkg = PACKAGES[p.qualification.approved_package!]
+  const title = `QuickStart · ${p.contact.company}`
+  try {
+    if (sync.pipedrive_deal_id) {
+      await updateDeal(sync.pipedrive_deal_id, { title, value: pkg.priceGbp })
+      await createNote({ dealId: sync.pipedrive_deal_id, content: buildApprovalNoteHtml(p, true) })
+      return sync
+    }
+    let personId = sync.pipedrive_person_id
+    if (!personId) {
+      personId =
+        (await findPersonByEmail(p.contact.email)) ??
+        (await createPerson({ name: p.contact.name, email: p.contact.email }))
+      sync.pipedrive_person_id = personId
+    }
+    const deal = await createDeal({
+      title,
+      value: pkg.priceGbp,
+      currency: 'GBP',
+      personId,
+      pipelineId: envId('QUICKSTART_PIPEDRIVE_PIPELINE_ID'),
+      stageId: envId('QUICKSTART_PIPEDRIVE_STAGE_SENT_ID'),
+    })
+    sync.pipedrive_deal_id = deal.id
+    sync.pipedrive_deal_url = deal.url
+    if (sync.pipedrive_lead_id) await archiveLead(sync.pipedrive_lead_id)
+    await createNote({ dealId: deal.id, content: buildApprovalNoteHtml(p, false) })
+  } catch (e) {
+    console.error('[quickstart] approval deal sync failed:', e instanceof Error ? e.message : e)
+    sync = addError(sync, e)
+  }
+  return sync
+}
+
+const isNotSure = (v: unknown) => v === NOT_SURE || (Array.isArray(v) && v.includes(NOT_SURE))
+const isEmpty = (v: unknown) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0)
+
+function fieldValueHtml(f: OnbField, v: unknown): string {
+  const one = (x: unknown) => f.options?.find((o) => o.value === x)?.label ?? String(x)
+  if (f.type === 'users' && Array.isArray(v)) {
+    return `<ul>${(v as UserRow[])
+      .map((u) => `<li>${esc(u.name)} &lt;${esc(u.email)}&gt; — ${esc(u.role)}${u.team ? `, ${esc(u.team)}` : ''}</li>`)
+      .join('')}</ul>`
+  }
+  if (f.type === 'pipelines' && Array.isArray(v)) {
+    return `<ul>${(v as PipelineRow[])
+      .map((r) => `<li>${esc(r.name)}: ${esc((r.stages ?? []).join(' → '))}</li>`)
+      .join('')}</ul>`
+  }
+  return esc(Array.isArray(v) ? v.map(one).join(', ') : one(v))
+}
+
+export function buildOnboardingNoteHtml(p: Project): string {
+  const answers = p.onboarding.answers
+  const parts: string[] = ['<h3>QuickStart onboarding submitted</h3>']
+  const unsure: string[] = []
+  for (const s of SECTIONS) {
+    const rows: string[] = []
+    for (const f of s.fields) {
+      const v = answers[f.key]
+      if (!isFieldVisible(f, answers) || isEmpty(v)) continue
+      if (isNotSure(v)) unsure.push(f.label)
+      rows.push(`<li><strong>${esc(f.label)}:</strong> ${fieldValueHtml(f, v)}</li>`)
+    }
+    if (rows.length) parts.push(`<h4>${esc(s.title)}</h4>`, `<ul>${rows.join('')}</ul>`)
+  }
+  const warn = p.onboarding.scope_exceptions
+  parts.push('<h4>Scope warnings</h4>')
+  parts.push(warn.length ? `<ul>${warn.map((w) => `<li>${esc(w)}</li>`).join('')}</ul>` : '<p>None</p>')
+  parts.push('<h4>To cover on the discovery call</h4>')
+  parts.push(unsure.length ? `<ul>${unsure.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : '<p>Nothing flagged.</p>')
+  return parts.join('\n')
+}
+
+/** After onboarding submit: note on the deal (+ optional stage move). Never throws. */
+export async function syncOnboardingToPipedrive(p: Project): Promise<Project['sync']> {
+  const dealId = p.sync.pipedrive_deal_id
+  if (!dealId) return p.sync
+  if (!isLive()) {
+    skip(`syncOnboardingToPipedrive ${p.project_id}`)
+    return p.sync
+  }
+  let sync: Project['sync'] = { ...p.sync }
+  try {
+    await createNote({ dealId, content: buildOnboardingNoteHtml(p) })
+    const stageId = envId('QUICKSTART_PIPEDRIVE_STAGE_RECEIVED_ID')
+    if (stageId) await updateDeal(dealId, { stageId })
+  } catch (e) {
+    console.error('[quickstart] onboarding deal sync failed:', e instanceof Error ? e.message : e)
+    sync = addError(sync, e)
+  }
+  return sync
 }
 
 export async function notifyStaff(subject: string, text: string): Promise<void> {

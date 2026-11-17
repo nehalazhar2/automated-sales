@@ -1,6 +1,7 @@
 import 'server-only'
 import { SITE_URL } from '@/lib/site'
 import { getStore } from './store'
+import { syncApprovalToPipedrive } from './effects'
 import { issueToken } from './tokens'
 import { QUESTIONS } from './qualification/questions'
 import { ALL_FIELDS } from './onboarding/sections'
@@ -46,6 +47,15 @@ export async function approveProject(
   })
   p.updated_at = at
   await store.put(p)
+  try {
+    const sync = await syncApprovalToPipedrive(p)
+    if (sync !== p.sync) {
+      p.sync = sync
+      await store.put(p)
+    }
+  } catch (e) {
+    console.error('[quickstart] approval sync failed:', e instanceof Error ? e.message : e)
+  }
   return { ok: true, link: linkFor(t.token) }
 }
 
