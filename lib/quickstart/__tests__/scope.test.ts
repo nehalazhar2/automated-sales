@@ -99,7 +99,8 @@ describe('field budget and visibility', () => {
   })
   it('data fields only show when bringing data; recipe details only with a recipe', () => {
     expect(isFieldVisible(FIELD_BY_KEY.import_rows, { bringing_data: 'no' })).toBe(false)
-    expect(isFieldVisible(FIELD_BY_KEY.import_rows, { bringing_data: 'not_sure' })).toBe(true)
+    expect(isFieldVisible(FIELD_BY_KEY.import_rows, { bringing_data: 'not_sure' })).toBe(false)
+    expect(isFieldVisible(FIELD_BY_KEY.import_rows, { bringing_data: 'yes' })).toBe(true)
     expect(isFieldVisible(FIELD_BY_KEY.recipe_details, { automation_recipes: ['none'] })).toBe(false)
     expect(isFieldVisible(FIELD_BY_KEY.recipe_details, { automation_recipes: ['new_deal_task'] })).toBe(true)
   })

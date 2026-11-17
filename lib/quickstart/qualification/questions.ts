@@ -31,7 +31,7 @@ const USER_OPTIONS = [
   NOT_SURE,
 ]
 
-const migrating = (a: Partial<QualAnswers>) => a.migration === 'yes' || a.migration === 'not_sure'
+const migrating = (a: Partial<QualAnswers>) => a.migration === 'yes'
 
 export const QUESTIONS: Question[] = [
   { key: 'name', step: 1, label: 'Your name', type: 'text', required: true },
@@ -86,7 +86,7 @@ export const QUESTIONS: Question[] = [
       { value: 'not_applicable', label: 'Not applicable' },
       NOT_SURE,
     ],
-    showIf: (a) => ['trial', 'new_paid', 'live', 'not_sure'].includes(a.pipedrive_status ?? ''),
+    showIf: (a) => ['trial', 'new_paid', 'live'].includes(a.pipedrive_status ?? ''),
   },
   {
     key: 'users_now', step: 3, label: 'How many people will use Pipedrive initially?', type: 'select', required: true,

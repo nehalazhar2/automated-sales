@@ -59,13 +59,20 @@ describe('qualification schema', () => {
     expect(p).not.toHaveProperty('clean_export');
   });
 
-  it('pruneHidden keeps migration detail when migration is yes or not_sure', () => {
-    for (const m of ['yes', 'not_sure'] as const) {
-      const p = pruneHidden({ ...base, migration: m, records: 'up_to_1000', data_types: ['contacts'], clean_export: 'yes' });
-      expect(p.records).toBe('up_to_1000');
-      expect(p.data_types).toEqual(['contacts']);
-      expect(p.clean_export).toBe('yes');
-    }
+  it('pruneHidden keeps migration detail only when migration is yes', () => {
+    const p = pruneHidden({ ...base, migration: 'yes', records: 'up_to_1000', data_types: ['contacts'], clean_export: 'yes' });
+    expect(p.records).toBe('up_to_1000');
+    expect(p.data_types).toEqual(['contacts']);
+    expect(p.clean_export).toBe('yes');
+  });
+
+  it('pruneHidden drops migration detail when migration is not_sure', () => {
+    const p = pruneHidden({ ...base, migration: 'not_sure', records: 'up_to_1000', data_types: ['contacts'], clean_export: 'yes' });
+    expect(p.migration).toBe('not_sure');
+    expect(p).not.toHaveProperty('records');
+    expect(p).not.toHaveProperty('data_types');
+    expect(p).not.toHaveProperty('clean_export');
+    expect(validateVisibleRequired({ ...base, migration: 'not_sure' })).toEqual({});
   });
 
   it('pruneHidden drops workflow_count unless workflows=simple', () => {
@@ -76,9 +83,15 @@ describe('qualification schema', () => {
   it('pruneHidden drops existing_configuration when pipedrive_status=not_started', () => {
     const a = { ...base, pipedrive_status: 'not_started', existing_configuration: 'basic_test_data' } as Partial<QualAnswers>;
     expect(pruneHidden(a)).not.toHaveProperty('existing_configuration');
-    for (const s of ['trial', 'new_paid', 'live', 'not_sure'] as const) {
+    for (const s of ['trial', 'new_paid', 'live'] as const) {
       expect(pruneHidden({ ...a, pipedrive_status: s }).existing_configuration).toBe('basic_test_data');
     }
+  });
+
+  it('pruneHidden drops existing_configuration when pipedrive_status=not_sure', () => {
+    const a = { ...base, pipedrive_status: 'not_sure', existing_configuration: 'basic_test_data' } as Partial<QualAnswers>;
+    expect(pruneHidden(a)).not.toHaveProperty('existing_configuration');
+    expect(validateVisibleRequired({ ...base, pipedrive_status: 'not_sure' })).not.toHaveProperty('existing_configuration');
   });
 
   it('reports missing required visible fields', () => {

@@ -148,6 +148,13 @@ describe('routeQualification rules', () => {
     const w = routeQualification(mk({ workflows: 'simple', workflow_count: 'not_sure' }));
     expect(w.reasons).toContain('UNKNOWN_WORKFLOW_COUNT');
   });
+  it('migration not_sure with no follow-ups -> review UNKNOWN_MIGRATION', () => {
+    const r = routeQualification(mk({ migration: 'not_sure' }));
+    expect(r.outcome).toBe('review');
+    expect(r.reasons).toContain('UNKNOWN_MIGRATION');
+    expect(r.reasons).not.toContain('UNKNOWN_RECORDS');
+    expect(r.reasons).not.toContain('UNKNOWN_CLEAN_EXPORT');
+  });
   it('existing_configuration not_sure -> review; active/automations/complex -> LIVE_PIPEDRIVE review', () => {
     expect(routeQualification(mk({ pipedrive_status: 'trial', existing_configuration: 'not_sure' })).reasons)
       .toContain('UNKNOWN_EXISTING_CONFIGURATION');
