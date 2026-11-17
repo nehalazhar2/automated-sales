@@ -10,9 +10,10 @@ import {
   updateDeal,
   archiveLead,
 } from '@/lib/pipedrive/client'
+import { getStore } from './store'
 import { QUESTIONS } from './qualification/questions'
 import { SECTIONS, NOT_SURE, isFieldVisible, type OnbField, type UserRow, type PipelineRow } from './onboarding/sections'
-import { PACKAGES } from './packages'
+import { PACKAGES, type PackageId } from './packages'
 import { SITE_URL } from '@/lib/site'
 import type { Project } from './types'
 
@@ -110,43 +111,77 @@ export function buildApprovalNoteHtml(p: Project, changed: boolean): string {
   return parts.join('\n')
 }
 
-/** After approval: create (or update) the Pipedrive deal. Never throws; errors land in sync.error. */
-export async function syncApprovalToPipedrive(p: Project): Promise<Project['sync']> {
+/**
+ * After approval: create (or update) the Pipedrive deal. Never throws; errors land in sync.error.
+ * previousPackage = package approved before this call (null if first approval); when it equals the
+ * current one and a deal exists, nothing is sent.
+ */
+export async function syncApprovalToPipedrive(
+  p: Project,
+  previousPackage: PackageId | null = null,
+): Promise<Project['sync']> {
   if (!isLive()) {
     skip(`syncApprovalToPipedrive ${p.project_id}`)
     return p.sync
   }
   let sync: Project['sync'] = { ...p.sync }
-  const pkg = PACKAGES[p.qualification.approved_package!]
+  const approved = p.qualification.approved_package!
+  const pkg = PACKAGES[approved]
   const title = `QuickStart · ${p.contact.company}`
-  try {
-    if (sync.pipedrive_deal_id) {
-      await updateDeal(sync.pipedrive_deal_id, { title, value: pkg.priceGbp })
-      await createNote({ dealId: sync.pipedrive_deal_id, content: buildApprovalNoteHtml(p, true) })
-      return sync
+  const failures: unknown[] = []
+  const step = async (fn: () => Promise<void>): Promise<boolean> => {
+    try {
+      await fn()
+      return true
+    } catch (e) {
+      console.error('[quickstart] approval deal sync failed:', e instanceof Error ? e.message : e)
+      failures.push(e)
+      return false
     }
+  }
+  if (sync.pipedrive_deal_id) {
+    if (previousPackage === approved) return p.sync
+    const dealId = sync.pipedrive_deal_id
+    if (await step(() => updateDeal(dealId, { title, value: pkg.priceGbp }))) {
+      await step(async () => {
+        await createNote({ dealId, content: buildApprovalNoteHtml(p, true) })
+      })
+    }
+  } else {
     let personId = sync.pipedrive_person_id
-    if (!personId) {
-      personId =
-        (await findPersonByEmail(p.contact.email)) ??
-        (await createPerson({ name: p.contact.name, email: p.contact.email }))
-      sync.pipedrive_person_id = personId
-    }
-    const deal = await createDeal({
-      title,
-      value: pkg.priceGbp,
-      currency: 'GBP',
-      personId,
-      pipelineId: envId('QUICKSTART_PIPEDRIVE_PIPELINE_ID'),
-      stageId: envId('QUICKSTART_PIPEDRIVE_STAGE_SENT_ID'),
+    let dealId: number | undefined
+    await step(async () => {
+      if (!personId) {
+        personId =
+          (await findPersonByEmail(p.contact.email)) ??
+          (await createPerson({ name: p.contact.name, email: p.contact.email }))
+        sync.pipedrive_person_id = personId
+      }
+      const deal = await createDeal({
+        title,
+        value: pkg.priceGbp,
+        currency: 'GBP',
+        personId,
+        pipelineId: envId('QUICKSTART_PIPEDRIVE_PIPELINE_ID'),
+        stageId: envId('QUICKSTART_PIPEDRIVE_STAGE_SENT_ID'),
+      })
+      dealId = deal.id
+      sync.pipedrive_deal_id = deal.id
+      sync.pipedrive_deal_url = deal.url
     })
-    sync.pipedrive_deal_id = deal.id
-    sync.pipedrive_deal_url = deal.url
-    if (sync.pipedrive_lead_id) await archiveLead(sync.pipedrive_lead_id)
-    await createNote({ dealId: deal.id, content: buildApprovalNoteHtml(p, false) })
-  } catch (e) {
-    console.error('[quickstart] approval deal sync failed:', e instanceof Error ? e.message : e)
-    sync = addError(sync, e)
+    if (dealId) {
+      const id = dealId
+      await step(async () => {
+        await createNote({ dealId: id, content: buildApprovalNoteHtml(p, false) })
+      })
+      const leadId = sync.pipedrive_lead_id
+      if (leadId) await step(() => archiveLead(leadId))
+    }
+  }
+  if (failures.length === 0) {
+    delete sync.error
+  } else {
+    for (const e of failures) sync = addError(sync, e)
   }
   return sync
 }
@@ -204,11 +239,23 @@ export async function syncOnboardingToPipedrive(p: Project): Promise<Project['sy
     await createNote({ dealId, content: buildOnboardingNoteHtml(p) })
     const stageId = envId('QUICKSTART_PIPEDRIVE_STAGE_RECEIVED_ID')
     if (stageId) await updateDeal(dealId, { stageId })
+    delete sync.error
   } catch (e) {
     console.error('[quickstart] onboarding deal sync failed:', e instanceof Error ? e.message : e)
     sync = addError(sync, e)
   }
   return sync
+}
+
+/** Re-read the project and write back only the sync fields, so concurrent writes survive. */
+export async function mergeSync(id: string, sync: Project['sync']): Promise<void> {
+  const store = getStore()
+  const cur = await store.get(id)
+  if (!cur) return
+  const merged = { ...cur.sync, ...sync }
+  if (sync.error === undefined) delete merged.error
+  cur.sync = merged
+  await store.put(cur)
 }
 
 export async function notifyStaff(subject: string, text: string): Promise<void> {

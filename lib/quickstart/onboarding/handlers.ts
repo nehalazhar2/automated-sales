@@ -1,7 +1,7 @@
 import 'server-only'
 import { PACKAGES, type PackageLimits } from '../packages'
 import { getStore } from '../store'
-import { notifyStaff, syncOnboardingToPipedrive } from '../effects'
+import { notifyStaff, syncOnboardingToPipedrive, mergeSync } from '../effects'
 import { hashToken, isTokenExpired, isWellFormedToken } from '../tokens'
 import type { Project } from '../types'
 import { MAX_BODY_BYTES, buildFieldErrors, onboardingDraftSchema, onboardingSubmitSchema } from './schema'
@@ -188,10 +188,7 @@ export async function submitOnboarding(req: Request, token: string): Promise<Res
   }
   try {
     const sync = await syncOnboardingToPipedrive(project)
-    if (sync !== project.sync) {
-      project.sync = sync
-      await getStore().put(project)
-    }
+    if (sync !== project.sync) await mergeSync(project.project_id, sync)
   } catch (e) {
     console.error('[quickstart] onboarding deal sync failed:', errMsg(e))
   }

@@ -18,6 +18,7 @@ async function call(path: string, init: RequestInit = {}): Promise<unknown> {
     ...init,
     headers: { ...headers(), ...(init.headers ?? {}) },
     cache: 'no-store',
+    signal: init.signal ?? AbortSignal.timeout(8000),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');

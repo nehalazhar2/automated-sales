@@ -1,7 +1,7 @@
 import 'server-only'
 import { SITE_URL } from '@/lib/site'
 import { getStore } from './store'
-import { syncApprovalToPipedrive } from './effects'
+import { syncApprovalToPipedrive, mergeSync } from './effects'
 import { issueToken } from './tokens'
 import { QUESTIONS } from './qualification/questions'
 import { ALL_FIELDS } from './onboarding/sections'
@@ -34,6 +34,7 @@ export async function approveProject(
     return { ok: false, error: `A rationale of at least ${MIN_RATIONALE} characters is required for this approval.` }
   }
 
+  const prevPkg = p.qualification.approval_status === 'approved' ? p.qualification.approved_package : null
   const t = issueToken(now)
   const at = now.toISOString()
   p.qualification.approved_package = pkg
@@ -48,11 +49,8 @@ export async function approveProject(
   p.updated_at = at
   await store.put(p)
   try {
-    const sync = await syncApprovalToPipedrive(p)
-    if (sync !== p.sync) {
-      p.sync = sync
-      await store.put(p)
-    }
+    const sync = await syncApprovalToPipedrive(p, prevPkg)
+    if (sync !== p.sync) await mergeSync(id, sync)
   } catch (e) {
     console.error('[quickstart] approval sync failed:', e instanceof Error ? e.message : e)
   }

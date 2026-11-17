@@ -138,6 +138,62 @@ describe('approval -> deal', () => {
     expect(note.body.content).toContain('Package changed')
   })
 
+  it('re-approve with the same package sends nothing', async () => {
+    const p = await seed({ pipedrive_person_id: 7, pipedrive_deal_id: 555 })
+    await approveProject(p.project_id, 'quickstart', null)
+    calls.length = 0
+    await approveProject(p.project_id, 'quickstart', null)
+    expect(calls).toHaveLength(0)
+  })
+
+  it('archive failure keeps deal id + note, records error; re-approve makes no second deal and clears it', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    failOn = (c) => c.url.startsWith('/api/v1/leads/')
+    const p = await seed()
+    await approveProject(p.project_id, 'quickstart', null)
+    expect(calls.some((c) => c.url === '/api/v1/notes')).toBe(true)
+    let s = (await stored(p.project_id)).sync
+    expect(s.pipedrive_deal_id).toBe(555)
+    expect(s.error).toMatch(/500/)
+    failOn = null
+    calls.length = 0
+    await approveProject(p.project_id, 'plus', 'Upgrade agreed on the phone call.')
+    expect(calls.some((c) => c.url === '/api/v2/deals' && c.method === 'POST')).toBe(false)
+    s = (await stored(p.project_id)).sync
+    expect(s.error).toBeUndefined()
+  })
+
+  it('timeout/abort is recorded and approval still succeeds', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.stubGlobal('fetch', vi.fn(async (_u: string, init: RequestInit = {}) => {
+      expect(init.signal).toBeInstanceOf(AbortSignal)
+      throw new DOMException('The operation was aborted', 'AbortError')
+    }))
+    const p = await seed()
+    const r = await approveProject(p.project_id, 'quickstart', null)
+    expect(r.ok).toBe(true)
+    expect((await stored(p.project_id)).sync.error).toMatch(/abort/i)
+  })
+
+  it('a concurrent write during sync survives (token not clobbered)', async () => {
+    const p = await seed()
+    const base = (globalThis.fetch as unknown as (u: string, i?: RequestInit) => Promise<Response>)
+    let done = false
+    vi.stubGlobal('fetch', vi.fn(async (u: string, i?: RequestInit) => {
+      if (!done) {
+        done = true
+        const cur = await stored(p.project_id)
+        cur.onboarding.token_hash = 'concurrent-hash'
+        await getStore().put(cur)
+      }
+      return base(u, i)
+    }))
+    await approveProject(p.project_id, 'quickstart', null)
+    const s = await stored(p.project_id)
+    expect(s.onboarding.token_hash).toBe('concurrent-hash')
+    expect(s.sync.pipedrive_deal_id).toBe(555)
+  })
+
   it('test mode makes no network call', async () => {
     process.env.VERCEL_ENV = 'preview'
     const p = await seed()
