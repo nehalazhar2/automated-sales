@@ -325,7 +325,7 @@ export default function OnboardingForm({
     if (summaryTick) summaryRef.current?.focus()
   }, [summaryTick])
 
-  // After a click on a missing question), focus that field
+  // After a click on a missing question, focus that field
   // (declared after the heading effect so it wins).
   useEffect(() => {
     if (!focusTick) return
@@ -334,7 +334,9 @@ export default function OnboardingForm({
     const target = [...(formRef.current?.querySelectorAll<HTMLElement>('[data-qs-field]') ?? [])].find((el) =>
       wanted ? el.dataset.qsField === wanted : errors[el.dataset.qsField ?? '']
     )
-    target?.querySelector<HTMLElement>('input:not([disabled]),select,textarea,button')?.focus()
+    // Prefer the control that is actually invalid (e.g. the bad email row), else the first control.
+    ;(target?.querySelector<HTMLElement>('[aria-invalid="true"]:not([disabled])') ??
+      target?.querySelector<HTMLElement>('input:not([disabled]),select,textarea,button'))?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusTick])
 
@@ -483,7 +485,7 @@ export default function OnboardingForm({
           <div className="qs-mnav">
             <div className="qs-mnav-row">
               <span className="qs-mnav-title">
-                Section {step + 1} of {REVIEW + 1} · {section ? section.title : 'Review & submit'}
+                {section ? `Section ${step + 1} of ${SECTIONS.length} · ${section.title}` : 'Review & submit'}
               </span>
               <button type="button" className="qs-linkbtn" aria-expanded={navOpen} aria-controls="qs-sec-list"
                 onClick={() => setNavOpen((o) => !o)}>
@@ -504,7 +506,7 @@ export default function OnboardingForm({
                     type="button"
                     className={`qs-sec${cur ? ' cur' : ''}${done ? ' done' : ''}${err ? ' err' : ''}`}
                     aria-current={cur ? 'step' : undefined}
-                    onClick={() => { setNavOpen(false); void go(i) }}
+                    onClick={() => { setNavOpen(false); if (i === step) titleRef.current?.focus(); else void go(i) }}
                     disabled={submitting}
                   >
                     <span className="qs-dot" aria-hidden="true">{err ? '!' : done ? '✓' : i + 1}</span>
@@ -521,7 +523,7 @@ export default function OnboardingForm({
                 type="button"
                 className={`qs-sec${step === REVIEW ? ' cur' : ''}`}
                 aria-current={step === REVIEW ? 'step' : undefined}
-                onClick={() => { setNavOpen(false); void go(REVIEW) }}
+                onClick={() => { setNavOpen(false); if (step === REVIEW) titleRef.current?.focus(); else void go(REVIEW) }}
                 disabled={submitting}
               >
                 <span className="qs-dot" aria-hidden="true">{REVIEW + 1}</span>

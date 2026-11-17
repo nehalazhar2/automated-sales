@@ -147,7 +147,7 @@
 .qs-sugchip[disabled]{opacity:.5;cursor:not-allowed}
 .qs-user{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 12px;align-items:start;border:1px solid var(--slate-300);border-radius:18px;padding:4px 12px 12px}
 .qs-user>*{min-width:0}
-.qs-user .qs-input,.qs-user .qs-select{padding:9px 12px;border-radius:14px}
+.qs-user .qs-input{padding:9px 12px;border-radius:14px}
 .qs-user-access{border:0;margin:0;padding:0}
 .qs-user-access legend{display:block;padding:0;font-size:13px;font-weight:800;color:var(--slate-600);margin:10px 0 4px}
 .qs-user-remove{grid-column:1/-1;justify-self:end}
@@ -177,9 +177,12 @@
   .qs-addbtn{padding:12px 14px}
   .qs-main{padding:24px 18px}
 }
-@media (max-width:600px){
-  .qs-input,.qs-select,.qs-textarea,.qs-user .qs-input,.qs-user .qs-select{font-size:16px;min-height:44px}
+@media (max-width:900px), (pointer:coarse){
+  .qs-input,.qs-select,.qs-textarea{font-size:16px}
+  .qs-input,.qs-select{min-height:44px}
   .qs-stage .qs-input{min-height:44px}
+}
+@media (max-width:600px){
   .qs-user{grid-template-columns:minmax(0,1fr)}
   .qs-user-remove{justify-self:stretch;text-align:center;border:1px solid var(--slate-500);border-radius:12px}
 }

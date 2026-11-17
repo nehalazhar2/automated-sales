@@ -85,12 +85,17 @@ function ApproveForm({
   return (
     <form action={action} className="qs-form">
       <input type="hidden" name="id" value={id} />
-      <label className="qs-label" htmlFor={`pkg-${id}`}>Package</label>
-      <select id={`pkg-${id}`} name="package" className="qs-select" defaultValue={def} required>
-        {!def && <option value="" disabled>Choose package</option>}
-        <option value="quickstart">QuickStart</option>
-        <option value="plus">QuickStart Plus</option>
-      </select>
+      <fieldset className="qs-field" style={{ marginTop: 4 }}>
+        <legend>Package</legend>
+        <div className="qs-chips">
+          {([['quickstart', 'QuickStart'], ['plus', 'QuickStart Plus']] as const).map(([v, label]) => (
+            <label key={v} className="qs-chip">
+              <input type="radio" name="package" value={v} defaultChecked={def === v} required />
+              <span>{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <label className="qs-label" htmlFor={`why-${id}`}>Rationale</label>
       <textarea id={`why-${id}`} name="rationale" className="qs-textarea" style={{ minHeight: 70 }} />
       <p className="qs-hint">Required (10+ characters) when overriding the candidate, or when the candidate is review or bespoke.</p>
