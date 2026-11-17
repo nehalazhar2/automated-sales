@@ -28,6 +28,15 @@ const REVIEW = SECTIONS.length
 const DEBOUNCE_MS = 1500
 const RETRY_DELAYS = [1000, 2000, 4000]
 
+const REQUEST_TIMEOUT_MS = 15_000
+
+/** Abort a hung request (treated as a network error by callers); no-op where unsupported. */
+function timeoutSignal(): AbortSignal | undefined {
+  return typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+    ? AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+    : undefined
+}
+
 function isAnswered(f: OnbField, v: unknown): boolean {
   if (v === undefined || v === null) return false
   if (typeof v === 'string') return v.trim() !== '' && v !== NOT_SURE
@@ -84,6 +93,8 @@ export default function OnboardingForm({
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [focusTick, setFocusTick] = useState(0)
+  // Sections the customer has moved on from in this session; only these can show as done.
+  const [visited, setVisited] = useState<ReadonlySet<number>>(() => new Set())
 
   const answersRef = useRef<Answers>(initialAnswers)
   const baseRef = useRef<string | null>(initialSavedAt)
@@ -140,6 +151,7 @@ export default function OnboardingForm({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ answers: pruneHidden(answersRef.current), baseSavedAt: baseRef.current }),
+          signal: timeoutSignal(),
         })
         let body: Record<string, unknown> = {}
         try {
@@ -256,6 +268,7 @@ export default function OnboardingForm({
     verRef.current++
     savedVerRef.current = verRef.current
     staleRef.current = false
+    prevValues.current = {}
     setAnswers(next)
     setSavedAt(stale.savedAt)
     setStale(null)
@@ -293,10 +306,14 @@ export default function OnboardingForm({
   const section = step < REVIEW ? SECTIONS[step] : null
   const visibleFields = section ? stats[step].visible : []
 
+  const markVisited = (i: number) =>
+    setVisited((v) => (v.has(i) ? v : new Set(v).add(i)))
+
   async function go(target: number) {
     if (target === step || submitting || advancingRef.current) return
     setSubmitError(null)
     void flush() // fire and forget; navigation never waits on the network
+    markVisited(step)
     setStep(target)
   }
 
@@ -308,6 +325,7 @@ export default function OnboardingForm({
     try {
       await flush()
       if (staleRef.current) return // banner is showing; stay put
+      markVisited(from)
       setStep(Math.min(from + 1, REVIEW))
     } finally {
       advancingRef.current = false
@@ -330,6 +348,7 @@ export default function OnboardingForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers: pruneHidden(answersRef.current), baseSavedAt: baseRef.current }),
+        signal: timeoutSignal(),
       })
       let body: Record<string, unknown> = {}
       try {
@@ -409,7 +428,7 @@ export default function OnboardingForm({
           <ol className="qs-side-list">
             {SECTIONS.map((s, i) => {
               const cur = i === step
-              const done = stats[i].done
+              const done = visited.has(i) && stats[i].done
               return (
                 <li key={s.id}>
                   <button
