@@ -121,4 +121,37 @@ describe('qualification schema', () => {
       expect(q.options?.length).toBeGreaterThan(0);
     }
   });
+
+  it('qualSubmitSchema prunes hidden answers from output', () => {
+    const id = '123e4567-e89b-42d3-a456-426614174000';
+    const r = qualSubmitSchema.safeParse({
+      submissionId: id,
+      answers: { ...base, migration: 'no', records: '5001_plus', data_types: ['emails'], clean_export: 'no', workflows: 'none', workflow_count: '9_plus' },
+      honeypot: '',
+    });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.answers).not.toHaveProperty('records');
+      expect(r.data.answers).not.toHaveProperty('data_types');
+      expect(r.data.answers).not.toHaveProperty('clean_export');
+      expect(r.data.answers).not.toHaveProperty('workflow_count');
+    }
+  });
+
+  it('existing_configuration accepts not_sure', () => {
+    const r = qualAnswersSchema.safeParse({ ...base, pipedrive_status: 'live', existing_configuration: 'not_sure' });
+    expect(r.success).toBe(true);
+  });
+
+  it('website normalisation', () => {
+    const w = (website: string) => qualAnswersSchema.safeParse({ ...base, website });
+    const ok = w('example.com');
+    expect(ok.success && ok.data.website).toBe('https://example.com');
+    const keep = w('http://example.com/x');
+    expect(keep.success && keep.data.website).toBe('http://example.com/x');
+    const blank = w('  ');
+    expect(blank.success && blank.data.website).toBe('');
+    expect(w('javascript:alert(1)').success).toBe(false);
+    expect(w('ftp://example.com').success).toBe(false);
+  });
 });

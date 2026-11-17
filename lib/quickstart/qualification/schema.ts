@@ -9,7 +9,7 @@ export const CURRENT_SYSTEM = [
 ] as const
 export const PIPEDRIVE_STATUS = ['not_started', 'trial', 'new_paid', 'live', 'not_sure'] as const
 export const EXISTING_CONFIGURATION = [
-  'basic_test_data', 'active_live', 'automations_integrations', 'complex_unclear', 'not_applicable',
+  'basic_test_data', 'active_live', 'automations_integrations', 'complex_unclear', 'not_applicable', 'not_sure',
 ] as const
 export const USER_BANDS = ['1_5', '6_10', '11_20', '21_plus', 'not_sure'] as const
 export const TEAMS = ['one', 'multiple', 'not_sure'] as const
@@ -54,15 +54,35 @@ export type Reporting = (typeof REPORTING)[number]
 export type Deadline = (typeof DEADLINE)[number]
 
 const text = (max = 200) => z.string().trim().min(1).max(max)
+// Trim; blank -> ''; add https:// when no scheme; accept only http(s) URLs.
+const websiteSchema = z
+  .string()
+  .max(300)
+  .transform((raw) => {
+    const v = raw.trim()
+    if (v === '') return ''
+    if (/^https?:\/\//i.test(v)) return v
+    // Other scheme (e.g. javascript:, ftp:) is left as-is so it is rejected below.
+    if (/^[a-z][a-z0-9+.-]*:(?!\d)/i.test(v)) return v
+    return `https://${v}`
+  })
+  .refine((v) => {
+    if (v === '') return true
+    try {
+      const u = new URL(v)
+      return (u.protocol === 'http:' || u.protocol === 'https:') && u.hostname.includes('.')
+    } catch {
+      return false
+    }
+  }, 'Enter a valid website address')
+
 const optionalText = (max: number) => z.string().trim().max(max).optional()
 
 export const qualAnswersSchema = z.object({
   name: text(120),
   email: z.string().trim().toLowerCase().email().max(254),
   company: text(200),
-  website: z
-    .union([z.literal(''), z.string().trim().url().max(300)])
-    .optional(),
+  website: websiteSchema.optional(),
   referral: z.enum(REFERRAL),
   referral_detail: optionalText(200),
   current_system: z.enum(CURRENT_SYSTEM),
@@ -127,6 +147,6 @@ export const qualSubmitSchema = z.object({
   for (const [key, message] of Object.entries(errs)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answers', key], message })
   }
-})
+}).transform((v) => ({ ...v, answers: pruneHidden(v.answers) as QualAnswers }))
 
 export type QualSubmit = z.infer<typeof qualSubmitSchema>

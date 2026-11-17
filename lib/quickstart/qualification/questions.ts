@@ -84,6 +84,7 @@ export const QUESTIONS: Question[] = [
       { value: 'automations_integrations', label: 'Automations or integrations' },
       { value: 'complex_unclear', label: 'Complex or unclear' },
       { value: 'not_applicable', label: 'Not applicable' },
+      NOT_SURE,
     ],
     showIf: (a) => ['trial', 'new_paid', 'live', 'not_sure'].includes(a.pipedrive_status ?? ''),
   },
