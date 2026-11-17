@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useRef } from 'react'
 import type { UserRow } from '@/lib/quickstart/onboarding/sections'
 
 const MAX_USERS = 50
@@ -29,16 +30,25 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
   const parsed = toUserRows(value)
   const rows = parsed.length ? parsed : [BLANK]
   const named = rows.filter((r) => r.name.trim() !== '').length
+  const root = useRef<HTMLDivElement>(null)
+  const pendingFocus = useRef<string | null>(null)
+  useEffect(() => {
+    if (!pendingFocus.current) return
+    const el = root.current?.querySelector<HTMLElement>(`#${pendingFocus.current}`)
+    pendingFocus.current = null
+    el?.focus()
+  })
   const setRow = (i: number, patch: Partial<UserRow>) => onChange(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)))
 
   return (
-    <div className="qs-users" id={id} aria-invalid={invalid ? true : undefined} aria-describedby={describedBy}>
+    <div className="qs-users" id={id} ref={root}>
       {rows.map((r, i) => (
         <div className="qs-user" key={i} role="group" aria-label={`Team member ${i + 1}`}>
           <div>
             <label className="qs-sublabel" htmlFor={`${id}-${i}-name`}>Name</label>
             <input id={`${id}-${i}-name`} className="qs-input" type="text" value={r.name} disabled={disabled} maxLength={200}
-              autoComplete="off" onChange={(e) => setRow(i, { name: e.target.value })} />
+              autoComplete="off" aria-invalid={invalid && i === 0 ? true : undefined}
+              aria-describedby={i === 0 ? describedBy : undefined} onChange={(e) => setRow(i, { name: e.target.value })} />
           </div>
           <div>
             <label className="qs-sublabel" htmlFor={`${id}-${i}-email`}>Work email</label>
@@ -69,11 +79,14 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
       {!disabled && (
         <div className="qs-pipe-actions">
           <button type="button" className="qs-addbtn" disabled={rows.length >= MAX_USERS}
-            onClick={() => onChange([...rows, { ...BLANK }])}>
+            onClick={() => {
+              pendingFocus.current = `${id}-${rows.length}-name`
+              onChange([...rows, { ...BLANK }])
+            }}>
             + Add a person
           </button>
           <span className={`qs-count${named > maxUsers ? ' over' : ''}`} aria-live="polite">
-            {named} of {maxUsers} users included in your package
+            {named} {named === 1 ? 'person' : 'people'} added ({maxUsers} included in your package{named > maxUsers ? '; we’ll talk through the extras' : ''})
           </span>
         </div>
       )}

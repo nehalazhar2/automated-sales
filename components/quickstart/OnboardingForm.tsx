@@ -7,7 +7,7 @@ import {
   pruneHidden,
   type OnbField,
 } from '@/lib/quickstart/onboarding/sections'
-import { SCOPE_VERSION, type PackageLimits } from '@/lib/quickstart/packages'
+import { type PackageLimits } from '@/lib/quickstart/packages'
 import OnboardingField from './onboarding/OnboardingField'
 
 type Answers = Record<string, unknown>
@@ -55,23 +55,28 @@ function sectionStats(index: number, answers: Answers) {
   let answered = 0
   let notSure = 0
   let requiredOpen = 0
+  const missing: { key: string; label: string }[] = []
   for (const f of visible) {
     const v = answers[f.key]
     if (v === NOT_SURE) notSure++
     else if (isAnswered(f, v)) answered++
-    else if (f.required) requiredOpen++
+    else if (f.required) {
+      requiredOpen++
+      missing.push({ key: f.key, label: f.label })
+    }
   }
   const requiredCount = visible.filter((f) => f.required).length
   // "Done" = every visible required field answered or marked not sure; with no required fields, at least one answer.
   const done = requiredCount > 0 ? requiredOpen === 0 : answered + notSure > 0
-  return { visible, answered, notSure, requiredOpen, done, blank: visible.length - answered - notSure }
+  return { visible, answered, notSure, requiredOpen, missing, done, blank: visible.length - answered - notSure }
 }
 
-function Confirmation({ company }: { company: string }) {
+function Confirmation({ company, focusOnMount }: { company: string; focusOnMount: boolean }) {
+  // Only move focus after an in-session submit; a returning visitor to a submitted link just reads the page.
   return (
-    <div className="qs-card qs-result" tabIndex={-1} ref={(el) => el?.focus()}>
+    <div className="qs-card qs-result" tabIndex={-1} ref={(el) => { if (focusOnMount) el?.focus() }}>
       <span className="qs-badge">{company}</span>
-      <h2>Requirements received for review</h2>
+      <h1>Requirements received for review</h1>
       <p className="qs-text">We&apos;ll review your answers and confirm the scope before anything is built.</p>
       <p className="qs-note" style={{ marginTop: 12 }}>You can close this page. Nothing else is needed from you right now.</p>
     </div>
@@ -82,13 +87,20 @@ export default function OnboardingForm({
   token, company, pkg, initialAnswers, initialStatus, initialWarnings, initialSavedAt,
 }: Props) {
   const [answers, setAnswers] = useState<Answers>(initialAnswers)
-  const [step, setStep] = useState(0)
+  // Returning visitors (a draft was saved before) land on the first section that still needs attention.
+  const returning = initialStatus === 'draft' && initialSavedAt !== null
+  const [step, setStep] = useState(() => {
+    if (!returning) return 0
+    const i = SECTIONS.findIndex((_, k) => !sectionStats(k, initialAnswers).done)
+    return i === -1 ? REVIEW : i
+  })
   const [errors, setErrors] = useState<Errors>({})
   const [warnings, setWarnings] = useState<string[]>(initialWarnings)
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [savedAt, setSavedAt] = useState<string | null>(initialSavedAt)
   const [mounted, setMounted] = useState(false)
   const [submitted, setSubmitted] = useState(initialStatus === 'submitted')
+  const [freshSubmit, setFreshSubmit] = useState(false)
   const [stale, setStale] = useState<{ answers: Answers; savedAt: string | null } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -109,6 +121,8 @@ export default function OnboardingForm({
   const formRef = useRef<HTMLDivElement>(null)
   const firstRender = useRef(true)
   const prevValues = useRef<Record<string, unknown>>({})
+  const staleRefEl = useRef<HTMLDivElement>(null)
+  const focusKey = useRef<string | null>(null)
   const [advancing, setAdvancing] = useState(false)
   const advancingRef = useRef(false)
 
@@ -181,6 +195,7 @@ export default function OnboardingForm({
         }
         if (res.status === 409 && body.error === 'already_submitted') {
           staleRef.current = true
+          setFreshSubmit(true)
           setSubmitted(true)
           return false
         }
@@ -274,6 +289,8 @@ export default function OnboardingForm({
     setStale(null)
     setErrors({})
     setSaveState('saved')
+    // The banner (which had focus) is about to disappear: hand focus to the section heading.
+    setTimeout(() => titleRef.current?.focus(), 0)
     // Warnings refresh (best effort).
     void fetch(apiBase, { cache: 'no-store' })
       .then((r) => r.json())
@@ -292,11 +309,27 @@ export default function OnboardingForm({
     titleRef.current?.focus()
   }, [step])
 
-  // After a rejected submit, focus the first invalid field (declared after the heading effect so it wins).
+  // Bring the current section into view in the mobile strip.
+  useEffect(() => {
+    document.querySelector<HTMLElement>('.qs-sec.cur')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [step])
+
+  // When saving stops because the draft changed elsewhere, make the banner impossible to miss.
+  useEffect(() => {
+    if (!stale) return
+    const el = staleRefEl.current
+    el?.focus()
+    el?.scrollIntoView({ block: 'nearest' })
+  }, [stale])
+
+  // After a rejected submit (or a click on a missing question), focus that field
+  // (declared after the heading effect so it wins).
   useEffect(() => {
     if (!focusTick) return
-    const target = [...(formRef.current?.querySelectorAll<HTMLElement>('[data-qs-field]') ?? [])].find(
-      (el) => errors[el.dataset.qsField ?? '']
+    const wanted = focusKey.current
+    focusKey.current = null
+    const target = [...(formRef.current?.querySelectorAll<HTMLElement>('[data-qs-field]') ?? [])].find((el) =>
+      wanted ? el.dataset.qsField === wanted : errors[el.dataset.qsField ?? '']
     )
     target?.querySelector<HTMLElement>('input:not([disabled]),select,textarea,button')?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -305,6 +338,18 @@ export default function OnboardingForm({
   const stats = useMemo(() => SECTIONS.map((_, i) => sectionStats(i, answers)), [answers])
   const section = step < REVIEW ? SECTIONS[step] : null
   const visibleFields = section ? stats[step].visible : []
+
+  const errSections = SECTIONS.map((s, i) =>
+    s.fields.some((f) => errors[f.key] && isFieldVisible(f, answers)) ? i : -1
+  ).filter((i) => i >= 0)
+  const otherErr = errSections.filter((i) => i !== step)
+
+  /** Jump to a section and focus one question (used by the Review list). */
+  function goToField(i: number, key: string) {
+    focusKey.current = key
+    void go(i)
+    setFocusTick((t) => t + 1)
+  }
 
   const markVisited = (i: number) =>
     setVisited((v) => (v.has(i) ? v : new Set(v).add(i)))
@@ -358,6 +403,7 @@ export default function OnboardingForm({
       }
       if (res.ok && body.ok) {
         staleRef.current = true
+        setFreshSubmit(true)
         setSubmitted(true)
         return
       }
@@ -371,6 +417,7 @@ export default function OnboardingForm({
         return
       }
       if (res.status === 409 && body.error === 'already_submitted') {
+        setFreshSubmit(true)
         setSubmitted(true)
         return
       }
@@ -395,7 +442,7 @@ export default function OnboardingForm({
     }
   }
 
-  if (submitted) return <Confirmation company={company} />
+  if (submitted) return <Confirmation company={company} focusOnMount={freshSubmit} />
 
   const indicator =
     saveState === 'saving' ? 'Saving…'
@@ -403,8 +450,8 @@ export default function OnboardingForm({
     : saveState === 'error' ? 'Couldn’t save. Your answers are kept on this page; we’ll try again when you make a change.'
     : saveState === 'stale' ? 'Not saved: this form was updated somewhere else.'
     : savedAt && mounted
-      ? `✓ Draft saved at ${new Date(savedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}. You can close this page and come back to the same link.`
-      : 'Your answers save automatically. You can close this page and come back to the same link.'
+      ? `✓ Draft saved ${new Date(savedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+      : 'Your answers save automatically'
 
   const warnBlock =
     warnings.length > 0 ? (
@@ -421,27 +468,30 @@ export default function OnboardingForm({
 
   return (
     <div className="qs-ob" ref={formRef}>
+      <h1 className="qs-vh">Pipedrive QuickStart onboarding for {company}</h1>
       <aside className="qs-side" aria-label="Sections">
-        <h2 className="qs-side-co">{company}</h2>
-        <div className="qs-side-pk">{pkg.name} · scope {SCOPE_VERSION}</div>
+        <p className="qs-side-co">{company}</p>
+        <div className="qs-side-pk">{pkg.name}</div>
         <nav>
           <ol className="qs-side-list">
             {SECTIONS.map((s, i) => {
               const cur = i === step
-              const done = visited.has(i) && stats[i].done
+              const done =
+                stats[i].done && (visited.has(i) || (returning && stats[i].answered + stats[i].notSure > 0))
+              const err = errSections.includes(i)
               return (
                 <li key={s.id}>
                   <button
                     type="button"
-                    className={`qs-sec${cur ? ' cur' : ''}${done ? ' done' : ''}`}
+                    className={`qs-sec${cur ? ' cur' : ''}${done ? ' done' : ''}${err ? ' err' : ''}`}
                     aria-current={cur ? 'step' : undefined}
                     onClick={() => void go(i)}
                     disabled={submitting}
                   >
-                    <span className="qs-dot" aria-hidden="true">{done ? '✓' : i + 1}</span>
+                    <span className="qs-dot" aria-hidden="true">{err ? '!' : done ? '✓' : i + 1}</span>
                     <span>
                       {s.title}
-                      <span className="qs-vh">{done ? ' (complete)' : ''}</span>
+                      <span className="qs-vh">{err ? ' (needs attention)' : done ? ' (complete)' : ''}</span>
                     </span>
                   </button>
                 </li>
@@ -461,16 +511,34 @@ export default function OnboardingForm({
             </li>
           </ol>
         </nav>
-        <div className="qs-saved" role="status" aria-live="polite">{indicator}</div>
+        <div className="qs-saved">
+          <span role="status" aria-live="polite">{indicator}</span>
+          <span className="qs-saved-long">You can close this page and come back to the same link.</span>
+        </div>
       </aside>
 
       <div className="qs-main">
         {stale && (
-          <div className="qs-alert" role="alert">
+          <div className="qs-alert qs-stale" role="alert" tabIndex={-1} ref={staleRefEl}>
             <strong>This form was updated somewhere else.</strong> To avoid overwriting those changes, saving is paused.
+            Loading the latest answers replaces anything you typed since your last save, so copy it somewhere first if you need it.
             <div>
               <button type="button" className="as-btn as-btn-secondary" onClick={loadLatest}>Load latest answers</button>
             </div>
+          </div>
+        )}
+
+        {section && (submitError || otherErr.length > 0) && (
+          <div className="qs-alert" role={submitError ? 'alert' : undefined} style={{ marginTop: 0, marginBottom: 14 }}>
+            {submitError}
+            {otherErr.length > 0 && (
+              <div className="qs-alert-list">
+                <span>{otherErr.length === 1 ? '1 other section needs attention:' : `${otherErr.length} other sections need attention:`}</span>
+                {otherErr.map((i) => (
+                  <button key={i} type="button" className="qs-linkbtn" onClick={() => void go(i)}>{SECTIONS[i].title}</button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -534,7 +602,16 @@ export default function OnboardingForm({
                       </div>
                       {st.requiredOpen > 0 && (
                         <div className="qs-review-req">
-                          {st.requiredOpen} required question{st.requiredOpen === 1 ? '' : 's'} still need an answer
+                          {st.requiredOpen === 1 ? '1 required question still needs an answer' : `${st.requiredOpen} required questions still need an answer`}
+                          <ul>
+                            {st.missing.map((m) => (
+                              <li key={m.key}>
+                                <button type="button" className="qs-linkbtn" onClick={() => goToField(i, m.key)} disabled={submitting}>
+                                  {m.label}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       )}
                     </div>

@@ -58,10 +58,11 @@ export default function PipelinesEditor({
   }
 
   return (
-    <div ref={root} className="qs-pipes" id={id} aria-invalid={invalid ? true : undefined} aria-describedby={describedBy}>
+    <div ref={root} className="qs-pipes" id={id}>
       {rows.map((p, pi) => {
         const count = p.stages.filter((s) => s.trim() !== '').length
         const over = count > maxStages
+        const sfx = rows.length > 1 ? ` in sales process ${pi + 1}` : ''
         return (
           <div className="qs-pipe" key={pi}>
             <div className="qs-pipe-head">
@@ -87,6 +88,9 @@ export default function PipelinesEditor({
               disabled={disabled}
               maxLength={200}
               placeholder="e.g. New business"
+              data-focus={`p${pi}-name`}
+              aria-invalid={invalid && pi === 0 ? true : undefined}
+              aria-describedby={pi === 0 ? describedBy : undefined}
               onChange={(e) => setRow(pi, { ...p, name: e.target.value })}
             />
             <div className="qs-sublabel" id={`${id}-p${pi}-stages`}>Steps, in order</div>
@@ -110,7 +114,7 @@ export default function PipelinesEditor({
                       className="qs-iconbtn"
                       data-focus={`p${pi}-s${si}-up`}
                       disabled={disabled || si === 0}
-                      aria-label={`Move step ${si + 1} up`}
+                      aria-label={`Move step ${si + 1} up${sfx}`}
                       onClick={() => move(pi, si, -1)}
                     >
                       ↑
@@ -120,7 +124,7 @@ export default function PipelinesEditor({
                       className="qs-iconbtn"
                       data-focus={`p${pi}-s${si}-down`}
                       disabled={disabled || si === p.stages.length - 1}
-                      aria-label={`Move step ${si + 1} down`}
+                      aria-label={`Move step ${si + 1} down${sfx}`}
                       onClick={() => move(pi, si, 1)}
                     >
                       ↓
@@ -129,7 +133,7 @@ export default function PipelinesEditor({
                       type="button"
                       className="qs-iconbtn"
                       disabled={disabled}
-                      aria-label={`Remove step ${si + 1}`}
+                      aria-label={`Remove step ${si + 1}${sfx}`}
                       onClick={() => {
                         pendingFocus.current = `p${pi}-add`
                         setRow(pi, { ...p, stages: p.stages.filter((_, i) => i !== si) })
@@ -155,20 +159,24 @@ export default function PipelinesEditor({
                 + Add a step
               </button>
               <span className={`qs-count${over ? ' over' : ''}`} aria-live="polite">
-                {count} of {maxStages} steps included in your package
+                {count} {count === 1 ? 'step' : 'steps'} ({maxStages} included in your package{over ? '; we’ll talk through the extras' : ''})
               </span>
             </div>
             {suggestions.length > 0 && !disabled && (
               <div className="qs-suggest">
                 <span className="qs-sublabel">Suggested steps</span>
                 <div className="qs-chips">
-                  {suggestions.map((sg) => (
+                  {suggestions.filter((sg) => !p.stages.includes(sg)).map((sg) => (
                     <button
                       key={sg}
                       type="button"
                       className="qs-sugchip"
+                      aria-label={`Add ${sg}${sfx}`}
                       disabled={p.stages.length >= MAX_STAGES}
-                      onClick={() => setRow(pi, { ...p, stages: [...p.stages, sg] })}
+                      onClick={() => {
+                        pendingFocus.current = `p${pi}-add`
+                        setRow(pi, { ...p, stages: [...p.stages, sg] })
+                      }}
                     >
                       + {sg}
                     </button>
@@ -185,12 +193,15 @@ export default function PipelinesEditor({
             type="button"
             className="qs-addbtn"
             disabled={rows.length >= MAX_PIPELINES}
-            onClick={() => onChange([...rows, { name: '', stages: [] }])}
+            onClick={() => {
+              pendingFocus.current = `p${rows.length}-name`
+              onChange([...rows, { name: '', stages: [] }])
+            }}
           >
             + Add another sales process
           </button>
           <span className={`qs-count${rows.filter((r) => r.name.trim() || r.stages.length).length > maxPipelines ? ' over' : ''}`}>
-            {rows.filter((r) => r.name.trim() || r.stages.length).length} of {maxPipelines} sales process{maxPipelines === 1 ? '' : 'es'} included
+            {rows.filter((r) => r.name.trim() || r.stages.length).length} sales process{rows.filter((r) => r.name.trim() || r.stages.length).length === 1 ? '' : 'es'} ({maxPipelines} included in your package{rows.filter((r) => r.name.trim() || r.stages.length).length > maxPipelines ? '; we’ll talk through the extra' : ''})
           </span>
         </div>
       )}

@@ -16,7 +16,7 @@ export default function NotFound() {
         <div className="qs-card qs-result">
           <h1 className="qs-title">This link is no longer active</h1>
           <p className="qs-text">
-            This link is no longer active. Please contact us and we&apos;ll send you a fresh one.
+            Onboarding links expire or are replaced when we send a new one. Contact us and we&apos;ll send you a fresh link.
           </p>
           <p style={{ marginTop: 16 }}>
             <Link className="as-btn as-btn-primary" href="/contact-2/">Contact us</Link>

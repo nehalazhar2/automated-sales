@@ -27,7 +27,13 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
   const invalid = error ? true : undefined
   const describedBy = [f.hint ? hintId : null, error ? eid : null].filter(Boolean).join(' ') || undefined
   const hintEl = f.hint ? <div id={hintId} className="qs-hint">{f.hint}</div> : null
-  const errorEl = error ? <div id={eid} className="qs-error">{error}</div> : null
+  const errText =
+    error && f.type === 'users' ? 'Add at least one person’s name, or tick Not sure.'
+    : error && f.type === 'pipelines' ? 'Give your sales process a name, or tick Not sure.'
+    : error
+  const errorEl = error ? <div id={eid} className="qs-error">{errText}</div> : null
+  const req = f.required ? <span className="qs-req" aria-hidden="true"> *</span> : null
+  const aReq = f.required ? true : undefined
   const options = f.options ?? []
   const set = (v: unknown) => onChange(f.key, v)
 
@@ -38,7 +44,7 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
         checked={notSure}
         onChange={(e) => onNotSure(f.key, e.target.checked, emptyFor(f))}
       />
-      <span>Not sure — let&apos;s cover it on the discovery call</span>
+      <span>Not sure — let&apos;s cover it on the discovery call<span className="qs-vh"> ({f.label})</span></span>
     </label>
   ) : null
 
@@ -49,12 +55,13 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
     const selected = multi && Array.isArray(value) ? (value as string[]) : []
     return (
       <fieldset className="qs-field" data-qs-field={f.key} aria-invalid={invalid} aria-describedby={describedBy}>
-        <legend>{f.label}{f.required ? <span className="qs-req"> *</span> : null}</legend>
+        <legend>{f.label}{req}</legend>
         <div className="qs-chips">
           {options.map((o) => (
             <label key={o.value} className="qs-chip">
               <input
                 type={multi ? 'checkbox' : 'radio'}
+                required={!multi && f.required ? true : undefined}
                 name={f.key}
                 value={o.value}
                 disabled={notSure}
@@ -75,7 +82,7 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
   if (f.type === 'users' || f.type === 'pipelines') {
     return (
       <fieldset className="qs-field" data-qs-field={f.key}>
-        <legend>{f.label}{f.required ? <span className="qs-req"> *</span> : null}</legend>
+        <legend>{f.label}{req}</legend>
         {f.type === 'users' ? (
           <UsersEditor id={id} value={value} disabled={notSure} maxUsers={pkg.maxUsers}
             describedBy={describedBy} invalid={!!error} onChange={set} />
@@ -93,9 +100,9 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
 
   return (
     <div className="qs-field" data-qs-field={f.key}>
-      <label className="qs-label" htmlFor={id}>{f.label}{f.required ? <span className="qs-req"> *</span> : null}</label>
+      <label className="qs-label" htmlFor={id}>{f.label}{req}</label>
       {f.type === 'select' ? (
-        <select id={id} className="qs-select" value={str} disabled={notSure} aria-invalid={invalid}
+        <select id={id} className="qs-select" value={str} disabled={notSure} aria-invalid={invalid} aria-required={aReq}
           aria-describedby={describedBy} onChange={(e) => set(e.target.value)}>
           <option value="">Choose…</option>
           {options.map((o) => (
@@ -104,7 +111,7 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
         </select>
       ) : f.type === 'textarea' ? (
         <textarea id={id} className="qs-textarea" value={str} disabled={notSure} maxLength={2000}
-          aria-invalid={invalid} aria-describedby={describedBy} onChange={(e) => set(e.target.value)} />
+          aria-invalid={invalid} aria-required={aReq} aria-describedby={describedBy} onChange={(e) => set(e.target.value)} />
       ) : (
         <input
           id={id}
@@ -116,6 +123,7 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
           value={f.type === 'number' && typeof value === 'number' ? String(value) : str}
           disabled={notSure}
           aria-invalid={invalid}
+          aria-required={aReq}
           aria-describedby={describedBy}
           onChange={(e) => set(e.target.value)}
         />
