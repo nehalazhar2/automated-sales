@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ALL_FIELDS, NOT_SURE, type OnbField } from './sections'
+import { ALL_FIELDS, NOT_SURE, isFieldVisible, pruneHidden, type OnbField } from './sections'
 
 export const MAX_BODY_BYTES = 200 * 1024
 const STR = 2000
@@ -30,7 +30,8 @@ for (const f of ALL_FIELDS) {
 }
 
 /** Lenient: unknown keys (including injected package fields) are stripped. */
-export const onboardingDraftSchema = z.object(shape)
+const base = z.object(shape)
+export const onboardingDraftSchema = base.transform((a) => pruneHidden(a as Record<string, unknown>))
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const URLISH = /^(https?:\/\/)?[^\s./]+(\.[^\s./]+)+(\/\S*)?$/
@@ -42,10 +43,11 @@ function isEmpty(v: unknown): boolean {
   return false
 }
 
-export const onboardingSubmitSchema = onboardingDraftSchema.superRefine((a, ctx) => {
+export const onboardingSubmitSchema = base.superRefine((a, ctx) => {
   const rec = a as Record<string, unknown>
   const add = (key: string, message: string) => ctx.addIssue({ code: 'custom', path: [key], message })
   for (const f of ALL_FIELDS) {
+    if (!isFieldVisible(f, rec)) continue
     const v = rec[f.key]
     if (v === NOT_SURE) continue
     if (f.required) {
@@ -69,7 +71,7 @@ export const onboardingSubmitSchema = onboardingDraftSchema.superRefine((a, ctx)
       if (bad) add(f.key, 'One or more email addresses look incorrect.')
     }
   }
-})
+}).transform((a) => pruneHidden(a as Record<string, unknown>))
 
 export type OnboardingAnswers = Record<string, unknown>
 

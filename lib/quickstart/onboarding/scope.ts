@@ -11,7 +11,10 @@ const nonEmpty = (v: unknown) => typeof v === 'string' && v !== NOT_SURE && v.tr
 /** Human-readable scope warnings. Never blocks; 'not_sure' never warns. */
 export function checkScope(answers: Record<string, unknown>, pkg: PackageLimits): string[] {
   const w: string[] = []
-  const pipelines = arr(answers.pipelines) as { name?: string; stages?: unknown[] }[]
+  const blank = (v: unknown) => typeof v !== 'string' || v.trim() === ''
+  const pipelines = (arr(answers.pipelines) as { name?: string; stages?: unknown[] }[])
+    .map((p) => ({ ...p, stages: arr(p.stages).filter((x) => !blank(x)) }))
+    .filter((p) => !blank(p.name) || p.stages.length > 0)
   if (pipelines.length > pkg.maxPipelines) {
     w.push(`You have listed ${pipelines.length} sales processes; your package includes ${pkg.maxPipelines}. We will talk through the options with you.`)
   }
@@ -19,7 +22,7 @@ export function checkScope(answers: Record<string, unknown>, pkg: PackageLimits)
   if (long.length) {
     w.push(`${long.length === 1 ? 'One sales process has' : 'Some sales processes have'} more than ${pkg.maxStagesPerPipeline} steps, which is the most your package includes. We can help simplify this.`)
   }
-  const users = arr(answers.team_users)
+  const users = (arr(answers.team_users) as { name?: unknown }[]).filter((u) => !blank(u?.name))
   if (users.length > pkg.maxUsers) {
     w.push(`You have listed ${users.length} users; your package includes up to ${pkg.maxUsers}. We will confirm the best way forward.`)
   }

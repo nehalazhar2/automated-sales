@@ -25,6 +25,8 @@ export type Project = {
     status: 'not_sent' | 'draft' | 'submitted'
     answers: Record<string, unknown>
     scope_exceptions: string[]
+    /** Last customer save/submit; used to reject stale tabs. Not bumped by admin actions. */
+    saved_at?: string | null
     versions: { at: string; answers: Record<string, unknown> }[]
   }
   sync: { pipedrive_person_id?: number; pipedrive_lead_id?: string; error?: string }

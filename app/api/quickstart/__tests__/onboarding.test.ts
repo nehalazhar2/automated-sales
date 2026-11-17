@@ -37,7 +37,7 @@ const REQUIRED_OK = {
   team_users: [{ name: 'Jane', email: 'jane@acme.co', role: 'admin' }],
   automation_recipes: ['new_deal_task'],
   reporting_needs: ['forecast'],
-  source_system: 'spreadsheet',
+  bringing_data: 'no',
 }
 
 async function seed(over: Partial<Project['qualification']> = {}, ob: Partial<Project['onboarding']> = {}, now = new Date()) {
@@ -198,11 +198,11 @@ describe('POST submit', () => {
   })
   it('bad email/url -> 400 by field', async () => {
     const { token } = await seed()
-    const res = await POST(mk('POST', { answers: { ...REQUIRED_OK, primary_admin_email: 'nope', website: 'not a url' } }), ctx(token))
+    const res = await POST(mk('POST', { answers: { ...REQUIRED_OK, primary_admin_email: 'nope', pipedrive_account_url: 'not a url' } }), ctx(token))
     const j = await res.json()
     expect(res.status).toBe(400)
     expect(j.fieldErrors.primary_admin_email).toBeTruthy()
-    expect(j.fieldErrors.website).toBeTruthy()
+    expect(j.fieldErrors.pipedrive_account_url).toBeTruthy()
   })
   it('success records version, exceptions, status and notifies staff', async () => {
     const { token, p } = await seed()
@@ -239,6 +239,57 @@ describe('POST submit', () => {
     const res = await POST(mk('POST', { answers: REQUIRED_OK }), ctx(token))
     expect(res.status).toBe(409)
     expect(await res.json()).toEqual({ ok: false, error: 'already_submitted' })
+  })
+})
+
+describe('conditional fields, seeding, stale writes', () => {
+  it('draft save prunes hidden fields', async () => {
+    const { token, p } = await seed()
+    await PUT(mk('PUT', { answers: { bringing_data: 'no', import_rows: '1001_5000', approver_same: 'yes', approver_name: 'X', lead_qualified_first: 'no', qualification_criteria: ['budget'] } }), ctx(token))
+    expect((await getStore().get(p.project_id))!.onboarding.answers).toEqual({
+      bringing_data: 'no', approver_same: 'yes', lead_qualified_first: 'no',
+    })
+  })
+  it('submit skips format checks for hidden fields and prunes them', async () => {
+    const { token, p } = await seed()
+    const res = await POST(mk('POST', { answers: { ...REQUIRED_OK, approver_same: 'yes', approver_email: 'nope' } }), ctx(token))
+    expect(res.status).toBe(200)
+    expect((await getStore().get(p.project_id))!.onboarding.answers).not.toHaveProperty('approver_email')
+    const { token: t2 } = await seed()
+    const bad = await POST(mk('POST', { answers: { ...REQUIRED_OK, approver_same: 'no', approver_email: 'nope' } }), ctx(t2))
+    expect(bad.status).toBe(400)
+  })
+  it('GET seeds from qualification answers when untouched, without persisting', async () => {
+    const { token, p } = await seed({ answers: { migration: 'yes', current_system: 'spreadsheet', records: '1001_5000', clean_export: 'yes', data_types: ['contacts', 'emails'] } })
+    const j = await (await GET(mk('GET'), ctx(token))).json()
+    expect(j.answers).toEqual({ bringing_data: 'yes', source_system: 'spreadsheet', import_rows: '1001_5000', clean_file_available: 'yes', data_types: ['contacts'] })
+    expect(j.savedAt).toBeUndefined()
+    expect((await getStore().get(p.project_id))!.onboarding.answers).toEqual({})
+  })
+  it('GET does not seed once a draft exists', async () => {
+    const { token } = await seed({ answers: { migration: 'yes' } })
+    const saved = await (await PUT(mk('PUT', { answers: { business_description: 'x' }, baseSavedAt: null }), ctx(token))).json()
+    const j = await (await GET(mk('GET'), ctx(token))).json()
+    expect(j.answers).toEqual({ business_description: 'x' })
+    expect(j.savedAt).toBe(saved.savedAt)
+  })
+  it('stale PUT -> 409 with current answers and savedAt; matching base succeeds', async () => {
+    const { token } = await seed()
+    const first = await (await PUT(mk('PUT', { answers: { business_description: 'new' }, baseSavedAt: null }), ctx(token))).json()
+    const stale = await PUT(mk('PUT', { answers: { business_description: 'old tab' }, baseSavedAt: null }), ctx(token))
+    expect(stale.status).toBe(409)
+    const sj = await stale.json()
+    expect(sj).toMatchObject({ ok: false, error: 'stale', savedAt: first.savedAt, answers: { business_description: 'new' } })
+    const ok = await PUT(mk('PUT', { answers: { business_description: 'newer' }, baseSavedAt: first.savedAt }), ctx(token))
+    expect(ok.status).toBe(200)
+  })
+  it('stale POST submit -> 409 stale', async () => {
+    const { token } = await seed()
+    const first = await (await PUT(mk('PUT', { answers: { business_description: 'a' }, baseSavedAt: null }), ctx(token))).json()
+    const res = await POST(mk('POST', { answers: REQUIRED_OK, baseSavedAt: null }), ctx(token))
+    expect(res.status).toBe(409)
+    expect((await res.json()).error).toBe('stale')
+    expect((await POST(mk('POST', { answers: REQUIRED_OK, baseSavedAt: first.savedAt }), ctx(token))).status).toBe(200)
   })
 })
 

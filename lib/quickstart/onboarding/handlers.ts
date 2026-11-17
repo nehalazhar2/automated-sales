@@ -6,6 +6,8 @@ import { hashToken, isTokenExpired, isWellFormedToken } from '../tokens'
 import type { Project } from '../types'
 import { MAX_BODY_BYTES, buildFieldErrors, onboardingDraftSchema, onboardingSubmitSchema } from './schema'
 import { checkScope } from './scope'
+import { seedFromQualification } from './seed'
+import { pruneHidden } from './sections'
 
 type Result = { status: number; body: Record<string, unknown> }
 
@@ -58,7 +60,7 @@ async function resolve(token: string): Promise<{ project: Project; pkg: PackageL
   return { project, pkg }
 }
 
-async function readAnswers(req: Request): Promise<{ result: Result } | { raw: unknown }> {
+async function readAnswers(req: Request): Promise<{ result: Result } | { raw: unknown; base: string | null }> {
   const len = Number(req.headers.get('content-length') ?? 0)
   if (len > MAX_BODY_BYTES) return { result: { status: 413, body: { ok: false, error: 'too_large' } } }
   let text: string
@@ -69,9 +71,12 @@ async function readAnswers(req: Request): Promise<{ result: Result } | { raw: un
   }
   if (text.length > MAX_BODY_BYTES) return { result: { status: 413, body: { ok: false, error: 'too_large' } } }
   try {
-    const raw = (JSON.parse(text) as { answers?: unknown } | null)?.answers
+    const parsed = JSON.parse(text) as { answers?: unknown; baseSavedAt?: unknown } | null
+    const raw = parsed?.answers
     if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw new Error('shape')
-    return { raw }
+    const base = parsed?.baseSavedAt ?? null
+    if (base !== null && typeof base !== 'string') throw new Error('shape')
+    return { raw, base }
   } catch {
     return { result: { status: 400, body: { ok: false, error: 'invalid_body' } } }
   }
@@ -95,16 +100,18 @@ export async function getOnboarding(req: Request, token: string): Promise<Respon
   if (!g.found) return json(g.result)
   const { project, pkg } = g.found
   const ob = project.onboarding
+  const untouched = ob.status === 'not_sent' && Object.keys(ob.answers).length === 0
+  const answers = untouched ? pruneHidden(seedFromQualification(project.qualification.answers)) : ob.answers
   return json({
     status: 200,
     body: {
       ok: true,
       company: project.contact.company,
       package: pkg,
-      answers: ob.answers,
+      answers,
       status: ob.status,
-      warnings: checkScope(ob.answers, pkg),
-      ...(ob.status !== 'not_sent' ? { savedAt: project.updated_at } : {}),
+      warnings: checkScope(answers, pkg),
+      ...(ob.saved_at ? { savedAt: ob.saved_at } : {}),
     },
   })
 }
@@ -116,6 +123,12 @@ export async function saveDraft(req: Request, token: string): Promise<Response> 
   if (project.onboarding.status === 'submitted') return json(ALREADY)
   const body = await readAnswers(req)
   if ('result' in body) return json(body.result)
+  if ((body.base ?? null) !== (project.onboarding.saved_at ?? null)) {
+    return json({
+      status: 409,
+      body: { ok: false, error: 'stale', answers: project.onboarding.answers, savedAt: project.onboarding.saved_at ?? null },
+    })
+  }
   const parsed = onboardingDraftSchema.safeParse(body.raw)
   if (!parsed.success) {
     return json({ status: 400, body: { ok: false, error: 'invalid', fieldErrors: buildFieldErrors(parsed.error) } })
@@ -124,6 +137,7 @@ export async function saveDraft(req: Request, token: string): Promise<Response> 
   const savedAt = new Date().toISOString()
   project.onboarding.answers = answers
   project.onboarding.status = 'draft'
+  project.onboarding.saved_at = savedAt
   project.updated_at = savedAt
   try {
     await getStore().put(project)
@@ -141,6 +155,12 @@ export async function submitOnboarding(req: Request, token: string): Promise<Res
   if (project.onboarding.status === 'submitted') return json(ALREADY)
   const body = await readAnswers(req)
   if ('result' in body) return json(body.result)
+  if ((body.base ?? null) !== (project.onboarding.saved_at ?? null)) {
+    return json({
+      status: 409,
+      body: { ok: false, error: 'stale', answers: project.onboarding.answers, savedAt: project.onboarding.saved_at ?? null },
+    })
+  }
   const parsed = onboardingSubmitSchema.safeParse(body.raw)
   if (!parsed.success) {
     return json({ status: 400, body: { ok: false, error: 'invalid', fieldErrors: buildFieldErrors(parsed.error) } })
@@ -151,6 +171,7 @@ export async function submitOnboarding(req: Request, token: string): Promise<Res
   project.onboarding.answers = answers
   project.onboarding.versions.push({ at: submittedAt, answers })
   project.onboarding.status = 'submitted'
+  project.onboarding.saved_at = submittedAt
   project.onboarding.scope_exceptions = warnings
   project.updated_at = submittedAt
   try {
