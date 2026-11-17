@@ -33,6 +33,7 @@ export type Project = {
     pipedrive_person_id?: number
     pipedrive_lead_id?: string
     pipedrive_lead_url?: string
+    pipedrive_lead_archived?: boolean
     pipedrive_deal_id?: number
     pipedrive_deal_url?: string
     error?: string

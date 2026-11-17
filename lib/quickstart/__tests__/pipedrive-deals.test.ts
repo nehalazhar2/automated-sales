@@ -155,12 +155,21 @@ describe('approval -> deal', () => {
     let s = (await stored(p.project_id)).sync
     expect(s.pipedrive_deal_id).toBe(555)
     expect(s.error).toMatch(/500/)
+    // same-package re-approve retries the archive; still failing keeps the error
+    calls.length = 0
+    await approveProject(p.project_id, 'quickstart', null)
+    expect(calls.map((c) => c.url)).toEqual(['/api/v1/leads/lead-1'])
+    s = (await stored(p.project_id)).sync
+    expect(s.error).toMatch(/500/)
+    expect(s.pipedrive_lead_archived).toBeUndefined()
     failOn = null
     calls.length = 0
     await approveProject(p.project_id, 'plus', 'Upgrade agreed on the phone call.')
     expect(calls.some((c) => c.url === '/api/v2/deals' && c.method === 'POST')).toBe(false)
+    expect(calls.some((c) => c.url === '/api/v1/leads/lead-1')).toBe(true)
     s = (await stored(p.project_id)).sync
     expect(s.error).toBeUndefined()
+    expect(s.pipedrive_lead_archived).toBe(true)
   })
 
   it('timeout/abort is recorded and approval still succeeds', async () => {

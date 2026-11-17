@@ -139,14 +139,23 @@ export async function syncApprovalToPipedrive(
       return false
     }
   }
+  const archiveIfNeeded = async () => {
+    const leadId = sync.pipedrive_lead_id
+    if (leadId && !sync.pipedrive_lead_archived) {
+      if (await step(() => archiveLead(leadId))) sync.pipedrive_lead_archived = true
+    }
+  }
   if (sync.pipedrive_deal_id) {
-    if (previousPackage === approved) return p.sync
     const dealId = sync.pipedrive_deal_id
-    if (await step(() => updateDeal(dealId, { title, value: pkg.priceGbp }))) {
+    if (previousPackage === approved) {
+      // Nothing to change on the deal; only retry a lead archive that never succeeded.
+      if (!sync.pipedrive_lead_id || sync.pipedrive_lead_archived) return p.sync
+    } else if (await step(() => updateDeal(dealId, { title, value: pkg.priceGbp }))) {
       await step(async () => {
         await createNote({ dealId, content: buildApprovalNoteHtml(p, true) })
       })
     }
+    await archiveIfNeeded()
   } else {
     let personId = sync.pipedrive_person_id
     let dealId: number | undefined
@@ -174,8 +183,7 @@ export async function syncApprovalToPipedrive(
       await step(async () => {
         await createNote({ dealId: id, content: buildApprovalNoteHtml(p, false) })
       })
-      const leadId = sync.pipedrive_lead_id
-      if (leadId) await step(() => archiveLead(leadId))
+      await archiveIfNeeded()
     }
   }
   if (failures.length === 0) {
