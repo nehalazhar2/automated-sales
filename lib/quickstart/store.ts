@@ -141,7 +141,8 @@ function blobBackend(): Backend {
 export function getStore(): Store {
   if (process.env.BLOB_READ_WRITE_TOKEN) return makeStore(blobBackend())
   // Serverless filesystems are ephemeral: without Blob every lead would be lost.
-  if (process.env.VERCEL) {
+  // `vercel dev` (VERCEL_ENV=development) runs locally, so the file store stays allowed there.
+  if (process.env.VERCEL && process.env.VERCEL_ENV !== 'development') {
     throw new Error('QuickStart storage not configured: set BLOB_READ_WRITE_TOKEN')
   }
   const root = process.env.QUICKSTART_DATA_DIR ?? path.join(process.cwd(), '.data/quickstart')

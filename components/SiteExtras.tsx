@@ -11,7 +11,8 @@ const QUICKSTART_PREFIX = '/pipedrive-quickstart';
 /** True for QuickStart routes, where private tokens live in the URL path. */
 export function isQuickstartPath(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
-  return pathname === QUICKSTART_PREFIX || pathname.startsWith(`${QUICKSTART_PREFIX}/`);
+  const p = pathname.toLowerCase();
+  return p === QUICKSTART_PREFIX || p.startsWith(`${QUICKSTART_PREFIX}/`);
 }
 
 /** Chat widget, attribution trackers (rendered in `place="top"`) and third-party scripts

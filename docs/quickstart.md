@@ -38,13 +38,13 @@ See `.env.example`.
 ## Enabling Blob storage
 
 1. In the Vercel dashboard create a Blob store with **private** access.
-2. Connect it to the **Production** environment only (this sets `BLOB_READ_WRITE_TOKEN`).
-3. On Vercel, if `BLOB_READ_WRITE_TOKEN` is missing the store throws `QuickStart storage not configured: set BLOB_READ_WRITE_TOKEN` and the qualify API returns `500 store_failed`. In production mode the lead's contact details, answers and outcome are emailed to staff (subject starts "STORE FAILED") so nothing is lost.
+2. Connect it to **both Production and Preview** (this sets `BLOB_READ_WRITE_TOKEN`). Without it Preview deployments cannot save projects. Data stays isolated by the `VERCEL_ENV` path prefix (see step 4), so Preview never touches production records.
+3. On Vercel (Preview or Production; `vercel dev` is exempt), if `BLOB_READ_WRITE_TOKEN` is missing the store throws `QuickStart storage not configured: set BLOB_READ_WRITE_TOKEN` and the qualify API returns `500 store_failed`. In production mode the lead's contact details, answers and outcome are emailed to staff (subject starts "STORE FAILED") so nothing is lost.
 4. Blob paths are prefixed with `VERCEL_ENV` (`production/...`, `preview/...`), so environments sharing a store never read each other's data. Locally the prefix is `local/`.
 
 ## Test mode
 
-Side effects (Pipedrive lookups and writes, staff emails) happen only when `VERCEL_ENV === 'production'` and `QUICKSTART_TEST_MODE !== '1'`. Everywhere else the code logs `skipped (test mode)` and projects are flagged `test_mode: true`. Preview deployments and local runs are therefore always safe to click through.
+Side effects (Pipedrive lookups and writes, staff emails) happen only when `VERCEL_ENV === 'production'` and `QUICKSTART_TEST_MODE !== '1'`. Everywhere else the code logs `skipped (test mode)` and projects are flagged `test_mode: true`. Preview deployments and local runs never touch Pipedrive or send staff emails, so they are safe to click through. They do store test projects in Blob under the `preview/` prefix, and onboarding links use `NEXT_PUBLIC_BASE_URL`, so set that on staging.
 
 ## Referral URLs for the pilot
 
@@ -70,7 +70,7 @@ Give each salesperson a link of the form `/pipedrive-quickstart/?ref=<code>`, fo
 
 Run with `QUICKSTART_TEST_MODE=1` set on production first, then unset it for one real submission.
 
-- [ ] `BLOB_READ_WRITE_TOKEN` is set for Production and the store is private.
+- [ ] `BLOB_READ_WRITE_TOKEN` is set for Production and Preview, and the store is private.
 - [ ] `QUICKSTART_ADMIN_KEY`, `QUICKSTART_NOTIFY_TO`, `RESEND_API_KEY` and `NEXT_PUBLIC_BASE_URL` are set.
 - [ ] `/pipedrive-quickstart/?ref=test` loads and prefills the referral detail.
 - [ ] Submit the wizard; the result card shows a recommendation with no reason codes.

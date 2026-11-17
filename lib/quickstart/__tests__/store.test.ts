@@ -122,6 +122,22 @@ describe('getStore configuration', () => {
     expect(() => getStore()).toThrow('QuickStart storage not configured: set BLOB_READ_WRITE_TOKEN')
   })
 
+  it('throws on Vercel preview and production without a token', () => {
+    delete process.env.BLOB_READ_WRITE_TOKEN
+    process.env.VERCEL = '1'
+    for (const env of ['preview', 'production']) {
+      process.env.VERCEL_ENV = env
+      expect(() => getStore()).toThrow('QuickStart storage not configured')
+    }
+  })
+
+  it('allows the file store under `vercel dev` (VERCEL_ENV=development)', () => {
+    delete process.env.BLOB_READ_WRITE_TOKEN
+    process.env.VERCEL = '1'
+    process.env.VERCEL_ENV = 'development'
+    expect(() => getStore()).not.toThrow()
+  })
+
   it('uses local files when not on Vercel and no token', () => {
     delete process.env.BLOB_READ_WRITE_TOKEN
     delete process.env.VERCEL
