@@ -2,6 +2,7 @@
 import { NOT_SURE, type OnbField } from '@/lib/quickstart/onboarding/sections'
 import type { PackageLimits } from '@/lib/quickstart/packages'
 import { errorId, fieldId, toggleMulti } from '../Field'
+import Select from '../Select'
 import PipelinesEditor from './PipelinesEditor'
 import UsersEditor from './UsersEditor'
 
@@ -102,15 +103,10 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
 
   return (
     <div className="qs-field" data-qs-field={f.key}>
-      <label className="qs-label" htmlFor={id}>{f.label}{req}</label>
+      <label className="qs-label" id={`${id}-label`} htmlFor={id}>{f.label}{req}</label>
       {f.type === 'select' ? (
-        <select id={id} className="qs-select" value={str} disabled={notSure} aria-invalid={invalid} aria-required={aReq}
-          aria-describedby={describedBy} onChange={(e) => set(e.target.value)}>
-          <option value="">Choose…</option>
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+        <Select id={id} labelId={`${id}-label`} options={options} value={str} disabled={notSure} invalid={!!invalid}
+          required={f.required} describedBy={describedBy} onChange={set} />
       ) : f.type === 'textarea' ? (
         <textarea id={id} className="qs-textarea" value={str} disabled={notSure} maxLength={2000}
           aria-invalid={invalid} aria-required={aReq} aria-describedby={describedBy} onChange={(e) => set(e.target.value)} />

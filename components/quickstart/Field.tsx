@@ -1,4 +1,5 @@
 'use client'
+import Select from './Select'
 import type { Question } from '@/lib/quickstart/qualification/questions'
 
 export type FieldValue = string | string[] | undefined
@@ -96,22 +97,18 @@ export default function Field({ question: q, value, error, onChange }: Props) {
   const str = typeof value === 'string' ? value : ''
   return (
     <div className="qs-field" data-qs-field={q.key}>
-      <label className="qs-label" htmlFor={id}>{q.label}{req}</label>
+      <label className="qs-label" id={`${id}-label`} htmlFor={id}>{q.label}{req}</label>
       {q.type === 'select' ? (
-        <select
+        <Select
           id={id}
-          className="qs-select"
+          labelId={`${id}-label`}
+          options={options}
           value={str}
-          aria-invalid={invalid}
-          aria-required={q.required || undefined}
-          aria-describedby={describedBy}
-          onChange={(e) => onChange(q.key, e.target.value)}
-        >
-          <option value="">Choose…</option>
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+          invalid={!!invalid}
+          required={q.required}
+          describedBy={describedBy}
+          onChange={(v) => onChange(q.key, v)}
+        />
       ) : q.type === 'textarea' ? (
         <textarea
           id={id}

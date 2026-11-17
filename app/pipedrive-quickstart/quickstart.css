@@ -236,3 +236,47 @@ html:has(.qs-hero){scroll-padding-top:96px}
 @media (forced-colors:active) and (max-width:900px){
   .qs-chip input:checked + span{padding:10px 15px}
 }
+
+/* Custom select (select-only combobox). Popup is positioned in place, inside .qs-cselect. */
+.qs-cselect{position:relative;min-width:0}
+.qs-cselect-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;max-width:100%;min-width:0;
+  min-height:44px;border:1px solid var(--slate-500);border-radius:18px;padding:10px 15px;font:inherit;font-size:14px;text-align:left;
+  background:#fff;color:var(--slate-800);cursor:pointer;
+}
+.qs-cselect-val{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qs-cselect-btn[data-placeholder] .qs-cselect-val{color:var(--slate-600)}
+.qs-cselect-chev{flex:none;color:var(--slate-600)}
+.qs-cselect-btn[aria-expanded="true"] .qs-cselect-chev{transform:rotate(180deg)}
+.qs-cselect-btn:focus-visible,.qs-cselect-btn[aria-expanded="true"]{outline:2px solid var(--emerald-700);outline-offset:1px;border-color:var(--emerald-700)}
+.qs-cselect-btn[aria-invalid="true"]{border-color:#b91c1c}
+.qs-cselect-btn:disabled{background:var(--slate-50);color:var(--slate-500);cursor:not-allowed}
+.qs-cselect-btn:disabled .qs-cselect-val,.qs-cselect-btn:disabled .qs-cselect-chev{color:var(--slate-500)}
+.qs-cselect-list{
+  position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:50;margin:0;padding:6px;list-style:none;box-sizing:border-box;
+  overflow-y:auto;overscroll-behavior:contain;max-height:min(50vh,320px);
+  background:#fff;border:1px solid var(--slate-500);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.18);
+}
+.qs-cselect-list.is-flip{top:auto;bottom:calc(100% + 4px)}
+.qs-cselect-list:focus{outline:none}
+.qs-cselect-opt{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;box-sizing:border-box;padding:10px 12px;
+  border-radius:12px;font-size:14px;color:var(--slate-800);cursor:pointer;
+}
+.qs-cselect-opt.is-empty{color:var(--slate-600)}
+.qs-cselect-opt.is-active{background:var(--emerald-50);outline:2px solid var(--emerald-700);outline-offset:-2px}
+.qs-cselect-opt.is-selected{font-weight:800}
+.qs-cselect-tick{flex:none;color:var(--emerald-700)}
+@media (max-width:900px), (pointer:coarse){
+  .qs-cselect-btn,.qs-cselect-opt{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .qs-cselect-chev{transition:none}
+}
+@media (forced-colors:active){
+  .qs-cselect-btn,.qs-cselect-list{border:1px solid ButtonText}
+  .qs-cselect-btn:focus-visible,.qs-cselect-btn[aria-expanded="true"]{outline:2px solid Highlight}
+  .qs-cselect-btn:disabled{border-color:GrayText;color:GrayText}
+  .qs-cselect-opt.is-active,.qs-cselect-opt.is-selected{background:Highlight;color:HighlightText;forced-color-adjust:none;outline:none}
+  .qs-cselect-opt.is-active .qs-cselect-tick,.qs-cselect-opt.is-selected .qs-cselect-tick{color:HighlightText}
+}
