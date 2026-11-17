@@ -139,9 +139,12 @@
 .qs-review-req{font-size:12px;font-weight:800;color:#92400e;margin-top:4px}
 
 @media (max-width:900px){
-  .qs-ob{grid-template-columns:1fr}
+  .qs-ob{grid-template-columns:minmax(0,1fr)}
+  .qs-side,.qs-main{min-width:0}
   .qs-side{padding:18px 14px}
+  .qs-side nav{min-width:0;max-width:100%;overflow-x:auto}
   .qs-side-list{display:flex;overflow-x:auto;gap:6px;padding-bottom:6px}
+  .qs-side-list li{flex:0 0 auto}
   .qs-sec{white-space:nowrap;width:auto}
   .qs-main{padding:24px 18px}
   .qs-user{grid-template-columns:1fr 1fr}
