@@ -60,6 +60,13 @@
 .qs-btn-green{background:var(--emerald-600);color:#fff;box-shadow:0 14px 28px rgba(5,150,105,.2)}
 .qs-btn-green:hover{transform:translateY(-2px);background:var(--emerald-700)}
 
+/* Result state: centred full-width card on the muted background */
+.qs-hero:has(.qs-result){background:var(--slate-50)}
+.qs-grid:has(.qs-result){grid-template-columns:1fr}
+.qs-grid:has(.qs-result) .qs-intro{display:none}
+.qs-result:focus,.qs-result h2:focus{outline:none}
+.qs-result{width:100%}
+
 @media (max-width:900px){
   .qs-grid{grid-template-columns:1fr}
 }

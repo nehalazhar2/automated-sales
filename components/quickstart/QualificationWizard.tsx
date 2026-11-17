@@ -118,6 +118,7 @@ export default function QualificationWizard({ initialReferralDetail = '' }: { in
         for (const [k, msgs] of Object.entries(body.fieldErrors ?? {})) {
           if (known.has(k) && msgs?.[0]) mapped[k] = msgs[0]
         }
+        // Exact mapping from the server; client re-validation only when nothing could be mapped.
         if (Object.keys(mapped).length === 0) {
           for (const s of STEPS) Object.assign(mapped, validateStep(answers, s.n))
         }

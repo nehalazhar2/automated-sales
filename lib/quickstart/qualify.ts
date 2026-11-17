@@ -1,5 +1,6 @@
 import 'server-only'
 import { randomUUID } from 'node:crypto'
+import type { ZodError } from 'zod'
 import { PACKAGES, SCOPE_VERSION } from './packages'
 import { qualSubmitSchema, type QualAnswers } from './qualification/schema'
 import { routeQualification } from './qualification/routing'
@@ -131,6 +132,16 @@ async function runQualify(submissionId: string, answers: QualAnswers): Promise<R
   return responseFor(project)
 }
 
+/** Key issues under `answers.<key>` by `<key>`; others by their first path segment. */
+function buildFieldErrors(error: ZodError): Record<string, string[]> {
+  const out: Record<string, string[]> = {}
+  for (const issue of error.issues) {
+    const key = String(issue.path[0] === 'answers' && issue.path.length > 1 ? issue.path[1] : (issue.path[0] ?? '_'))
+    ;(out[key] ??= []).push(issue.message)
+  }
+  return out
+}
+
 export async function handleQualify(req: Request): Promise<Response> {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -155,7 +166,7 @@ export async function handleQualify(req: Request): Promise<Response> {
   if (!parsed.success) {
     return json({
       status: 400,
-      body: { ok: false, error: 'invalid_body', fieldErrors: parsed.error.flatten().fieldErrors },
+      body: { ok: false, error: 'invalid_body', fieldErrors: buildFieldErrors(parsed.error) },
     })
   }
   const { submissionId, answers } = parsed.data

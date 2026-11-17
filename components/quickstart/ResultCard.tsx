@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { PackageLimits } from '@/lib/quickstart/packages'
 
@@ -13,13 +13,20 @@ const CONFIRM = 'Thanks — we’ve got your request. We’ll be in touch within
 
 export default function ResultCard({ result }: { result: QualifyResult }) {
   const [confirmed, setConfirmed] = useState(false)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    const h = headingRef.current
+    if (!h) return
+    h.focus()
+    h.scrollIntoView({ block: 'center' })
+  }, [])
   const { outcome, package: pkg } = result
 
   if ((outcome === 'quickstart' || outcome === 'plus') && pkg) {
     return (
       <div className="qs-card qs-result" aria-live="polite">
         <span className="qs-badge">Recommended for you</span>
-        <h2>{pkg.name}</h2>
+        <h2 ref={headingRef} tabIndex={-1}>{pkg.name}</h2>
         <p className="qs-price">
           {gbp(pkg.priceGbp)} <small>indicative, excl. VAT and Pipedrive licences</small>
         </p>
@@ -49,7 +56,7 @@ export default function ResultCard({ result }: { result: QualifyResult }) {
   if (outcome === 'bespoke') {
     return (
       <div className="qs-card qs-result" aria-live="polite">
-        <h2>A tailored implementation</h2>
+        <h2 ref={headingRef} tabIndex={-1}>A tailored implementation</h2>
         <p className="qs-text">
           Your requirements would benefit from a tailored implementation. Let&apos;s discuss the best solution.
         </p>
@@ -63,7 +70,7 @@ export default function ResultCard({ result }: { result: QualifyResult }) {
   // review (and any unexpected outcome): never show a price
   return (
     <div className="qs-card qs-result" aria-live="polite">
-      <h2>Thanks — we&apos;ll review your requirements</h2>
+      <h2 ref={headingRef} tabIndex={-1}>Thanks — we&apos;ll review your requirements</h2>
       <p className="qs-text">We&apos;ll look over your answers and be in touch within one working day.</p>
       <div className="qs-confirm" role="status">
         Your requirements have been sent for review.

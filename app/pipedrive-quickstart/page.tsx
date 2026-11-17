@@ -22,7 +22,7 @@ export default async function Page({
   return (
     <section className="as-hero qs-hero">
       <div className="as-container qs-grid">
-        <div>
+        <div className="qs-intro">
           <span className="as-eyebrow">Pipedrive QuickStart</span>
           <h1>Get Pipedrive set up properly, without the back-and-forth.</h1>
           <p className="as-lead">
