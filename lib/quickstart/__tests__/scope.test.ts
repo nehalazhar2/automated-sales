@@ -40,6 +40,20 @@ describe('checkScope', () => {
     expect(checkScope({ import_rows: '1001_5000' }, plus)).toEqual([])
     expect(checkScope({ import_rows: '5001_plus' }, plus)).toHaveLength(1)
   })
+  it('warns when historical deals are requested, not for other data types', () => {
+    const w = checkScope({ data_types: ['contacts', 'historical_deals'] }, plus)
+    expect(w).toHaveLength(1)
+    expect(w[0]).toMatch(/past \(closed\) deals/)
+    expect(checkScope({ data_types: ['contacts', 'companies', 'open_opportunities'] }, qs)).toEqual([])
+    expect(checkScope({ data_types: 'not_sure' }, qs)).toEqual([])
+  })
+  it('warns when import batches exceed the package allowance', () => {
+    expect(checkScope({ import_batches: 'one' }, qs)).toEqual([])
+    expect(checkScope({ import_batches: 'two' }, qs)).toHaveLength(1)
+    expect(checkScope({ import_batches: 'two' }, plus)).toEqual([])
+    expect(checkScope({ import_batches: 'three_plus' }, plus)).toHaveLength(1)
+    expect(checkScope({ import_batches: 'not_sure' }, qs)).toEqual([])
+  })
   it('warns when customer fields exceed the limit', () => {
     const extra = Array.from({ length: 10 }, (_, i) => `f${i}`).join('\n')
     expect(checkScope({ customer_fields: ['a', 'b', 'c', 'd', 'e', 'f'], customer_extra_fields: extra }, qs)).toHaveLength(1)
@@ -99,7 +113,7 @@ describe('field budget and visibility', () => {
     expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, { pipedrive_plan: 'no_account' })).toBe(false)
     expect(FIELD_BY_KEY.lead_responder).toMatchObject({ type: 'text', allowNotSure: true })
     expect(FIELD_BY_KEY.lead_allocation.hint ?? '').not.toMatch(/above/)
-    expect(ALL_FIELDS.length).toBe(51)
+    expect(ALL_FIELDS.length).toBe(52)
     expect(checkScope({ reporting_needs: ['targets'] }, PACKAGES.quickstart)).toEqual([])
   })
   it('pipelines offers the ten suggested steps', () => {
