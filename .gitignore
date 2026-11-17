@@ -12,3 +12,5 @@ next-env.d.ts
 # QuickStart local data
 .data/
 .playwright-mcp/
+.vercel
+.env*
