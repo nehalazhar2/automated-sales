@@ -95,6 +95,11 @@ describe('field budget and visibility', () => {
     expect(isFieldVisible(FIELD_BY_KEY.stage_criteria, { pipelines: [{ name: 'A', stages: [] }] })).toBe(true)
     expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, {})).toBe(false)
     expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, { pipedrive_plan: 'growth' })).toBe(true)
+    expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, { pipedrive_plan: 'not_sure' })).toBe(true)
+    expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, { pipedrive_plan: 'no_account' })).toBe(false)
+    expect(FIELD_BY_KEY.lead_responder).toMatchObject({ type: 'text', allowNotSure: true })
+    expect(FIELD_BY_KEY.lead_allocation.hint ?? '').not.toMatch(/above/)
+    expect(ALL_FIELDS.length).toBe(51)
     expect(checkScope({ reporting_needs: ['targets'] }, PACKAGES.quickstart)).toEqual([])
   })
   it('pipelines offers the ten suggested steps', () => {
