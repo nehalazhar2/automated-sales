@@ -10,7 +10,7 @@ export type QualifyResult = {
 
 const gbp = (n: number) => `£${n.toLocaleString('en-GB')}`
 const RECEIVED = 'We’ve received your answers and will be in touch within one working day to confirm scope. No payment is taken at this stage.'
-const CONFIRM = 'Thanks, we’ve noted that you’d like to go ahead. We’ll be in touch within one working day to confirm scope.'
+const CONFIRM = 'Great — we have your answers and will be in touch within one working day to confirm scope.'
 
 export default function ResultCard({ result }: { result: QualifyResult }) {
   const [confirmed, setConfirmed] = useState(false)

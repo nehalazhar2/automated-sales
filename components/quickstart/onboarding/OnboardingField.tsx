@@ -27,9 +27,11 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
   const invalid = error ? true : undefined
   const describedBy = [f.hint ? hintId : null, error ? eid : null].filter(Boolean).join(' ') || undefined
   const hintEl = f.hint ? <div id={hintId} className="qs-hint">{f.hint}</div> : null
+  // Only the generic "required" message is rewritten; any other server message is shown as is.
+  const isRequiredMsg = !!error && error.startsWith('Please answer')
   const errText =
-    error && f.type === 'users' ? 'Add at least one person’s name, or tick Not sure.'
-    : error && f.type === 'pipelines' ? 'Give your sales process a name, or tick Not sure.'
+    isRequiredMsg && f.type === 'users' ? 'Add at least one person’s name, or tick Not sure.'
+    : isRequiredMsg && f.type === 'pipelines' ? 'Give your sales process a name, or tick Not sure.'
     : error
   const errorEl = error ? <div id={eid} className="qs-error">{errText}</div> : null
   const req = f.required ? <span className="qs-req" aria-hidden="true"> *</span> : null
@@ -85,7 +87,7 @@ export default function OnboardingField({ field: f, value, error, pkg, onChange,
         <legend>{f.label}{req}</legend>
         {f.type === 'users' ? (
           <UsersEditor id={id} value={value} disabled={notSure} maxUsers={pkg.maxUsers}
-            describedBy={describedBy} invalid={!!error} onChange={set} />
+            describedBy={describedBy} invalid={isRequiredMsg} emailInvalid={!!error && !isRequiredMsg} onChange={set} />
         ) : (
           <PipelinesEditor id={id} value={value} disabled={notSure} suggestions={f.suggestions}
             maxPipelines={pkg.maxPipelines} maxStages={pkg.maxStagesPerPipeline}

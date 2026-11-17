@@ -310,8 +310,19 @@ export default function OnboardingForm({
   }, [step])
 
   // Bring the current section into view in the mobile strip.
+  // Scrolls only the strip itself (never the page), and not on first render.
+  const stripMounted = useRef(false)
   useEffect(() => {
-    document.querySelector<HTMLElement>('.qs-sec.cur')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+    if (!stripMounted.current) {
+      stripMounted.current = true
+      return
+    }
+    const cur = formRef.current?.querySelector<HTMLElement>('.qs-sec.cur')
+    const strip = formRef.current?.querySelector<HTMLElement>('.qs-side-list')
+    if (!cur || !strip || strip.scrollWidth <= strip.clientWidth) return
+    const c = cur.getBoundingClientRect()
+    const r = strip.getBoundingClientRect()
+    strip.scrollLeft += c.left - r.left - (r.width - c.width) / 2
   }, [step])
 
   // When saving stops because the draft changed elsewhere, make the banner impossible to miss.

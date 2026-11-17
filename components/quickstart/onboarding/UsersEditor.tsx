@@ -11,6 +11,8 @@ type Props = {
   maxUsers: number
   describedBy?: string
   invalid?: boolean
+  /** The server rejected one or more email addresses: mark the ones that fail a basic check. */
+  emailInvalid?: boolean
   onChange: (rows: UserRow[]) => void
 }
 
@@ -24,9 +26,12 @@ export function toUserRows(v: unknown): UserRow[] {
   }))
 }
 
+/** Basic shape check, only used to point at the likely-wrong address after a server rejection. */
+const badEmail = (v: string) => v.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
+
 const BLANK: UserRow = { name: '', email: '', role: 'regular' }
 
-export default function UsersEditor({ id, value, disabled, maxUsers, describedBy, invalid, onChange }: Props) {
+export default function UsersEditor({ id, value, disabled, maxUsers, describedBy, invalid, emailInvalid, onChange }: Props) {
   const parsed = toUserRows(value)
   const rows = parsed.length ? parsed : [BLANK]
   const named = rows.filter((r) => r.name.trim() !== '').length
@@ -53,7 +58,10 @@ export default function UsersEditor({ id, value, disabled, maxUsers, describedBy
           <div>
             <label className="qs-sublabel" htmlFor={`${id}-${i}-email`}>Work email</label>
             <input id={`${id}-${i}-email`} className="qs-input" type="email" inputMode="email" value={r.email} disabled={disabled}
-              maxLength={200} autoComplete="off" onChange={(e) => setRow(i, { email: e.target.value })} />
+              maxLength={200} autoComplete="off"
+              aria-invalid={emailInvalid && badEmail(r.email) ? true : undefined}
+              aria-describedby={emailInvalid && badEmail(r.email) ? describedBy : undefined}
+              onChange={(e) => setRow(i, { email: e.target.value })} />
           </div>
           <div>
             <label className="qs-sublabel" htmlFor={`${id}-${i}-role`}>Access</label>
