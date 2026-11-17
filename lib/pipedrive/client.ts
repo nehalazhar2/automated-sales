@@ -98,3 +98,10 @@ export async function createLead(input: {
   const domain = process.env.PIPEDRIVE_DOMAIN;
   return { id, url: `https://${domain}.pipedrive.com/leads/inbox/${id}` };
 }
+
+export async function countOpenDealsForPerson(personId: number): Promise<number> {
+  const data = (await call(
+    `/api/v2/deals?person_id=${encodeURIComponent(String(personId))}&status=open&limit=1`
+  )) as { data?: unknown[] };
+  return data.data?.length ?? 0;
+}
