@@ -174,3 +174,19 @@
 - [ ] Step 2: Run → FAIL.
 - [ ] Step 3: Verify each endpoint against the official Pipedrive API docs (v2 deals create/update, v1/v2 lead archive via `is_archived`, notes `deal_id`) before implementing; implement.
 - [ ] Step 4: `npm test`, `npm run typecheck`, `npm run build` → PASS. Commit.
+
+### Task 11: Custom accessible select (replace native dropdowns)
+
+**Spec:** `docs/superpowers/specs/2026-11-17-quickstart-custom-select-design.md`
+
+**Files:**
+- Create: `components/quickstart/Select.tsx` (client component), `components/quickstart/selectKeys.ts` (pure keyboard/type-ahead reducer), `lib/quickstart/__tests__/selectKeys.test.ts`
+- Modify: `components/quickstart/Field.tsx`, `components/quickstart/onboarding/OnboardingField.tsx`, any remaining `<select>` under `components/quickstart/**`, `app/pipedrive-quickstart/quickstart.css` (`.qs-cselect*`, R18-scoped)
+
+**Interfaces:**
+- `Select({ id, labelId, options: {value,label}[], value: string, onChange(v), placeholder='Choose…', disabled?, invalid?, describedBy?, required?, name? })` — `name` renders a hidden input.
+- `selectKeys(state: { open: boolean; active: number; typed: string; typedAt: number }, key: string, ctx: { count: number; labels: string[]; selected: number; now: number }): { state; action?: 'open'|'close'|'select'|'selectAndTab' }`
+
+- [ ] Step 1: Reducer tests: Down/Up/Home/End/PageUp/PageDown bounds; Enter/Space/Alt+Down open; Esc closes without select; Tab selects active; type-ahead jumps to first match, repeated letter cycles, buffer resets after 500ms.
+- [ ] Step 2: Run → FAIL. Step 3: implement reducer + component; replace all native selects. Step 4: tests/typecheck/build PASS.
+- [ ] Step 5: Browser verification (Playwright, port 3124): every QuickStart select operable by keyboard only and by pointer; open popup is adjacent to its trigger (≤8px below, or flipped ≤8px above) and fully inside the viewport at 320/375/768/1024/1440, 740×360 and 932×430 (touch), 1152/960/819/683; forced-colors shows active/selected; overlap audit still passes. Commit.
