@@ -198,7 +198,7 @@ describe('POST submit', () => {
   })
   it('bad email/url -> 400 by field', async () => {
     const { token } = await seed()
-    const res = await POST(mk('POST', { answers: { ...REQUIRED_OK, primary_admin_email: 'nope', pipedrive_account_url: 'not a url' } }), ctx(token))
+    const res = await POST(mk('POST', { answers: { ...REQUIRED_OK, pipedrive_plan: 'growth', primary_admin_email: 'nope', pipedrive_account_url: 'not a url' } }), ctx(token))
     const j = await res.json()
     expect(res.status).toBe(400)
     expect(j.fieldErrors.primary_admin_email).toBeTruthy()

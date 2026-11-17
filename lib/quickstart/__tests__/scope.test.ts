@@ -68,7 +68,7 @@ describe('SECTIONS', () => {
 
 describe('field budget and visibility', () => {
   it('keeps the form short', () => {
-    expect(ALL_FIELDS.length).toBeLessThanOrEqual(48)
+    expect(ALL_FIELDS.length).toBeLessThanOrEqual(52)
     for (const s of SECTIONS) expect(s.fields.filter((f) => isFieldVisible(f, {})).length).toBeLessThanOrEqual(9)
     for (const k of ['company_name', 'website', 'separate_processes']) expect(FIELD_BY_KEY[k]).toBeUndefined()
   })
@@ -88,6 +88,14 @@ describe('field budget and visibility', () => {
     expect(isFieldVisible(FIELD_BY_KEY.import_rows, { bringing_data: 'not_sure' })).toBe(true)
     expect(isFieldVisible(FIELD_BY_KEY.recipe_details, { automation_recipes: ['none'] })).toBe(false)
     expect(isFieldVisible(FIELD_BY_KEY.recipe_details, { automation_recipes: ['new_deal_task'] })).toBe(true)
+  })
+  it('restores covered brief items and keeps targets standard', () => {
+    for (const k of ['email_provider', 'currency', 'activity_types', 'stage_criteria']) expect(FIELD_BY_KEY[k]).toBeDefined()
+    expect(isFieldVisible(FIELD_BY_KEY.stage_criteria, {})).toBe(false)
+    expect(isFieldVisible(FIELD_BY_KEY.stage_criteria, { pipelines: [{ name: 'A', stages: [] }] })).toBe(true)
+    expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, {})).toBe(false)
+    expect(isFieldVisible(FIELD_BY_KEY.pipedrive_account_url, { pipedrive_plan: 'growth' })).toBe(true)
+    expect(checkScope({ reporting_needs: ['targets'] }, PACKAGES.quickstart)).toEqual([])
   })
   it('pipelines offers the ten suggested steps', () => {
     expect(FIELD_BY_KEY.pipelines.suggestions).toEqual(['Enquiry', 'Qualification', 'Discovery', 'Demo', 'Survey', 'Quote', 'Approval', 'Negotiation', 'Contract', 'Deposit'])
