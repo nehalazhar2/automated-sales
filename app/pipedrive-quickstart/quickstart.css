@@ -17,13 +17,13 @@
 .qs-form{display:grid;gap:4px}
 .qs-field{border:0;margin:0;padding:0;min-width:0;display:block}
 .qs-label,.qs-field legend{display:block;font-size:13px;font-weight:900;color:var(--slate-700);margin:14px 0 6px;padding:0}
-.qs-input,.qs-select,.qs-textarea{
+.qs-input,.qs-textarea{
   width:100%;border:1px solid var(--slate-500);border-radius:18px;padding:12px 15px;font:inherit;font-size:14px;
   background:#fff;color:var(--slate-800);
 }
 .qs-textarea{min-height:110px;resize:vertical}
-.qs-input:focus,.qs-select:focus,.qs-textarea:focus{outline:2px solid var(--emerald-700);outline-offset:1px;border-color:var(--emerald-700)}
-.qs-input[aria-invalid="true"],.qs-select[aria-invalid="true"],.qs-textarea[aria-invalid="true"]{border-color:#b91c1c}
+.qs-input:focus,.qs-textarea:focus{outline:2px solid var(--emerald-700);outline-offset:1px;border-color:var(--emerald-700)}
+.qs-input[aria-invalid="true"],.qs-textarea[aria-invalid="true"]{border-color:#b91c1c}
 .qs-hint{font-size:13px;color:var(--slate-600);margin-top:6px}
 .qs-error{font-size:13px;font-weight:700;color:#b91c1c;margin-top:6px}
 
@@ -119,7 +119,7 @@
 .qs-notsure input{width:16px;height:16px;accent-color:var(--emerald-600);margin:0}
 .qs-chip input:disabled + span{opacity:.5}
 .qs-chip input:disabled{cursor:not-allowed}
-.qs-input:disabled,.qs-select:disabled,.qs-textarea:disabled{background:var(--slate-50);color:var(--slate-500)}
+.qs-input:disabled,.qs-textarea:disabled{background:var(--slate-50);color:var(--slate-500)}
 
 .qs-sublabel{display:block;font-size:13px;font-weight:800;color:var(--slate-600);margin:10px 0 4px}
 .qs-pipes,.qs-users{display:grid;gap:14px}
@@ -151,7 +151,7 @@
 .qs-user-access{border:0;margin:0;padding:0}
 .qs-user-access legend{display:block;padding:0;font-size:13px;font-weight:800;color:var(--slate-600);margin:10px 0 4px}
 .qs-user-remove{grid-column:1/-1;justify-self:end}
-.qs-input,.qs-select,.qs-textarea{min-width:0;box-sizing:border-box;max-width:100%}
+.qs-input,.qs-textarea{min-width:0;box-sizing:border-box;max-width:100%}
 .qs-stage .qs-input{flex:1 1 0}
 .qs-review{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
 .qs-review li{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--slate-200);border-radius:16px;padding:12px 16px}
@@ -168,6 +168,12 @@
   .qs-side-list.is-open{display:grid}
   .qs-side-list li{min-width:0}
   .qs-sec{padding:12px 12px}
+  .qs-main{padding:24px 18px}
+}
+@media (max-width:900px), (pointer:coarse){
+  .qs-input,.qs-textarea{font-size:16px}
+  .qs-input{min-height:44px}
+  .qs-stage .qs-input{min-height:44px}
   .qs-chip span{padding:11px 16px}
   .qs-notsure{min-height:44px;padding:4px 0}
   .qs-notsure input{width:20px;height:20px}
@@ -175,12 +181,6 @@
   .qs-sugchip{padding:11px 14px}
   .qs-linkbtn{padding:12px 8px}
   .qs-addbtn{padding:12px 14px}
-  .qs-main{padding:24px 18px}
-}
-@media (max-width:900px), (pointer:coarse){
-  .qs-input,.qs-select,.qs-textarea{font-size:16px}
-  .qs-input,.qs-select{min-height:44px}
-  .qs-stage .qs-input{min-height:44px}
 }
 @media (max-width:600px){
   .qs-user{grid-template-columns:minmax(0,1fr)}
@@ -233,7 +233,7 @@ html:has(.qs-hero){scroll-padding-top:96px}
   .qs-sec.done .qs-dot{background:Highlight;color:HighlightText;border-color:Highlight;forced-color-adjust:none}
   .qs-sec.err .qs-dot{border-style:dashed}
 }
-@media (forced-colors:active) and (max-width:900px){
+@media (forced-colors:active) and (max-width:900px), (forced-colors:active) and (pointer:coarse){
   .qs-chip input:checked + span{padding:10px 15px}
 }
 
@@ -278,5 +278,6 @@ html:has(.qs-hero){scroll-padding-top:96px}
   .qs-cselect-btn:focus-visible,.qs-cselect-btn[aria-expanded="true"]{outline:2px solid Highlight}
   .qs-cselect-btn:disabled{border-color:GrayText;color:GrayText}
   .qs-cselect-opt.is-active,.qs-cselect-opt.is-selected{background:Highlight;color:HighlightText;forced-color-adjust:none;outline:none}
+  .qs-cselect-opt.is-active{outline:2px solid HighlightText;outline-offset:-4px}
   .qs-cselect-opt.is-active .qs-cselect-tick,.qs-cselect-opt.is-selected .qs-cselect-tick{color:HighlightText}
 }

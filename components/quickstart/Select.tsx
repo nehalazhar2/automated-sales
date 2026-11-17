@@ -49,7 +49,7 @@ export default function Select({
   id, labelId, options, value, onChange, placeholder = 'Choose…', disabled, invalid, describedBy, required, name,
 }: Props) {
   // Optional fields keep a way to clear the answer (the native select had an empty "Choose…" option).
-  const items: SelectOption[] = required ? options : [{ value: '', label: placeholder }, ...options]
+  const items: SelectOption[] = required ? options : [{ value: '', label: 'No answer' }, ...options]
   const selIdx = items.findIndex((o) => o.value === value)
   const current = selIdx >= 0 ? items[selIdx] : undefined
   const showPlaceholder = !current || current.value === ''
@@ -61,7 +61,8 @@ export default function Select({
   const list = useRef<HTMLUListElement>(null)
   const listId = `${id}-list`
   const optId = (i: number) => `${id}-opt-${i}`
-  const labels = items.map((o) => o.label)
+  // The clear option is excluded from type-ahead (empty label never matches).
+  const labels = items.map((o) => (o.value === '' ? '' : o.label))
 
   const close = useCallback((refocus: boolean) => {
     setSt((s) => ({ ...s, open: false, typed: '' }))
@@ -199,6 +200,7 @@ export default function Select({
           role="listbox"
           tabIndex={-1}
           aria-labelledby={labelId}
+          onMouseDown={(e) => e.preventDefault()}
           className={`qs-cselect-list${placement.flip ? ' is-flip' : ''}`}
           style={{ maxHeight: placement.maxHeight }}
         >

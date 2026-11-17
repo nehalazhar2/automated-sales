@@ -99,6 +99,12 @@ describe('selectKeys type-ahead', () => {
     expect(s.typed).toBe('l')
     expect(s.active).toBe(9)
   })
+  it('skips empty labels (the clear option) in type-ahead', () => {
+    const withClear = ['', 'Cherry', 'Date']
+    const r = selectKeys(open(2), 'c', { count: 3, labels: withClear, selected: -1, now: 1000 })
+    expect(r.state.active).toBe(1)
+    expect(selectKeys(open(1), 'c', { count: 3, labels: withClear, selected: -1, now: 1000 }).state.active).toBe(1)
+  })
   it('no match keeps the active option', () => {
     expect(selectKeys(open(4), 'z', ctx()).state.active).toBe(4)
   })

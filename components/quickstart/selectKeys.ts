@@ -19,7 +19,7 @@ function findMatch(labels: string[], typed: string, active: number): number {
   const start = needle.length === 1 ? active + 1 : active
   for (let i = 0; i < n; i++) {
     const idx = (((start + i) % n) + n) % n
-    if (labels[idx].toLowerCase().startsWith(needle)) return idx
+    if (labels[idx] && labels[idx].toLowerCase().startsWith(needle)) return idx
   }
   return -1
 }
